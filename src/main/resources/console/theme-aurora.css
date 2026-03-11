@@ -169,7 +169,6 @@ body {
 .card-wrapper:hover {
   box-shadow: 0 8px 32px rgba(168, 85, 247, 0.12), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
   border-color: rgba(168, 85, 247, 0.25) !important;
-  transform: translateY(-1px) !important;
 }
 .card-header {
   border-bottom-color: rgba(168, 85, 247, 0.08) !important;
@@ -206,7 +205,6 @@ body {
 }
 .btn.btn-primary:hover {
   box-shadow: 0 6px 24px rgba(168, 85, 247, 0.45), 0 0 40px rgba(236, 72, 153, 0.15) !important;
-  transform: translateY(-1px) !important;
 }
 .btn.btn-primary:active {
   transform: translateY(0) !important;
