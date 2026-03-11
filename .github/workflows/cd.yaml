@@ -12,7 +12,6 @@ jobs:
       contents: write
     with:
       ui-path: "ui"
-      pnpm-version: 9
-      node-version: 22
+      skip-node-setup: true
       java-version: 21
       skip-appstore-release: true
