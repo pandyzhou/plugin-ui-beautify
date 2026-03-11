@@ -244,9 +244,9 @@ body {
 
 /* === 11. Modal === */
 .modal-wrapper .modal-layer {
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(16px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+  background: rgba(0, 0, 0, 0.65) !important;
 }
 .modal-wrapper .modal-content,
 .modal-content {

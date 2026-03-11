@@ -105,8 +105,9 @@
 
 /* --- Modal --- */
 .modal-wrapper .modal-layer {
-  backdrop-filter: none !important;
-  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(16px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
 }
 .modal-wrapper .modal-content {
   border-radius: 0.5rem !important;

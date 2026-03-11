@@ -166,9 +166,9 @@
 
 /* === 8. Modal === */
 .modal-wrapper .modal-layer {
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  background: rgba(14, 23, 49, 0.3) !important;
+  backdrop-filter: blur(16px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+  background: rgba(14, 23, 49, 0.35) !important;
 }
 .modal-wrapper .modal-content {
   border-radius: 1.25rem !important;
