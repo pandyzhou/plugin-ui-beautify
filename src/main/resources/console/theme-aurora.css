@@ -411,6 +411,37 @@ textarea::placeholder {
 .formkit-help {
   color: #7c8599 !important;
 }
+/* FormKit select dropdown */
+.formkit-listbox,
+.formkit-dropdown-wrapper,
+[data-type="select"] .formkit-inner {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+.formkit-option,
+.formkit-listbox .formkit-option,
+[data-type="select"] [role="option"] {
+  color: #e2e8f0 !important;
+  background-color: #1e293b !important;
+}
+.formkit-option:hover,
+.formkit-option[aria-selected="true"],
+[data-type="select"] [role="option"]:hover {
+  background-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+.formkit-input[type="select"],
+.formkit-input option,
+[data-type="select"] .formkit-input {
+  color: #e2e8f0 !important;
+  background-color: #1e293b !important;
+}
+/* Generic dropdown/popper in aurora mode */
+.v-popper__inner {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
 
 /* === 16. Description list === */
 .description-wrapper {
