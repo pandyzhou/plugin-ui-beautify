@@ -418,3 +418,15 @@ body .border-gray-100,
 body .border-gray-200 {
   border-color: rgba(76, 203, 160, 0.1) !important;
 }
+
+/* === NEW: Extended Components === */
+.empty-title { color: #2d6a4f !important; }
+.empty-message { color: #52796f !important; }
+.switch-inner[aria-checked="true"] { background-color: #4ccba0 !important; }
+.entity-wrapper:hover { border-left-color: #4ccba0 !important; }
+.tag-wrapper:hover { box-shadow: 0 2px 8px rgba(76, 203, 160, 0.2) !important; }
+select:focus { border-color: #4ccba0 !important; box-shadow: 0 0 0 2px rgba(76, 203, 160, 0.2) !important; }
+.page-header { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.2), transparent) 1 !important; }
+.card-header { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }
+.card-footer { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }
+[class*="rounded-full"][class*="bg-gray-100"] { background-color: rgba(76, 203, 160, 0.12) !important; }

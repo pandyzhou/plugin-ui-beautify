@@ -417,3 +417,15 @@ body .border-gray-100,
 body .border-gray-200 {
   border-color: rgba(236, 72, 153, 0.06) !important;
 }
+
+/* === NEW: Extended Components === */
+.empty-title { color: #9d174d !important; }
+.empty-message { color: #be185d !important; }
+.switch-inner[aria-checked="true"] { background-color: #ec4899 !important; }
+.entity-wrapper:hover { border-left-color: #ec4899 !important; }
+.tag-wrapper:hover { box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2) !important; }
+select:focus { border-color: #ec4899 !important; box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2) !important; }
+.page-header { border-image: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.2), transparent) 1 !important; }
+.card-header { border-image: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.15), transparent) 1 !important; }
+.card-footer { border-image: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.15), transparent) 1 !important; }
+[class*="rounded-full"][class*="bg-gray-100"] { background-color: rgba(236, 72, 153, 0.1) !important; }

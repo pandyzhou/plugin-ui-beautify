@@ -223,3 +223,94 @@
         height: 3em !important;
     }
 }
+
+/* === Password Reset Page === */
+.halo-form .password-reset-hint {
+    font-size: 0.85rem !important;
+    opacity: 0.7 !important;
+    margin-top: 0.5rem !important;
+}
+
+/* === TOTP / 2FA Page === */
+.halo-form input[type="text"][maxlength="6"],
+.halo-form input[type="number"][maxlength="6"],
+.halo-form input[autocomplete="one-time-code"] {
+    text-align: center !important;
+    font-size: 1.5rem !important;
+    letter-spacing: 0.5em !important;
+    font-family: 'Courier New', monospace !important;
+    padding: 0.75rem 1rem !important;
+}
+
+/* === Error Pages (404/500) === */
+.error-page,
+[class*="error-container"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 60vh !important;
+    text-align: center !important;
+}
+.error-page h1,
+[class*="error-container"] h1 {
+    font-size: 4rem !important;
+    font-weight: 700 !important;
+    opacity: 0.3 !important;
+    margin-bottom: 0.5rem !important;
+}
+.error-page p,
+[class*="error-container"] p {
+    font-size: 1.1rem !important;
+    opacity: 0.6 !important;
+}
+.error-page a,
+[class*="error-container"] a {
+    margin-top: 1.5rem !important;
+    display: inline-block !important;
+    padding: 0.6rem 1.5rem !important;
+    border-radius: 9999px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+.error-page a:hover,
+[class*="error-container"] a:hover {
+    transform: translateY(-1px) !important;
+}
+
+/* === Password Strength Indicator === */
+.password-strength,
+[class*="password-strength"] {
+    height: 4px !important;
+    border-radius: 9999px !important;
+    margin-top: 0.5rem !important;
+    transition: all 0.3s ease !important;
+    overflow: hidden !important;
+}
+
+/* === Remember Me Toggle === */
+.halo-form input[type="checkbox"] {
+    width: 1rem !important;
+    height: 1rem !important;
+    border-radius: 0.25rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+/* === Logo Animation === */
+.halo-form-wrapper img[alt*="logo"],
+.halo-form-wrapper img[class*="logo"],
+.halo-form-wrapper .logo {
+    animation: _gw_float 3s ease-in-out infinite !important;
+}
+@keyframes _gw_float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .halo-form-wrapper img[alt*="logo"],
+    .halo-form-wrapper img[class*="logo"],
+    .halo-form-wrapper .logo {
+        animation: none !important;
+    }
+}

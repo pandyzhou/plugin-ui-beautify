@@ -178,6 +178,116 @@ select:focus-visible {
   border-radius: 0.5rem !important;
 }
 
+/* --- Empty State --- */
+.empty-wrapper {
+  padding: 2rem !important;
+}
+.empty-wrapper img,
+.empty-wrapper svg {
+  opacity: 0.6 !important;
+  transition: opacity 0.3s ease !important;
+}
+.empty-wrapper:hover img,
+.empty-wrapper:hover svg {
+  opacity: 0.85 !important;
+}
+.empty-title {
+  font-weight: 600 !important;
+  margin-top: 1rem !important;
+}
+.empty-message {
+  opacity: 0.7 !important;
+  font-size: 0.875rem !important;
+}
+
+/* --- Switch Theme Enhancement --- */
+.switch-inner .switch-indicator {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* --- Loading Spinner --- */
+.animate-spin {
+  color: currentColor !important;
+}
+
+/* --- Select Enhancement --- */
+select {
+  border-radius: 0.625rem !important;
+  padding: 0.5rem 2rem 0.5rem 0.75rem !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 12px !important;
+}
+select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* --- Menu Item Hover Micro-shift --- */
+.menu-item-title {
+  transition: transform 0.2s ease, color 0.2s ease !important;
+}
+.menu-item:hover .menu-item-title {
+  transform: translateX(2px) !important;
+}
+
+/* --- Card Hover Micro-scale --- */
+.card-wrapper {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+.card-wrapper:hover {
+  transform: translateY(-2px) scale(1.003) !important;
+}
+
+/* --- Button Click Feedback --- */
+.btn:active {
+  transform: scale(0.97) !important;
+  transition-duration: 0.1s !important;
+}
+
+/* --- Entity Row Hover Left Border --- */
+.entity-wrapper {
+  border-left: 3px solid transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+/* --- Tag Hover Float --- */
+.tag-wrapper {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.tag-wrapper:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* --- Form Focus Micro-scale --- */
+input:focus,
+textarea:focus {
+  transform: scale(1.005) !important;
+}
+
+/* --- Dropdown Item Hover Slide --- */
+[class*="dropdown-item"]:hover {
+  transform: translateX(3px) !important;
+  transition: transform 0.15s ease !important;
+}
+
+/* --- Gradient Dividers --- */
+.page-header {
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.2), transparent) 1 !important;
+}
+.card-header {
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.15), transparent) 1 !important;
+}
+.card-footer {
+  border-top: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.15), transparent) 1 !important;
+}
+
 /* --- Reduced Motion --- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

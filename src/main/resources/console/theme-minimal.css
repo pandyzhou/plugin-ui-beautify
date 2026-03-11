@@ -266,3 +266,10 @@ body .ring-\[\#eaecf0\] {
 body .border-\[\#eaecf0\] {
   border-color: #e5e7eb !important;
 }
+
+/* === NEW: Extended Components === */
+.empty-title { color: #374151 !important; }
+.empty-message { color: #6b7280 !important; }
+.entity-wrapper:hover { border-left-color: #9ca3af !important; }
+select:focus { border-color: #6b7280 !important; box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.15) !important; }
+.page-header { border-image: linear-gradient(90deg, transparent, rgba(107, 114, 128, 0.15), transparent) 1 !important; }
