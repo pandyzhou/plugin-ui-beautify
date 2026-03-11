@@ -33,7 +33,7 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
 
     /** Exact-match paths. */
     private static final Set<String> GATEWAY_EXACT = Set.of(
-        "/login", "/signup", "/logout", "/setup"
+        "/login", "/signup", "/logout", "/setup", "/binding"
     );
 
     /** Prefix-match paths (always end with /). */

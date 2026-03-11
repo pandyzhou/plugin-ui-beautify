@@ -1,4 +1,4 @@
-apiVersion: v1alpha1
+apiVersion: plugin.halo.run/v1alpha1
 kind: Setting
 metadata:
   name: plugin-ui-beautify-settings

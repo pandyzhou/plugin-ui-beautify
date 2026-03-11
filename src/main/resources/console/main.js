@@ -1,9 +1,9 @@
-/* UI Beautify — Theme Loader + Particle Effects (v3.4.0) */
+/* UI Beautify — Theme Loader + Particle Effects (v1.1.2) */
 (function() {
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.1.1";
+  var PLUGIN_VERSION = "1.1.2";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -71,9 +71,16 @@
     var existing = document.getElementById(CUSTOM_STYLE_ID);
     if (existing) existing.remove();
     if (!css || !css.trim()) return;
+    /* Basic sanitization — block dangerous CSS patterns */
+    var sanitized = css
+      .replace(/expression\s*\(/gi, "/* blocked */")
+      .replace(/javascript\s*:/gi, "/* blocked */")
+      .replace(/@import\b/gi, "/* blocked */")
+      .replace(/behavior\s*:/gi, "/* blocked */")
+      .replace(/-moz-binding\s*:/gi, "/* blocked */");
     var style = document.createElement("style");
     style.id = CUSTOM_STYLE_ID;
-    style.textContent = css;
+    style.textContent = sanitized;
     document.head.appendChild(style);
   }
 
@@ -392,9 +399,15 @@
     var url = arguments[0];
     var options = arguments[1];
 
-    if (typeof url === "string" && url.indexOf(CONFIG_URL) !== -1
-        && options && options.method
-        && options.method.toUpperCase() === "PUT") {
+    /* Handle Request objects */
+    var urlStr = typeof url === "string" ? url
+      : (url && url.url) ? url.url : "";
+    var method = (options && options.method)
+      ? options.method
+      : (url && url.method) ? url.method : "GET";
+
+    if (urlStr.indexOf(CONFIG_URL) !== -1
+        && method.toUpperCase() === "PUT") {
       return originalFetch.apply(this, arguments).then(function(response) {
         if (response.ok || response.status === 204) {
           setTimeout(function() {
@@ -403,13 +416,14 @@
                 currentTheme = newTheme;
                 loadThemeCSS(newTheme);
               } else {
-                /* effects toggle may have changed */
                 FX.apply(newTheme);
               }
-            });
+            }).catch(function() {});
           }, 300);
         }
         return response;
+      }).catch(function(err) {
+        return Promise.reject(err);
       });
     }
 
