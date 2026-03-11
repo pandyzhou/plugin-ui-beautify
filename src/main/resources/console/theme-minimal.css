@@ -1,0 +1,268 @@
+/* ============================================
+   Theme: Minimal — 极简
+   Primary: #6B7280 (gray-500)
+   No shadows, no gradients, pure clean
+   ============================================ */
+
+/* --- Sidebar --- */
+.sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+.sidebar__search {
+  border-radius: 0.375rem !important;
+  transition: all 0.15s ease !important;
+}
+.sidebar__search:hover {
+  background-color: #f3f4f6 !important;
+}
+.sidebar__profile {
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* --- Menu --- */
+.menu-item {
+  border-radius: 0.375rem !important;
+  margin: 0 !important;
+  transition: all 0.12s ease !important;
+}
+.menu-item:hover {
+  background-color: #f9fafb !important;
+}
+.menu-item-title.active {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+.menu-item-title.active::before {
+  background-color: #6b7280 !important;
+  border-radius: 0 1px 1px 0 !important;
+}
+
+/* --- Main Content --- */
+.main-content {
+  background: #fafafa !important;
+}
+.main-content__footer {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+.main-content__footer:hover {
+  opacity: 1;
+}
+
+/* --- Page Header --- */
+.page-header {
+  border-bottom: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+}
+
+/* --- Card --- */
+.card-wrapper {
+  border-radius: 0.5rem !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease !important;
+}
+.card-wrapper:hover {
+  border-color: #d1d5db !important;
+  box-shadow: none !important;
+}
+
+/* --- Button --- */
+.btn {
+  border-radius: 0.375rem !important;
+  transition: all 0.12s ease !important;
+  box-shadow: none !important;
+}
+.btn.btn-primary {
+  box-shadow: none !important;
+}
+.btn.btn-primary:hover {
+  box-shadow: none !important;
+  transform: none;
+}
+.btn.btn-secondary {
+  box-shadow: none !important;
+}
+.btn.btn-secondary:hover {
+  box-shadow: none !important;
+  transform: none;
+}
+
+/* --- Entity --- */
+.entity-wrapper {
+  border-radius: 0 !important;
+  transition: all 0.1s ease !important;
+}
+.entity-wrapper:hover {
+  background-color: #f9fafb !important;
+}
+.entity-wrapper.entity-selected {
+  background-color: #f3f4f6 !important;
+}
+
+/* --- Modal --- */
+.modal-wrapper .modal-layer {
+  backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+.modal-wrapper .modal-content {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* --- Alert / Tabs / Tag / Dropdown / Toast --- */
+.alert-wrapper { border-radius: 0.375rem !important; }
+.tabs-wrapper .tabs-items-wrapper { border-radius: 0.375rem !important; }
+.tag-wrapper { border-radius: 0.25rem !important; }
+.dropdown-item-wrapper { border-radius: 0.25rem !important; }
+.toast-body {
+  border-radius: 0.375rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* --- Form Inputs --- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+textarea, select {
+  border-radius: 0.375rem !important;
+  transition: border-color 0.12s ease !important;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+textarea:focus, select:focus {
+  border-color: #6b7280 !important;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1) !important;
+}
+
+/* --- Pagination --- */
+.pagination-button {
+  border-radius: 0.375rem !important;
+}
+
+/* --- Description list --- */
+.description-item-wrapper {
+  border-color: #e5e7eb !important;
+}
+.description-item__label {
+  color: #6b7280 !important;
+}
+
+/* --- Scrollbar --- */
+* {
+  scrollbar-color: rgba(107, 114, 128, 0.2) transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.35);
+}
+
+/* --- Dropdown --- */
+.v-popper--theme-dropdown .v-popper__inner {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* --- Tabs detail --- */
+.tabbar-item {
+  color: #6b7280 !important;
+  transition: color 0.12s ease !important;
+}
+.tabbar-item:hover {
+  color: #111827 !important;
+}
+.tabbar-pills .tabbar-item:hover,
+.tabbar-pills .tabbar-item-active {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+.tabbar-outline .tabbar-item-active {
+  border-bottom-color: #6b7280 !important;
+  color: #111827 !important;
+}
+.tabbar-default .tabbar-item-active {
+  border-bottom-color: #6b7280 !important;
+  color: #111827 !important;
+}
+
+/* --- FormKit --- */
+.formkit-label {
+  color: #111827 !important;
+}
+.formkit-help {
+  color: #6b7280 !important;
+}
+
+/* --- Entity detail --- */
+.entity-field-title {
+  color: #111827 !important;
+}
+.entity-field-description {
+  color: #6b7280 !important;
+}
+.entity-dropdown-trigger {
+  color: #6b7280 !important;
+  transition: color 0.12s ease !important;
+}
+.entity-dropdown-trigger:hover {
+  color: #111827 !important;
+  background-color: #f3f4f6 !important;
+}
+
+/* --- Code block --- */
+pre {
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+}
+code:not(pre code) {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+/* --- Table --- */
+tbody tr:nth-child(even) {
+  background-color: #f9fafb !important;
+}
+tbody tr:hover {
+  background-color: #f3f4f6 !important;
+}
+th {
+  border-bottom: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+}
+td {
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* --- Tooltip --- */
+.v-popper--theme-tooltip .v-popper__inner {
+  background: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* --- Tailwind overrides --- */
+body .divide-gray-100 > :not(:first-child),
+body [class*="divide-gray"] > :not(:first-child) {
+  border-color: #e5e7eb !important;
+}
+body .ring-\[\#eaecf0\] {
+  --tw-ring-color: #e5e7eb !important;
+}
+body .border-\[\#eaecf0\] {
+  border-color: #e5e7eb !important;
+}

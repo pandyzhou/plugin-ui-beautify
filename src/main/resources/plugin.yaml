@@ -1,0 +1,19 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: Plugin
+metadata:
+  name: plugin-ui-beautify
+spec:
+  enabled: true
+  version: "1.0.0"
+  requires: ">=2.22.0"
+  author:
+    name: 周易
+  logo: logo.png
+  homepage: ""
+  issues: ""
+  displayName: "后台美化插件"
+  description: "为 Halo 后台 Console 和网关页面（登录/注册等）提供现代化的界面美化，支持多种风格切换、动态装饰效果和自定义 CSS"
+  license:
+    - name: "MIT"
+  settingName: "plugin-ui-beautify-settings"
+  configMapName: "plugin-ui-beautify-configmap"

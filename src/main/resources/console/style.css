@@ -1,0 +1,187 @@
+/* ============================================
+   Halo Console Beautify — Base Styles Only
+   Theme-neutral, shared across all themes
+   ============================================ */
+
+/* --- Switch cursor protection --- */
+.switch-inner {
+  cursor: pointer !important;
+}
+.switch-inner.switch-disabled {
+  cursor: not-allowed !important;
+}
+
+/* --- Scrollbar --- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* --- Tooltip --- */
+.v-popper--theme-tooltip .v-popper__inner {
+  border-radius: 0.5rem !important;
+  font-size: 0.8125rem !important;
+  padding: 0.375rem 0.625rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+.v-popper--theme-tooltip .v-popper__arrow-outer {
+  border-color: inherit !important;
+}
+
+/* --- Checkbox / Radio --- */
+input[type="checkbox"],
+input[type="radio"] {
+  border-radius: 0.25rem !important;
+  transition: background-color 150ms ease, border-color 150ms ease !important;
+  cursor: pointer !important;
+}
+input[type="radio"] {
+  border-radius: 50% !important;
+}
+
+/* --- Code block / Pre --- */
+pre, code {
+  border-radius: 0.5rem !important;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace !important;
+  font-size: 0.875em !important;
+}
+pre {
+  padding: 1rem !important;
+  overflow-x: auto !important;
+}
+code:not(pre code) {
+  padding: 0.15em 0.4em !important;
+  border-radius: 0.25rem !important;
+}
+
+/* --- Table --- */
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+}
+th {
+  font-weight: 600 !important;
+  text-align: left !important;
+}
+th, td {
+  padding: 0.625rem 0.75rem !important;
+}
+tbody tr {
+  transition: background-color 150ms ease !important;
+}
+
+/* --- Avatar --- */
+.avatar-wrapper {
+  border-radius: 50% !important;
+  transition: transform 200ms ease, box-shadow 200ms ease !important;
+  overflow: hidden !important;
+}
+.avatar-wrapper:hover {
+  transform: scale(1.05) !important;
+}
+
+/* --- Editor (ProseMirror / Tiptap) --- */
+.ProseMirror {
+  border-radius: 0.5rem !important;
+  padding: 1rem !important;
+  outline: none !important;
+  min-height: 300px !important;
+  line-height: 1.75 !important;
+}
+.ProseMirror:focus {
+  outline: none !important;
+}
+.editor-toolbar,
+[class*="editor-toolbar"],
+.tiptap-toolbar {
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  padding: 0.375rem !important;
+}
+.editor-toolbar button,
+.tiptap-toolbar button {
+  border-radius: 0.375rem !important;
+  transition: background-color 150ms ease !important;
+  padding: 0.25rem 0.375rem !important;
+}
+
+/* --- Modal animation --- */
+.modal-wrapper .modal-content {
+  animation: _ui_scaleIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+@keyframes _ui_scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* --- Dropdown animation --- */
+.v-popper--theme-dropdown .v-popper__inner {
+  animation: _ui_dropIn 150ms ease !important;
+}
+@keyframes _ui_dropIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Toast animation --- */
+.toast-body {
+  animation: _ui_slideInRight 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+@keyframes _ui_slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Disabled states --- */
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background-color: rgba(148, 163, 184, 0.1) !important;
+}
+
+/* --- Focus-visible (keyboard accessibility) --- */
+.btn:focus-visible {
+  outline: 2px solid currentColor !important;
+  outline-offset: 2px !important;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid currentColor !important;
+  outline-offset: 1px !important;
+}
+.menu-item-title:focus-visible {
+  outline: 2px solid currentColor !important;
+  outline-offset: -2px !important;
+  border-radius: 0.5rem !important;
+}
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

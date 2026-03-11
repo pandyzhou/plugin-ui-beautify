@@ -1,0 +1,225 @@
+/* ============================================
+   Gateway Pages Beautify - Plugin Overlay
+   Injected via GatewayStyleInjector WebFilter
+   ============================================ */
+
+/* --- Gradient Background + Floating Orbs --- */
+.gateway-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 30%, #f0f9ff 60%, #faf5ff 100%) !important;
+    background-attachment: fixed !important;
+}
+
+.gateway-page::before,
+.gateway-page::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.gateway-page::before {
+    width: min(400px, 50vw);
+    height: min(400px, 50vw);
+    background: radial-gradient(circle, #4ccba0 0%, transparent 70%);
+    top: -100px;
+    right: -100px;
+    animation: _gw_orb1 20s ease-in-out infinite;
+}
+
+.gateway-page::after {
+    width: min(350px, 45vw);
+    height: min(350px, 45vw);
+    background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+    bottom: -80px;
+    left: -80px;
+    animation: _gw_orb2 25s ease-in-out infinite;
+}
+
+@keyframes _gw_orb1 {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(-40px, 60px); }
+    66% { transform: translate(30px, -30px); }
+}
+
+@keyframes _gw_orb2 {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(50px, -40px); }
+    66% { transform: translate(-30px, 50px); }
+}
+
+/* --- Wrapper z-index --- */
+.gateway-wrapper {
+    position: relative;
+    z-index: 1;
+    line-height: 1.6;
+}
+
+/* --- Glassmorphism Card --- */
+.halo-form-wrapper {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(16px) saturate(1.8) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 1.25em !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+    padding: 2em !important;
+    animation: _gw_fadeInUp 0.5s ease-out;
+    transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.halo-form-wrapper:hover {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1) !important;
+}
+
+@keyframes _gw_fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Form Title --- */
+.form-title {
+    font-weight: 600 !important;
+    letter-spacing: -0.01em;
+}
+
+/* --- Form Inputs --- */
+.halo-form .form-input {
+    border-radius: 0.75em !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    height: 2.75em !important;
+    padding: 0 0.875em !important;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.halo-form .form-input:hover {
+    border-color: #cbd5e1 !important;
+}
+
+.halo-form .form-input:focus-within {
+    border-color: #4ccba0 !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(76, 203, 160, 0.15) !important;
+}
+
+/* --- Validation states --- */
+.halo-form .form-input.is-error,
+.halo-form .form-input:invalid {
+    border-color: #f87171 !important;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12) !important;
+    animation: _gw_shake 400ms ease;
+}
+
+.halo-form .form-input.is-success {
+    border-color: #4ade80 !important;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.12) !important;
+}
+
+@keyframes _gw_shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+
+/* --- Submit Button --- */
+.halo-form button[type="submit"] {
+    border-radius: 0.75em !important;
+    height: 2.75em !important;
+    font-weight: 500 !important;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 3px rgba(14, 23, 49, 0.2) !important;
+}
+
+.halo-form button[type="submit"]:hover {
+    box-shadow: 0 4px 12px rgba(14, 23, 49, 0.25) !important;
+    transform: translateY(-1px);
+}
+
+.halo-form button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* --- Pill Items (social login) --- */
+.pill-items li {
+    border-radius: 1em !important;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.pill-items li:hover {
+    border-color: #4ccba0 !important;
+    background: rgba(76, 203, 160, 0.06) !important;
+    box-shadow: 0 2px 8px rgba(76, 203, 160, 0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* --- Divider (social login separator) --- */
+.divider,
+[class*="divider"] {
+    color: #94a3b8 !important;
+    font-size: 0.8125rem !important;
+}
+
+/* --- Alert --- */
+.alert {
+    border-radius: 0.75em !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    animation: _gw_fadeInUp 0.3s ease-out;
+}
+
+.alert-error {
+    background: rgba(254, 226, 226, 0.4) !important;
+    border-color: #fecaca !important;
+}
+
+/* --- Checkbox --- */
+.halo-form input[type="checkbox"]:checked {
+    background-color: #4ccba0 !important;
+    border-color: #4ccba0 !important;
+}
+
+/* --- Footer links --- */
+.gateway-page a:not(button):not([type="submit"]) {
+    transition: color 150ms ease !important;
+}
+.gateway-page a:not(button):not([type="submit"]):hover {
+    color: #4ccba0 !important;
+}
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+    .gateway-page::before,
+    .gateway-page::after {
+        animation: none !important;
+    }
+    .halo-form-wrapper {
+        animation: none !important;
+    }
+    .alert {
+        animation: none !important;
+    }
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* --- Mobile --- */
+@media only screen and (max-width: 768px) {
+    .gateway-page::before,
+    .gateway-page::after {
+        opacity: 0.2;
+    }
+    .halo-form-wrapper {
+        padding: 1.5em !important;
+        border-radius: 1em !important;
+    }
+    .halo-form button[type="submit"] {
+        height: 3em !important;
+    }
+}

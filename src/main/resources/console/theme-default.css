@@ -1,0 +1,420 @@
+/* ============================================
+   Theme: Default — 薄荷清新 (v3.0)
+   Primary: #4CCBA0
+   Accent gradient: mint → teal
+   ============================================ */
+
+/* === 1. Sidebar === */
+.sidebar {
+  background: linear-gradient(180deg, #f0faf5 0%, #e6f7ef 50%, #f0fdf4 100%) !important;
+  border-right: 1px solid rgba(76, 203, 160, 0.15) !important;
+  box-shadow: 2px 0 12px rgba(76, 203, 160, 0.06) !important;
+}
+.sidebar__logo-container {
+  padding-bottom: 0.75rem !important;
+}
+.sidebar__search {
+  border-radius: 0.75rem !important;
+  background-color: rgba(76, 203, 160, 0.08) !important;
+  border: 1px solid rgba(76, 203, 160, 0.12) !important;
+  transition: all 0.2s ease !important;
+}
+.sidebar__search:hover {
+  background-color: rgba(76, 203, 160, 0.14) !important;
+  border-color: rgba(76, 203, 160, 0.25) !important;
+  box-shadow: 0 2px 8px rgba(76, 203, 160, 0.1) !important;
+}
+.sidebar__profile {
+  position: relative !important;
+  border-top: 1px solid rgba(76, 203, 160, 0.12) !important;
+  background: rgba(76, 203, 160, 0.03) !important;
+}
+.sidebar__profile::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -80px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 80px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cpath d='M30 60 Q40 30 60 50 Q80 70 90 40 Q100 10 120 35 Q140 60 160 30' fill='none' stroke='%234ccba0' stroke-width='1.5' opacity='0.12'/%3E%3Ccircle cx='45' cy='45' r='3' fill='%234ccba0' opacity='0.1'/%3E%3Ccircle cx='110' cy='25' r='4' fill='%2336b389' opacity='0.08'/%3E%3Ccircle cx='150' cy='40' r='2.5' fill='%234ccba0' opacity='0.1'/%3E%3C/svg%3E") no-repeat center bottom !important;
+  background-size: contain !important;
+  pointer-events: none !important;
+  opacity: 0.6 !important;
+}
+
+/* === 2. Menu === */
+.menu-item {
+  border-radius: 0.625rem !important;
+  margin: 2px 0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.menu-item:hover {
+  background-color: rgba(76, 203, 160, 0.08) !important;
+}
+.menu-item-title:hover {
+  background-color: rgba(76, 203, 160, 0.1) !important;
+  color: #0e1731 !important;
+}
+.menu-item-title.active {
+  background: linear-gradient(135deg, rgba(76, 203, 160, 0.15), rgba(76, 203, 160, 0.08)) !important;
+  color: #0e1731 !important;
+  font-weight: 600 !important;
+}
+.menu-item-title.active::before {
+  background: linear-gradient(180deg, #4ccba0, #36b389) !important;
+  border-radius: 0 3px 3px 0 !important;
+  width: 3px !important;
+}
+.menu-label {
+  color: #4ccba0 !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* === 3. Main Content — 渐变背景 + 装饰光斑 === */
+.main-content {
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(76, 203, 160, 0.07), transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(54, 179, 137, 0.05), transparent 50%),
+    linear-gradient(160deg, #f0faf5 0%, #f8fdfb 25%, #f5faf8 60%, #edf7f2 100%) !important;
+}
+.main-content__footer {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+.main-content__footer:hover {
+  opacity: 1;
+}
+
+/* === 4. Page Header === */
+.page-header {
+  border-bottom: 1px solid rgba(76, 203, 160, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+.page-header__title {
+  color: #0e1731 !important;
+}
+
+/* === 5. Card — 毛玻璃 + 主题色边框 === */
+.card-wrapper {
+  border-radius: 1rem !important;
+  border: 1px solid rgba(76, 203, 160, 0.12) !important;
+  box-shadow: 0 1px 3px rgba(76, 203, 160, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.card-wrapper:hover {
+  box-shadow: 0 8px 24px rgba(76, 203, 160, 0.1), 0 4px 8px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(76, 203, 160, 0.25) !important;
+  transform: translateY(-1px) !important;
+}
+.card-header {
+  border-bottom: 1px solid rgba(76, 203, 160, 0.08) !important;
+}
+.card-footer {
+  border-top: 1px solid rgba(76, 203, 160, 0.08) !important;
+}
+
+/* === 6. Button === */
+.btn {
+  border-radius: 0.625rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn.btn-primary {
+  background: linear-gradient(135deg, #4ccba0, #36b389) !important;
+  box-shadow: 0 2px 8px rgba(76, 203, 160, 0.35) !important;
+  border: none !important;
+}
+.btn.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(76, 203, 160, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.card-grid .card:hover .card-icon {
+  transform: translateY(-1px) !important;
+}
+
+.card-grid .card:not(:hover) .card-icon {
+  transform: translateY(0) !important;
+}
+
+.card-grid .card:hover .card-arrow {
+  transform: translateY(-1px) !important;
+}
+
+.card-grid .card:not(:hover) .card-arrow {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(76, 203, 160, 0.3) !important;
+}
+.btn.btn-default {
+  border: 1px solid rgba(76, 203, 160, 0.2) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+.btn.btn-default:hover {
+  border-color: rgba(76, 203, 160, 0.4) !important;
+  background: rgba(76, 203, 160, 0.05) !important;
+}
+.btn.btn-secondary {
+  box-shadow: 0 1px 4px rgba(14, 23, 49, 0.15) !important;
+}
+.btn.btn-secondary:hover {
+  box-shadow: 0 4px 12px rgba(14, 23, 49, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+.btn.btn-secondary:active {
+  transform: translateY(0) !important;
+}
+
+/* === 7. Entity (list rows) === */
+.entity-wrapper {
+  border-radius: 0.625rem !important;
+  transition: all 0.2s ease !important;
+}
+.entity-wrapper:hover {
+  background-color: rgba(76, 203, 160, 0.04) !important;
+}
+.entity-wrapper.entity-selected {
+  background-color: rgba(76, 203, 160, 0.08) !important;
+  border-left: 2px solid #4ccba0 !important;
+}
+
+/* === 8. Modal === */
+.modal-wrapper .modal-layer {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(14, 23, 49, 0.3) !important;
+}
+.modal-wrapper .modal-content {
+  border-radius: 1.25rem !important;
+  box-shadow: 0 24px 80px rgba(76, 203, 160, 0.08), 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(76, 203, 160, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* === 9. Alert / Tabs / Tag / Dropdown / Toast === */
+.alert-wrapper {
+  border-radius: 0.75rem !important;
+}
+.tabs-wrapper .tabs-items-wrapper {
+  border-radius: 0.625rem !important;
+}
+.tag-wrapper {
+  border-radius: 9999px !important;
+}
+.tag-default {
+  border-color: rgba(76, 203, 160, 0.3) !important;
+  color: #2d8a6e !important;
+}
+.dropdown-item-wrapper {
+  border-radius: 0.5rem !important;
+}
+.toast-body {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 8px 24px rgba(76, 203, 160, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(76, 203, 160, 0.1) !important;
+}
+
+/* === 10. Form Inputs === */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+  border-radius: 0.625rem !important;
+  border-color: rgba(76, 203, 160, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #4ccba0 !important;
+  box-shadow: 0 0 0 3px rgba(76, 203, 160, 0.15), 0 2px 4px rgba(76, 203, 160, 0.1) !important;
+}
+
+/* === 11. Pagination === */
+.pagination-button {
+  border-radius: 0.5rem !important;
+  border-color: rgba(76, 203, 160, 0.2) !important;
+}
+.pagination-button:hover {
+  border-color: rgba(76, 203, 160, 0.4) !important;
+  background-color: rgba(76, 203, 160, 0.05) !important;
+}
+
+/* === 12. Description list === */
+.description-item-wrapper {
+  border-color: rgba(76, 203, 160, 0.08) !important;
+  transition: background-color 0.15s ease !important;
+}
+.description-item-wrapper:hover {
+  background-color: rgba(76, 203, 160, 0.03) !important;
+}
+.description-item__label {
+  color: #4a7c6a !important;
+}
+
+/* === 13. Scrollbar === */
+* {
+  scrollbar-color: rgba(76, 203, 160, 0.25) transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(76, 203, 160, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(76, 203, 160, 0.4);
+}
+
+/* === 14. Dropdown === */
+.v-popper--theme-dropdown .v-popper__inner {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(76, 203, 160, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(76, 203, 160, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* === 15. Tabs detail === */
+.tabbar-item {
+  color: #4a7c6a !important;
+  transition: color 0.18s ease !important;
+}
+.tabbar-item:hover {
+  color: #0e1731 !important;
+}
+.tabbar-pills .tabbar-item:hover,
+.tabbar-pills .tabbar-item-active {
+  background-color: rgba(76, 203, 160, 0.1) !important;
+  color: #0e1731 !important;
+}
+.tabbar-outline .tabbar-item-active {
+  border-bottom-color: #4ccba0 !important;
+  color: #0e1731 !important;
+}
+.tabbar-default .tabbar-item-active {
+  border-bottom-color: #4ccba0 !important;
+  color: #0e1731 !important;
+}
+
+/* === 16. FormKit === */
+.formkit-label {
+  color: #0e1731 !important;
+}
+.formkit-help {
+  color: #4a7c6a !important;
+}
+
+/* === 17. Entity detail === */
+.entity-field-title {
+  color: #0e1731 !important;
+}
+.entity-field-description {
+  color: #4a7c6a !important;
+}
+.entity-dropdown-trigger {
+  color: #4a7c6a !important;
+  transition: color 0.15s ease !important;
+}
+.entity-dropdown-trigger:hover {
+  color: #0e1731 !important;
+  background-color: rgba(76, 203, 160, 0.06) !important;
+}
+
+/* === 19. Code block === */
+pre {
+  background: rgba(76, 203, 160, 0.04) !important;
+  border: 1px solid rgba(76, 203, 160, 0.12) !important;
+}
+code:not(pre code) {
+  background: rgba(76, 203, 160, 0.08) !important;
+  color: #2d8a6e !important;
+}
+
+/* === 20. Table === */
+tbody tr:nth-child(even) {
+  background-color: rgba(76, 203, 160, 0.03) !important;
+}
+tbody tr:hover {
+  background-color: rgba(76, 203, 160, 0.06) !important;
+}
+th {
+  border-bottom: 1px solid rgba(76, 203, 160, 0.12) !important;
+  color: #0e1731 !important;
+}
+td {
+  border-bottom: 1px solid rgba(76, 203, 160, 0.06) !important;
+}
+
+/* === 21. Tooltip === */
+.v-popper--theme-tooltip .v-popper__inner {
+  background: #0e1731 !important;
+  color: #f0fdf4 !important;
+}
+
+/* === 22. Checkbox / Radio === */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: #4ccba0 !important;
+  border-color: #4ccba0 !important;
+}
+
+/* === 23. Editor === */
+.ProseMirror {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(76, 203, 160, 0.12) !important;
+}
+.ProseMirror:focus {
+  border-color: #4ccba0 !important;
+  box-shadow: 0 0 0 3px rgba(76, 203, 160, 0.12) !important;
+}
+.editor-toolbar,
+[class*="editor-toolbar"],
+.tiptap-toolbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid rgba(76, 203, 160, 0.08) !important;
+}
+.editor-toolbar button:hover,
+.tiptap-toolbar button:hover {
+  background-color: rgba(76, 203, 160, 0.08) !important;
+}
+
+/* === 24. Tailwind overrides — 融入主题色 === */
+body .bg-gray-50,
+body [class*="bg-gray-50"] {
+  background-color: rgba(76, 203, 160, 0.04) !important;
+}
+body .hover\:bg-gray-50:hover {
+  background-color: rgba(76, 203, 160, 0.07) !important;
+}
+body .hover\:bg-gray-100:hover {
+  background-color: rgba(76, 203, 160, 0.1) !important;
+}
+body .divide-gray-100 > :not(:first-child),
+body [class*="divide-gray"] > :not(:first-child) {
+  border-color: rgba(76, 203, 160, 0.1) !important;
+}
+body .ring-\[\#eaecf0\] {
+  --tw-ring-color: rgba(76, 203, 160, 0.12) !important;
+}
+body .border-\[\#eaecf0\] {
+  border-color: rgba(76, 203, 160, 0.12) !important;
+}
+body .border-gray-100,
+body .border-gray-200 {
+  border-color: rgba(76, 203, 160, 0.1) !important;
+}

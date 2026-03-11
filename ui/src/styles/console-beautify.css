@@ -1,0 +1,93 @@
+/* ============================================
+   Console Beautify - Plugin CSS Overlay
+   Structure-only — no theme colors
+   Loaded via Halo plugin bundle.css mechanism
+   ============================================ */
+
+/* --- Sidebar Enhancement --- */
+.sidebar .sidebar__logo-container {
+    padding-bottom: 0.75rem !important;
+}
+
+.sidebar .menu-item {
+    border-radius: 0.5rem !important;
+    margin: 1px 0 !important;
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar .sidebar__search {
+    border-radius: 0.625rem !important;
+    transition: all 180ms ease !important;
+}
+
+/* --- Card Enhancement --- */
+.card-wrapper {
+    border-radius: 0.75rem !important;
+    transition: box-shadow 200ms ease, border-color 200ms ease !important;
+}
+
+/* --- Button Enhancement --- */
+.btn {
+    border-radius: 0.5rem !important;
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* --- Page Header Enhancement --- */
+.page-header {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* --- Entity List Enhancement --- */
+.entity-wrapper {
+    border-radius: 0.5rem !important;
+    transition: all 150ms ease !important;
+}
+
+/* --- Modal Enhancement --- */
+.modal-content {
+    border-radius: 1rem !important;
+}
+
+.modal-layer {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* --- Alert Enhancement --- */
+.alert-wrapper {
+    border-radius: 0.625rem !important;
+}
+
+/* --- Tabs Enhancement --- */
+.tabs-wrapper .tabs-items-wrapper {
+    border-radius: 0.5rem !important;
+}
+
+/* --- Dropdown Enhancement --- */
+[data-headlessui-state] {
+    border-radius: 0.625rem !important;
+}
+
+/* --- Form Input Enhancement --- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+    border-radius: 0.5rem !important;
+    transition: border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+/* --- Footer --- */
+.main-content__footer {
+    opacity: 0.6;
+    transition: opacity 200ms ease;
+}
+
+.main-content__footer:hover {
+    opacity: 1;
+}

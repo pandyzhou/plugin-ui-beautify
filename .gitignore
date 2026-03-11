@@ -1,0 +1,27 @@
+# Build
+build/
+out/
+*.jar
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node
+node_modules/
+ui/node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup
+_backup/

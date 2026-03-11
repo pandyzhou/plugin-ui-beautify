@@ -1,0 +1,48 @@
+/* Gateway Minimal — clean, no decorations */
+.gateway-page {
+  background: #fafafa !important;
+}
+.gateway-page::before,
+.gateway-page::after {
+  display: none !important;
+}
+.halo-form-wrapper {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  animation: none !important;
+}
+.halo-form-wrapper:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+.halo-form .form-input {
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+}
+.halo-form .form-input:focus-within {
+  border-color: #6b7280 !important;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1) !important;
+}
+.halo-form button[type="submit"] {
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+}
+.halo-form button[type="submit"]:hover {
+  box-shadow: none !important;
+  transform: none;
+}
+.pill-items li {
+  border-radius: 0.375rem !important;
+}
+.pill-items li:hover {
+  border-color: #6b7280 !important;
+  background: #f9fafb !important;
+  box-shadow: none !important;
+  transform: none;
+}
+.halo-form input[type="checkbox"]:checked {
+  background-color: #6b7280 !important;
+  border-color: #6b7280 !important;
+}
