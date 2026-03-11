@@ -12,8 +12,8 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.halo.run/snapshots' }
-    maven { url 'https://repo.halo.run/releases' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/releases' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
