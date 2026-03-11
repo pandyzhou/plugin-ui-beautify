@@ -6,12 +6,27 @@ on:
       - published
 
 jobs:
-  cd:
-    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-cd.yaml@v3
-    permissions:
-      contents: write
-    with:
-      ui-path: "ui"
-      skip-node-setup: true
-      java-version: 21
-      skip-appstore-release: true
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: |
+          version=${{ github.event.release.tag_name }}
+          chmod +x gradlew
+          ./gradlew clean build -x check -Pversion=${version#v}
+
+      - name: Upload to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} build/libs/*.jar
