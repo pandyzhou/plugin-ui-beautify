@@ -210,7 +210,7 @@ input[type="url"],
 input[type="search"],
 input[type="number"],
 textarea,
-select {
+.formkit-outer select {
   border-radius: 0.625rem !important;
   border-color: rgba(76, 203, 160, 0.2) !important;
   transition: all 0.2s ease !important;
@@ -222,7 +222,7 @@ input[type="url"]:focus,
 input[type="search"]:focus,
 input[type="number"]:focus,
 textarea:focus,
-select:focus {
+.formkit-outer select:focus {
   border-color: #4ccba0 !important;
   box-shadow: 0 0 0 3px rgba(76, 203, 160, 0.15), 0 2px 4px rgba(76, 203, 160, 0.1) !important;
 }
@@ -406,7 +406,7 @@ body .border-gray-200 {
 .switch-inner[aria-checked="true"] { background-color: #4ccba0 !important; }
 .entity-wrapper:hover { border-left-color: #4ccba0 !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(76, 203, 160, 0.2) !important; }
-select:focus { border-color: #4ccba0 !important; box-shadow: 0 0 0 2px rgba(76, 203, 160, 0.2) !important; }
+.formkit-outer select:focus { border-color: #4ccba0 !important; box-shadow: 0 0 0 2px rgba(76, 203, 160, 0.2) !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.2), transparent) 1 !important; }
 .card-header { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }
 .card-footer { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }

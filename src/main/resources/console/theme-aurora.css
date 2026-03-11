@@ -382,7 +382,7 @@ input[type="url"],
 input[type="search"],
 input[type="number"],
 textarea,
-select {
+.formkit-outer select {
   border-radius: 0.625rem !important;
   background: #252540 !important;
   border-color: #3a3a5c !important;
@@ -396,7 +396,7 @@ input[type="url"]:focus,
 input[type="search"]:focus,
 input[type="number"]:focus,
 textarea:focus,
-select:focus {
+.formkit-outer select:focus {
   border-color: #a855f7 !important;
   box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15), 0 0 16px rgba(168, 85, 247, 0.08) !important;
   background: #252540 !important;
@@ -437,7 +437,8 @@ textarea::placeholder {
   background-color: #1e293b !important;
 }
 /* Generic dropdown/popper in aurora mode */
-.v-popper__inner {
+.v-popper--theme-dropdown .v-popper__inner,
+.v-popper--theme-tooltip .v-popper__inner {
   background-color: #1e293b !important;
   color: #e2e8f0 !important;
   border-color: #334155 !important;
@@ -702,9 +703,9 @@ input[type="radio"]:checked {
 .switch-inner[aria-checked="true"] { background: linear-gradient(135deg, #a855f7, #ec4899) !important; }
 .entity-wrapper:hover { border-left-color: #a855f7 !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(168, 85, 247, 0.25) !important; }
-select { background-color: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
-select:focus { border-color: #a855f7 !important; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25) !important; }
-select option { background-color: #1e293b !important; color: #e2e8f0 !important; }
+.formkit-outer select { background-color: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+.formkit-outer select:focus { border-color: #a855f7 !important; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25) !important; }
+.formkit-outer select option { background-color: #1e293b !important; color: #e2e8f0 !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.15), transparent) 1 !important; }
 .card-header { border-image: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.1), transparent) 1 !important; }
 .card-footer { border-image: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.1), transparent) 1 !important; }

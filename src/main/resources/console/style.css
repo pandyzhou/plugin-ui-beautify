@@ -215,7 +215,8 @@ select:focus-visible {
 }
 
 /* --- Select Enhancement --- */
-select {
+.formkit-outer select,
+.form-select {
   border-radius: 0.625rem !important;
   padding: 0.5rem 2rem 0.5rem 0.75rem !important;
   transition: all 0.2s ease !important;
@@ -225,7 +226,8 @@ select {
   background-position: right 0.75rem center !important;
   background-size: 12px !important;
 }
-select:focus {
+.formkit-outer select:focus,
+.form-select:focus {
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
 }
@@ -247,6 +249,9 @@ select:focus {
 }
 
 /* --- Button Click Feedback --- */
+.btn.btn-primary {
+  color: #fff !important;
+}
 .btn:active {
   transform: scale(0.97) !important;
   transition-duration: 0.1s !important;
@@ -266,7 +271,7 @@ select:focus {
 }
 
 /* --- Dropdown Item Hover Slide --- */
-[class*="dropdown-item"]:hover {
+.dropdown-item-wrapper:hover {
   transform: translateX(3px) !important;
   transition: transform 0.15s ease !important;
 }
