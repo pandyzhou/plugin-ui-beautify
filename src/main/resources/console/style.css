@@ -236,10 +236,10 @@ select:focus {
 
 /* --- Card Hover Micro-scale --- */
 .card-wrapper {
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease !important;
 }
 .card-wrapper:hover {
-  transform: translateY(-2px) scale(1.003) !important;
+  transform: none !important;
 }
 
 /* --- Button Click Feedback --- */
@@ -256,14 +256,14 @@ select:focus {
 
 /* --- Tag Hover Float --- */
 .tag-wrapper {
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  transition: box-shadow 0.2s ease !important;
 }
 .tag-wrapper:hover {
-  transform: translateY(-1px) !important;
+  transform: none !important;
 }
 
 /* --- Form Focus Micro-scale --- */
-input:focus,
+input:not([type="checkbox"]):not([type="radio"]):not(select):focus,
 textarea:focus {
   transform: scale(1.005) !important;
 }
