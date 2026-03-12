@@ -189,9 +189,11 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 .pagination-button:hover { background-color: var(--ui-surface-hover) !important; }
 
 /* === 22. Tabs === */
+.tabbar-wrapper, .tabbar-default, .tabbar-outline { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
+.tabs-wrapper, .tabs-items-wrapper { background-color: var(--ui-surface) !important; }
 .tabbar-item { color: var(--ui-text-secondary) !important; }
-.tabbar-item:hover { color: var(--ui-text) !important; }
-.tabbar-default .tabbar-item-active { color: var(--ui-text) !important; }
+.tabbar-item:hover { color: var(--ui-text) !important; background-color: var(--ui-surface-hover) !important; }
+.tabbar-default .tabbar-item-active, .tabbar-item--active { color: var(--ui-text) !important; background-color: var(--ui-primary-soft) !important; }
 
 /* === 23. Tailwind Overrides === */
 body .bg-white, body [class*="bg-white"] { background-color: var(--ui-surface) !important; }
