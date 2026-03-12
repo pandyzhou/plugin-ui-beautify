@@ -16,6 +16,10 @@
   var enableCursorGlow = true;
   var enablePageTransition = true;
   var enableListAnimation = true;
+  var enableMacOSCards = true;
+  var enable3DCards = true;
+  var enableWallpaper = true;
+  var enableWelcomeBanner = true;
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -65,6 +69,10 @@
           enableCursorGlow = data.basic.enableCursorGlow !== false;
           enablePageTransition = data.basic.enablePageTransition !== false;
           enableListAnimation = data.basic.enableListAnimation !== false;
+          enableMacOSCards = data.basic.enableMacOSCards !== false;
+          enable3DCards = data.basic.enable3DCards !== false;
+          enableWallpaper = data.basic.enableWallpaper !== false;
+          enableWelcomeBanner = data.basic.enableWelcomeBanner !== false;
           applyCustomCss(data.basic.customCss || "");
           /* Apply toggle states */
           applyToggleStates();
@@ -96,19 +104,25 @@
   function applyToggleStates() {
     /* Cursor glow */
     var glowEl = document.getElementById("ui-beautify-cursor-glow");
-    if (glowEl) {
-      glowEl.style.display = enableCursorGlow ? "" : "none";
-    }
+    if (glowEl) glowEl.style.display = enableCursorGlow ? "" : "none";
     /* List animation */
     var listStyleEl = document.getElementById("ui-beautify-list-anim");
-    if (listStyleEl) {
-      listStyleEl.disabled = !enableListAnimation;
-    }
+    if (listStyleEl) listStyleEl.disabled = !enableListAnimation;
     /* Page transition */
     var pageStyleEl = document.getElementById("ui-beautify-page-anim");
-    if (pageStyleEl) {
-      pageStyleEl.disabled = !enablePageTransition;
-    }
+    if (pageStyleEl) pageStyleEl.disabled = !enablePageTransition;
+    /* macOS cards */
+    var macLights = document.querySelectorAll(".ui-traffic-lights");
+    macLights.forEach(function(el) { el.style.display = enableMacOSCards ? "" : "none"; });
+    /* 3D cards */
+    var tiltCards = document.querySelectorAll(".card-wrapper > *");
+    if (!enable3DCards) tiltCards.forEach(function(el) { el.style.transform = ""; });
+    /* Wallpaper */
+    var wallEl = document.getElementById("ui-beautify-wallpaper");
+    if (wallEl) wallEl.style.display = enableWallpaper ? "" : "none";
+    /* Welcome banner */
+    var bannerEl = document.getElementById("ui-welcome-banner");
+    if (bannerEl) bannerEl.style.display = enableWelcomeBanner ? "" : "none";
   }
 
   /* ========== Particle Effects Engine ========== */
@@ -689,6 +703,478 @@
         }, 8000 + Math.random() * 5000);
       }
     };
+
+  /* ============================================
+     BIG FEATURE 1: AURORA DYNAMIC BACKGROUND
+     Multi-layer gradient that slowly moves
+     ============================================ */
+  (function initAuroraBackground() {
+    if (reducedMotion.matches) return;
+    var aurora = document.createElement("div");
+    aurora.id = "ui-beautify-aurora-bg";
+    aurora.style.cssText =
+      "position:fixed;top:0;left:0;width:200%;height:200%;" +
+      "pointer-events:none;z-index:-1;opacity:0.5;" +
+      "will-change:transform;";
+    document.body.prepend(aurora);
+
+    function updateAuroraColors(theme) {
+      var gradients = {
+        "default": "radial-gradient(ellipse at 20% 50%, rgba(76,203,160,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(54,179,137,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(76,203,160,0.06) 0%, transparent 50%)",
+        "sakura": "radial-gradient(ellipse at 20% 50%, rgba(236,72,153,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(219,39,119,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(244,114,182,0.06) 0%, transparent 50%)",
+        "ocean": "radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(37,99,235,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(96,165,250,0.06) 0%, transparent 50%)",
+        "deepblue": "radial-gradient(ellipse at 20% 50%, rgba(56,189,248,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(14,165,233,0.1) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(99,102,241,0.08) 0%, transparent 50%)",
+        "dark": "radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(167,139,250,0.04) 0%, transparent 50%)",
+        "aurora": "radial-gradient(ellipse at 20% 50%, rgba(168,85,247,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(236,72,153,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(129,140,248,0.06) 0%, transparent 50%)",
+        "minimal": "none"
+      };
+      aurora.style.background = gradients[theme] || gradients["default"];
+      if (theme === "minimal") aurora.style.opacity = "0";
+      else aurora.style.opacity = "0.5";
+    }
+
+    var angle = 0;
+    function animateAurora() {
+      angle += 0.001;
+      var x = Math.sin(angle) * 5;
+      var y = Math.cos(angle * 0.7) * 3;
+      var r = Math.sin(angle * 0.3) * 2;
+      aurora.style.transform = "translate(" + x + "%, " + y + "%) rotate(" + r + "deg)";
+      requestAnimationFrame(animateAurora);
+    }
+    animateAurora();
+    window._uiBeautifyUpdateAurora = updateAuroraColors;
+  })();
+  /* ============================================
+     BIG FEATURE 2: macOS WINDOW CARDS
+     Traffic light dots on card headers
+     ============================================ */
+  (function initMacOSCards() {
+    function injectTrafficLights(header) {
+      if (header.querySelector(".ui-traffic-lights")) return;
+      var container = document.createElement("div");
+      container.className = "ui-traffic-lights";
+      container.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;";
+      var colors = ["#ff5f57", "#febc2e", "#28c840"];
+      for (var i = 0; i < 3; i++) {
+        var dot = document.createElement("span");
+        dot.style.cssText = "width:11px;height:11px;border-radius:50%;background:" + colors[i] + ";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);transition:transform 0.15s ease;";
+        dot.addEventListener("mouseenter", function() { this.style.transform = "scale(1.2)"; });
+        dot.addEventListener("mouseleave", function() { this.style.transform = "scale(1)"; });
+        container.appendChild(dot);
+      }
+      header.style.position = "relative";
+      header.style.paddingLeft = "72px";
+      header.prepend(container);
+    }
+
+    function scanAndInject() {
+      document.querySelectorAll(".card-header").forEach(injectTrafficLights);
+    }
+
+    scanAndInject();
+    var macObserver = new MutationObserver(function() {
+      setTimeout(scanAndInject, 100);
+    });
+    macObserver.observe(document.body, { childList: true, subtree: true });
+  })();
+  /* ============================================
+     BIG FEATURE 3: SIDEBAR OVERHAUL
+     Card-style menu items + enlarged icons
+     ============================================ */
+  (function initSidebarOverhaul() {
+    var sidebarStyle = document.createElement("style");
+    sidebarStyle.id = "ui-beautify-sidebar-overhaul";
+    sidebarStyle.textContent =
+      ".sidebar .menu-item-title {" +
+      "  margin: 3px 10px !important;" +
+      "  padding: 9px 12px !important;" +
+      "  border-radius: 10px !important;" +
+      "  border: 1px solid transparent !important;" +
+      "  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;" +
+      "}" +
+      ".sidebar .menu-item-title:hover {" +
+      "  border-color: rgba(128,128,128,0.1) !important;" +
+      "  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;" +
+      "}" +
+      ".sidebar .menu-item-title.active {" +
+      "  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;" +
+      "}" +
+      ".sidebar .menu-icon svg {" +
+      "  width: 22px !important;" +
+      "  height: 22px !important;" +
+      "  transition: transform 0.2s ease !important;" +
+      "}" +
+      ".sidebar .menu-item-title:hover .menu-icon svg {" +
+      "  transform: scale(1.15) !important;" +
+      "}" +
+      ".sidebar .menu-label {" +
+      "  margin-top: 16px !important;" +
+      "  padding: 6px 22px 4px !important;" +
+      "  font-size: 10px !important;" +
+      "  text-transform: uppercase !important;" +
+      "  letter-spacing: 1.5px !important;" +
+      "  opacity: 0.5 !important;" +
+      "}";
+    document.head.appendChild(sidebarStyle);
+  })();
+  /* ============================================
+     BIG FEATURE 4: DASHBOARD VISUAL OVERHAUL
+     Gradient cards + large numbers + sparklines
+     ============================================ */
+  (function initDashboardOverhaul() {
+    var dashStyle = document.createElement("style");
+    dashStyle.id = "ui-beautify-dashboard";
+    dashStyle.textContent =
+      ".dashboard .vue-grid-item > div {" +
+      "  overflow: hidden !important;" +
+      "  position: relative !important;" +
+      "}" +
+      ".dashboard [class*='text-2xl']," +
+      ".dashboard [class*='text-3xl'] {" +
+      "  font-size: 2.25rem !important;" +
+      "  font-weight: 800 !important;" +
+      "  letter-spacing: -0.03em !important;" +
+      "}" +
+      ".dashboard .rounded-full[class*='bg-gray-100']," +
+      ".dashboard .rounded-full[class*='bg-gray'] {" +
+      "  width: 48px !important;" +
+      "  height: 48px !important;" +
+      "  display: flex !important;" +
+      "  align-items: center !important;" +
+      "  justify-content: center !important;" +
+      "}" +
+      ".dashboard .rounded-full[class*='bg-gray-100'] svg," +
+      ".dashboard .rounded-full[class*='bg-gray'] svg {" +
+      "  width: 24px !important;" +
+      "  height: 24px !important;" +
+      "}";
+    document.head.appendChild(dashStyle);
+
+    /* Inject sparklines */
+    function injectSparklines() {
+      var cards = document.querySelectorAll(".dashboard .vue-grid-item > div");
+      cards.forEach(function(card) {
+        if (card.querySelector(".ui-sparkline")) return;
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 120 30");
+        svg.setAttribute("class", "ui-sparkline");
+        svg.style.cssText = "position:absolute;bottom:0;left:0;width:100%;height:35px;opacity:0.15;pointer-events:none;";
+        var points = [];
+        for (var i = 0; i < 20; i++) {
+          points.push((i / 19 * 120).toFixed(1) + "," + (5 + Math.random() * 20).toFixed(1));
+        }
+        svg.innerHTML = '<polyline points="' + points.join(" ") + '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+        card.appendChild(svg);
+      });
+    }
+
+    /* Retry until dashboard loads */
+    var dashRetry = setInterval(function() {
+      if (document.querySelector(".dashboard .vue-grid-item")) {
+        injectSparklines();
+        clearInterval(dashRetry);
+      }
+    }, 500);
+    setTimeout(function() { clearInterval(dashRetry); }, 15000);
+
+    /* Re-inject on route change */
+    var lastDashPath = "";
+    setInterval(function() {
+      var p = location.pathname;
+      if (p !== lastDashPath && p.indexOf("/console") > -1) {
+        lastDashPath = p;
+        setTimeout(injectSparklines, 800);
+      }
+    }, 300);
+  })();
+  /* ============================================
+     BIG FEATURE 5: ZEN MODE EDITOR
+     Immersive full-screen writing experience
+     ============================================ */
+  (function initZenMode() {
+    var zenStyle = document.createElement("style");
+    zenStyle.id = "ui-beautify-zen";
+    zenStyle.textContent =
+      "body.ui-zen-mode .sidebar { transform: translateX(-100%) !important; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important; }" +
+      "body.ui-zen-mode .main-content { margin-left: 0 !important; width: 100% !important; transition: margin-left 0.5s ease !important; }" +
+      "body.ui-zen-mode .page-header { opacity: 0 !important; height: 0 !important; overflow: hidden !important; transition: opacity 0.3s ease, height 0.3s ease !important; }" +
+      "body.ui-zen-mode .page-header:hover { opacity: 1 !important; height: auto !important; }" +
+      "body.ui-zen-mode .editor-header { opacity: 0.3 !important; transition: opacity 0.3s ease !important; }" +
+      "body.ui-zen-mode .editor-header:hover { opacity: 1 !important; }" +
+      "body.ui-zen-mode .ProseMirror { max-width: 48rem !important; margin: 0 auto !important; padding: 2rem !important; min-height: 80vh !important; }" +
+      "body.ui-zen-mode .editor-entry-extra { display: none !important; }" +
+      "body.ui-zen-mode #ui-zen-btn { background: #ef4444 !important; }" +
+      "body.ui-zen-mode #ui-zen-btn::after { content: '退出 Zen'; }" +
+      "body:not(.ui-zen-mode) #ui-zen-btn::after { content: '🧘 Zen'; }";
+    document.head.appendChild(zenStyle);
+
+    var zenBtn = document.createElement("button");
+    zenBtn.id = "ui-zen-btn";
+    zenBtn.style.cssText =
+      "position:fixed;bottom:24px;right:24px;z-index:9999;" +
+      "padding:10px 20px;border-radius:24px;border:none;cursor:pointer;" +
+      "font-size:14px;font-weight:600;color:#fff;" +
+      "background:linear-gradient(135deg,#667eea,#764ba2);" +
+      "box-shadow:0 4px 16px rgba(102,126,234,0.4);" +
+      "transition:all 0.3s ease;display:none;";
+    zenBtn.addEventListener("click", function() {
+      document.body.classList.toggle("ui-zen-mode");
+    });
+    document.body.appendChild(zenBtn);
+
+    /* Show button only on editor pages */
+    setInterval(function() {
+      var isEditor = !!document.querySelector(".ProseMirror");
+      zenBtn.style.display = isEditor ? "block" : "none";
+      if (!isEditor) document.body.classList.remove("ui-zen-mode");
+    }, 500);
+
+    /* ESC to exit */
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") document.body.classList.remove("ui-zen-mode");
+    });
+  })();
+  /* ============================================
+     BIG FEATURE 6: 3D CARD TILT ON HOVER
+     Perspective tilt following mouse position
+     ============================================ */
+  (function init3DCards() {
+    if (reducedMotion.matches) return;
+    var tiltStyle = document.createElement("style");
+    tiltStyle.textContent =
+      ".card-wrapper { perspective: 800px !important; }" +
+      ".card-wrapper > * { transition: transform 0.15s ease-out !important; transform-style: preserve-3d !important; }";
+    document.head.appendChild(tiltStyle);
+
+    document.addEventListener("mousemove", function(e) {
+      var cards = document.querySelectorAll(".card-wrapper");
+      cards.forEach(function(card) {
+        var rect = card.getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+        var x = (e.clientX - rect.left) / rect.width - 0.5;
+        var y = (e.clientY - rect.top) / rect.height - 0.5;
+        var child = card.firstElementChild;
+        if (child) {
+          child.style.transform = "rotateY(" + (x * 4).toFixed(2) + "deg) rotateX(" + (-y * 4).toFixed(2) + "deg) translateZ(4px)";
+        }
+      });
+    });
+
+    document.addEventListener("mouseleave", function() {
+      document.querySelectorAll(".card-wrapper > *").forEach(function(el) {
+        el.style.transform = "";
+      });
+    }, true);
+
+    /* Reset on mouseout of individual cards */
+    document.addEventListener("mouseout", function(e) {
+      var card = e.target.closest(".card-wrapper");
+      if (card && !card.contains(e.relatedTarget)) {
+        var child = card.firstElementChild;
+        if (child) child.style.transform = "";
+      }
+    });
+  })();
+  /* ============================================
+     BIG FEATURE 7: RAINBOW GLOW BORDERS
+     Rotating conic-gradient on hover/focus
+     ============================================ */
+  (function initRainbowBorders() {
+    if (reducedMotion.matches) return;
+    var rbStyle = document.createElement("style");
+    rbStyle.textContent =
+      "@keyframes _ui_rainbowSpin { 0% { --_rb_angle: 0deg; } 100% { --_rb_angle: 360deg; } }" +
+      "@property --_rb_angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }" +
+      ".card-wrapper:hover { position: relative !important; }" +
+      ".card-wrapper:hover::before {" +
+      "  content: '' !important; position: absolute !important;" +
+      "  inset: -2px !important; border-radius: inherit !important; z-index: -1 !important;" +
+      "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
+      "  animation: _ui_rainbowSpin 3s linear infinite !important;" +
+      "  opacity: 0.4 !important; filter: blur(8px) !important;" +
+      "}" +
+      ".formkit-outer input:focus { position: relative !important; }" +
+      ".formkit-outer input:focus::after {" +
+      "  content: '' !important; position: absolute !important;" +
+      "  inset: -3px !important; border-radius: inherit !important; z-index: -1 !important;" +
+      "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
+      "  animation: _ui_rainbowSpin 3s linear infinite !important;" +
+      "  opacity: 0.3 !important; filter: blur(6px) !important;" +
+      "}";
+    document.head.appendChild(rbStyle);
+  })();
+  /* ============================================
+     BIG FEATURE 8: PAGE SLIDE TRANSITION
+     Slide-in from right on route change
+     ============================================ */
+  (function initSlideTransition() {
+    if (reducedMotion.matches) return;
+    var slideStyle = document.createElement("style");
+    slideStyle.id = "ui-beautify-slide-transition";
+    slideStyle.textContent =
+      "@keyframes _ui_slideIn { from { opacity: 0; transform: translateX(30px) scale(0.98); } to { opacity: 1; transform: translateX(0) scale(1); } }" +
+      "@keyframes _ui_slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-20px); } }";
+    document.head.appendChild(slideStyle);
+
+    var lastSlide = location.pathname;
+    setInterval(function() {
+      if (!enablePageTransition) return;
+      var cur = location.pathname;
+      if (cur !== lastSlide) {
+        lastSlide = cur;
+        var mc = document.querySelector(".main-content");
+        if (mc) {
+          mc.style.animation = "none";
+          void mc.offsetHeight;
+          mc.style.animation = "_ui_slideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards";
+        }
+      }
+    }, 100);
+  })();
+  /* ============================================
+     BIG FEATURE 9: WELCOME BANNER
+     Time-based greeting on dashboard
+     ============================================ */
+  (function initWelcomeBanner() {
+    function createBanner() {
+      var dashboard = document.querySelector(".dashboard");
+      if (!dashboard || dashboard.querySelector("#ui-welcome-banner")) return;
+
+      var hour = new Date().getHours();
+      var greeting, emoji, gradient;
+      if (hour < 6) { greeting = "夜深了"; emoji = "🌙"; gradient = "linear-gradient(135deg, #1a1a2e, #16213e)"; }
+      else if (hour < 12) { greeting = "早上好"; emoji = "☀️"; gradient = "linear-gradient(135deg, #f093fb, #f5576c)"; }
+      else if (hour < 14) { greeting = "中午好"; emoji = "🌤️"; gradient = "linear-gradient(135deg, #4facfe, #00f2fe)"; }
+      else if (hour < 18) { greeting = "下午好"; emoji = "🌅"; gradient = "linear-gradient(135deg, #fa709a, #fee140)"; }
+      else { greeting = "晚上好"; emoji = "🌆"; gradient = "linear-gradient(135deg, #a18cd1, #fbc2eb)"; }
+
+      /* Try to get username */
+      var userName = "";
+      var userEl = document.querySelector(".sidebar__profile .profile-name") ||
+                   document.querySelector("[class*='profile'] [class*='name']") ||
+                   document.querySelector(".sidebar__profile span");
+      if (userEl) userName = "，" + userEl.textContent.trim();
+
+      var banner = document.createElement("div");
+      banner.id = "ui-welcome-banner";
+      banner.style.cssText =
+        "background:" + gradient + ";border-radius:16px;padding:28px 32px;" +
+        "margin-bottom:20px;color:#fff;position:relative;overflow:hidden;" +
+        "box-shadow:0 8px 32px rgba(0,0,0,0.12);";
+      banner.innerHTML =
+        '<div style="position:relative;z-index:1;">' +
+        '<div style="font-size:2.5rem;margin-bottom:4px;">' + emoji + '</div>' +
+        '<div style="font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;">' + greeting + userName + '</div>' +
+        '<div style="font-size:0.9rem;opacity:0.8;margin-top:6px;">' + new Date().toLocaleDateString("zh-CN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) + '</div>' +
+        '</div>' +
+        '<div style="position:absolute;top:-20%;right:-5%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="position:absolute;bottom:-30%;right:15%;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>';
+
+      dashboard.prepend(banner);
+    }
+
+    /* Retry until dashboard loads */
+    var bannerRetry = setInterval(function() {
+      if (document.querySelector(".dashboard")) {
+        createBanner();
+        clearInterval(bannerRetry);
+      }
+    }, 500);
+    setTimeout(function() { clearInterval(bannerRetry); }, 15000);
+
+    /* Re-inject on route change */
+    var lastBannerPath = "";
+    setInterval(function() {
+      var p = location.pathname;
+      if (p !== lastBannerPath) {
+        lastBannerPath = p;
+        setTimeout(createBanner, 800);
+      }
+    }, 300);
+  })();
+  /* ============================================
+     BIG FEATURE 10: DYNAMIC WALLPAPER
+     Particle network with connecting lines
+     ============================================ */
+  (function initDynamicWallpaper() {
+    if (reducedMotion.matches) return;
+    var wallCanvas = document.createElement("canvas");
+    wallCanvas.id = "ui-beautify-wallpaper";
+    wallCanvas.style.cssText =
+      "position:fixed;top:0;left:0;width:100%;height:100%;" +
+      "pointer-events:none;z-index:-2;opacity:0.4;";
+    document.body.prepend(wallCanvas);
+    var wCtx = wallCanvas.getContext("2d");
+    var wParticles = [];
+    var WALL_COUNT = 40;
+    var wallColor = "59,130,246";
+
+    function wallResize() {
+      wallCanvas.width = window.innerWidth;
+      wallCanvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", wallResize);
+    wallResize();
+
+    for (var i = 0; i < WALL_COUNT; i++) {
+      wParticles.push({
+        x: Math.random() * wallCanvas.width,
+        y: Math.random() * wallCanvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: 1 + Math.random() * 1.5
+      });
+    }
+
+    function wallDraw() {
+      wCtx.clearRect(0, 0, wallCanvas.width, wallCanvas.height);
+      for (var i = 0; i < wParticles.length; i++) {
+        var p = wParticles[i];
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > wallCanvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > wallCanvas.height) p.vy *= -1;
+
+        wCtx.beginPath();
+        wCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        wCtx.fillStyle = "rgba(" + wallColor + ",0.5)";
+        wCtx.fill();
+
+        for (var j = i + 1; j < wParticles.length; j++) {
+          var q = wParticles[j];
+          var dx = p.x - q.x, dy = p.y - q.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 130) {
+            wCtx.beginPath();
+            wCtx.moveTo(p.x, p.y);
+            wCtx.lineTo(q.x, q.y);
+            wCtx.strokeStyle = "rgba(" + wallColor + "," + (0.12 * (1 - dist / 130)).toFixed(3) + ")";
+            wCtx.lineWidth = 0.5;
+            wCtx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(wallDraw);
+    }
+    wallDraw();
+
+    window._uiBeautifyUpdateWallpaper = function(theme) {
+      var colors = {
+        "default": "76,203,160", "sakura": "236,72,153", "ocean": "59,130,246",
+        "deepblue": "56,189,248", "dark": "139,92,246", "aurora": "168,85,247",
+        "minimal": "148,163,184"
+      };
+      wallColor = colors[theme] || colors["default"];
+    };
+  })();
+  /* Update all dynamic features on theme change */
+  var origLoadTheme = loadThemeCSS;
+  loadThemeCSS = function(theme) {
+    origLoadTheme(theme);
+    if (window._uiBeautifyUpdateAurora) window._uiBeautifyUpdateAurora(theme);
+    if (window._uiBeautifyUpdateWallpaper) window._uiBeautifyUpdateWallpaper(theme);
+  };
+
   })();
 })();
 

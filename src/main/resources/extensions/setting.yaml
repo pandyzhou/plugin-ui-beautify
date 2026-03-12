@@ -50,6 +50,26 @@ spec:
           value: true
           help: "列表项依次淡入的交错动画效果"
         - $formkit: checkbox
+          label: "启用 macOS 窗口风格"
+          name: enableMacOSCards
+          value: true
+          help: "卡片标题栏显示 macOS 风格的红黄绿圆点装饰"
+        - $formkit: checkbox
+          label: "启用 3D 卡片倾斜"
+          name: enable3DCards
+          value: true
+          help: "鼠标悬停卡片时产生 3D 透视倾斜效果"
+        - $formkit: checkbox
+          label: "启用动态壁纸"
+          name: enableWallpaper
+          value: true
+          help: "背景层显示粒子连线网络动态壁纸"
+        - $formkit: checkbox
+          label: "启用欢迎横幅"
+          name: enableWelcomeBanner
+          value: true
+          help: "仪表盘顶部显示时间问候横幅"
+        - $formkit: checkbox
           label: "启用网关页面美化"
           name: enableGateway
           value: true
