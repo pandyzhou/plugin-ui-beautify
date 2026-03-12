@@ -157,7 +157,7 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 .dropdown-item-wrapper--danger:hover { background-color: rgba(255,68,102,0.1) !important; }
 
 /* === 15. Scrollbar === */
-* { scrollbar-color: var(--ui-scrollbar) transparent !important; }
+html { scrollbar-color: var(--ui-scrollbar) transparent !important; }
 ::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; }
 ::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-hover) !important; }
 

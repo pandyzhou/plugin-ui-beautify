@@ -1,10 +1,10 @@
-/* UI Beautify — Modular Architecture (v1.3.5) */
+/* UI Beautify — Modular Architecture */
 (function() {
   "use strict";
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.6.3";
+  var PLUGIN_VERSION = "1.7.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -32,7 +32,7 @@
     fetchConfig: function() {
       var self = this;
       return fetch(CONFIG_URL)
-        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(res) { return res.ok ? res.json().catch(function() { return null; }) : null; })
         .then(function(data) {
           if (data && data.basic) {
             self._applyCustomCss(data.basic.customCss || "");
@@ -99,14 +99,16 @@
         document.head.appendChild(baseLink);
       }
 
-      /* Load theme-specific CSS */
+      /* Load theme-specific CSS — insert after base to ensure correct cascade */
       if (existing) existing.remove();
       var link = document.createElement("link");
       link.id = LINK_ID;
       link.rel = "stylesheet";
       link.dataset.theme = theme;
       link.href = BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION;
-      document.head.appendChild(link);
+      var baseEl = document.getElementById(BASE_LINK_ID);
+      if (baseEl && baseEl.nextSibling) { baseEl.parentNode.insertBefore(link, baseEl.nextSibling); }
+      else { document.head.appendChild(link); }
 
       FX.apply(theme);
       this._notifyThemeChange(theme);
@@ -480,13 +482,17 @@
     init: function() {
       this._styleEl = document.createElement("style");
       this._styleEl.id = "ui-beautify-page-anim";
-      this._styleEl.textContent = "@keyframes _ui_pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}";
+      this._styleEl.textContent =
+        "@keyframes _ui_pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}" +
+        "@keyframes _ui_slideIn{from{opacity:0;transform:translateX(30px) scale(0.98)}to{opacity:1;transform:translateX(0) scale(1)}}";
       document.head.appendChild(this._styleEl);
     },
     onRouteChange: function() {
       if (!App.isEnabled("enablePageTransition")) return;
       var mc = document.querySelector(".main-content");
-      if (mc) { mc.style.animation = "none"; void mc.offsetHeight; mc.style.animation = "_ui_pageIn 0.3s ease forwards"; }
+      if (!mc) return;
+      var anim = Math.random() > 0.5 ? "_ui_pageIn 0.3s ease forwards" : "_ui_slideIn .35s cubic-bezier(.22,1,.36,1) forwards";
+      mc.style.animation = "none"; void mc.offsetHeight; mc.style.animation = anim;
     },
     onToggle: function(on) { if (this._styleEl) this._styleEl.disabled = !on; }
   });
@@ -627,7 +633,24 @@
       this._inner.style.background = this._GRADIENTS[theme] || this._GRADIENTS["default"];
       this._inner.style.opacity = theme === "minimal" ? "0" : "0.3";
     },
-    onToggle: function(on) { if (this._el) this._el.style.display = on ? "" : "none"; }
+    onToggle: function(on) {
+      if (!this._el) return;
+      if (on) {
+        this._el.style.display = "";
+        if (!this._rafId) {
+          var self = this;
+          (function animate() {
+            self._angle += 0.001;
+            var x = Math.sin(self._angle)*3, y = Math.cos(self._angle*0.7)*2, r = Math.sin(self._angle*0.3)*1.5;
+            if (self._inner) self._inner.style.transform = "translate("+x+"%,"+y+"%) rotate("+r+"deg)";
+            self._rafId = requestAnimationFrame(animate);
+          })();
+        }
+      } else {
+        this._el.style.display = "none";
+        if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+      }
+    }
   });
 
   /* --- Module: macOS Window Cards --- */
@@ -804,21 +827,6 @@
   });
 
   /* --- Module: Page Slide Transition --- */
-  App.register({
-    id: "slideTransition", toggle: "enablePageTransition", skipIfReducedMotion: true,
-    init: function() {
-      var s = document.createElement("style");
-      s.id = "ui-beautify-slide-transition";
-      s.textContent = "@keyframes _ui_slideIn{from{opacity:0;transform:translateX(30px) scale(0.98)}to{opacity:1;transform:translateX(0) scale(1)}}";
-      document.head.appendChild(s);
-    },
-    onRouteChange: function() {
-      if (!App.isEnabled("enablePageTransition")) return;
-      var mc = document.querySelector(".main-content");
-      if (mc) { mc.style.animation = "none"; void mc.offsetHeight; mc.style.animation = "_ui_slideIn .35s cubic-bezier(.22,1,.36,1) forwards"; }
-    }
-  });
-
   /* --- Module: Welcome Banner --- */
   App.register({
     id: "welcomeBanner", toggle: "enableWelcomeBanner",
@@ -884,10 +892,14 @@
           vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, r: 1 + Math.random() * 1.5
         });
       }
-
+      this._startDraw();
+    },
+    onThemeChange: function(theme) { this._color = this._COLORS[theme] || this._COLORS["default"]; },
+    _startDraw: function() {
+      var self = this, c = this._canvas, ctx = this._ctx, ps = this._particles, col = this._color;
+      if (this._rafId) cancelAnimationFrame(this._rafId);
       (function draw() {
-        var c = self._canvas, ctx = self._ctx, ps = self._particles, col = self._color;
-        if (!c || !ctx) return;
+        col = self._color;
         ctx.clearRect(0, 0, c.width, c.height);
         for (var i = 0; i < ps.length; i++) {
           var p = ps[i];
@@ -908,8 +920,11 @@
         self._rafId = requestAnimationFrame(draw);
       })();
     },
-    onThemeChange: function(theme) { this._color = this._COLORS[theme] || this._COLORS["default"]; },
-    onToggle: function(on) { if (this._canvas) this._canvas.style.display = on ? "" : "none"; }
+    onToggle: function(on) {
+      if (!this._canvas) return;
+      if (on) { this._canvas.style.display = ""; this._startDraw(); }
+      else { this._canvas.style.display = "none"; if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; } }
+    }
   });
 
   /* --- Module: Button Ripple Effect --- */
@@ -1049,8 +1064,8 @@
         setTimeout(function() { if (el.parentNode) el.remove(); }, (dur+delay)*1000+500);
       }
       for (var i = 0; i < 6; i++) spawn();
-      setInterval(spawn, 3000);
-      setTimeout(function() { if (container.parentNode) container.remove(); }, 120000);
+      var spawnId = setInterval(spawn, 3000);
+      setTimeout(function() { clearInterval(spawnId); if (container.parentNode) container.remove(); if (ss.parentNode) ss.remove(); }, 120000);
     }
   });
 
