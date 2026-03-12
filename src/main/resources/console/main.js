@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.2.1";
+  var PLUGIN_VERSION = "1.2.2";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -13,6 +13,9 @@
   var VALID_THEMES = ["default", "ocean", "dark", "sakura", "minimal", "aurora"];
   var currentTheme = null;
   var enableEffects = true;
+  var enableCursorGlow = true;
+  var enablePageTransition = true;
+  var enableListAnimation = true;
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -59,7 +62,12 @@
       .then(function(data) {
         if (data && data.basic) {
           enableEffects = data.basic.enableEffects !== false;
+          enableCursorGlow = data.basic.enableCursorGlow !== false;
+          enablePageTransition = data.basic.enablePageTransition !== false;
+          enableListAnimation = data.basic.enableListAnimation !== false;
           applyCustomCss(data.basic.customCss || "");
+          /* Apply toggle states */
+          applyToggleStates();
           return data.basic.consoleTheme || "default";
         }
         return "default";
@@ -82,6 +90,25 @@
     style.id = CUSTOM_STYLE_ID;
     style.textContent = sanitized;
     document.head.appendChild(style);
+  }
+
+  /* Toggle states for performance features */
+  function applyToggleStates() {
+    /* Cursor glow */
+    var glowEl = document.getElementById("ui-beautify-cursor-glow");
+    if (glowEl) {
+      glowEl.style.display = enableCursorGlow ? "" : "none";
+    }
+    /* List animation */
+    var listStyleEl = document.getElementById("ui-beautify-list-anim");
+    if (listStyleEl) {
+      listStyleEl.disabled = !enableListAnimation;
+    }
+    /* Page transition */
+    var pageStyleEl = document.getElementById("ui-beautify-page-anim");
+    if (pageStyleEl) {
+      pageStyleEl.disabled = !enablePageTransition;
+    }
   }
 
   /* ========== Particle Effects Engine ========== */
@@ -449,7 +476,7 @@
       var curPath = location.pathname + location.hash;
       if (curPath !== lastPath) {
         lastPath = curPath;
-        if (mainContent && !reducedMotion.matches) {
+        if (mainContent && !reducedMotion.matches && enablePageTransition) {
           mainContent.style.animation = "none";
           void mainContent.offsetHeight;
           mainContent.style.animation = "_ui_pageIn 0.3s ease forwards";
@@ -458,6 +485,7 @@
     }, 100);
     /* Inject keyframes */
     var pageStyle = document.createElement("style");
+    pageStyle.id = "ui-beautify-page-anim";
     pageStyle.textContent =
       "@keyframes _ui_pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }";
     document.head.appendChild(pageStyle);
@@ -469,6 +497,7 @@
   (function initStaggeredList() {
     if (reducedMotion.matches) return;
     var staggerStyle = document.createElement("style");
+    staggerStyle.id = "ui-beautify-list-anim";
     staggerStyle.textContent =
       "@keyframes _ui_staggerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
       ".entity-wrapper { animation: _ui_staggerIn 0.25s ease both; }" +
@@ -501,7 +530,7 @@
     document.body.appendChild(glow);
 
     var mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
-    var visible = false, rafId = null;
+    var visible = false, rafId = null, idleTimer = null;
 
     function lerp(a, b, t) { return a + (b - a) * t; }
 
@@ -510,18 +539,27 @@
       glowY = lerp(glowY, mouseY, 0.25);
       glow.style.left = glowX + "px";
       glow.style.top = glowY + "px";
+      /* Stop when close enough (idle) */
+      if (Math.abs(glowX - mouseX) < 0.5 && Math.abs(glowY - mouseY) < 0.5) {
+        rafId = null;
+        return;
+      }
       rafId = requestAnimationFrame(animate);
     }
 
     document.addEventListener("mousemove", function(e) {
+      if (!enableCursorGlow) {
+        glow.style.opacity = "0";
+        return;
+      }
       mouseX = e.clientX;
       mouseY = e.clientY;
       if (!visible) {
         glowX = mouseX; glowY = mouseY;
         glow.style.opacity = "1";
         visible = true;
-        rafId = requestAnimationFrame(animate);
       }
+      if (!rafId) rafId = requestAnimationFrame(animate);
     });
     document.addEventListener("mouseleave", function() {
       glow.style.opacity = "0"; visible = false;

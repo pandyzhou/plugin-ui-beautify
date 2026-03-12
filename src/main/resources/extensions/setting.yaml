@@ -33,6 +33,21 @@ spec:
           value: true
           help: "开启后各主题会显示专属动态效果（樱花飘落、星空闪烁、气泡上浮等）"
         - $formkit: checkbox
+          label: "启用光标光晕"
+          name: enableCursorGlow
+          value: true
+          help: "鼠标移动时显示主题色光晕跟随效果"
+        - $formkit: checkbox
+          label: "启用页面过渡动画"
+          name: enablePageTransition
+          value: true
+          help: "页面切换时的淡入过渡效果"
+        - $formkit: checkbox
+          label: "启用列表入场动画"
+          name: enableListAnimation
+          value: true
+          help: "列表项依次淡入的交错动画效果"
+        - $formkit: checkbox
           label: "启用网关页面美化"
           name: enableGateway
           value: true
