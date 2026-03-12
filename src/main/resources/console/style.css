@@ -249,7 +249,21 @@ select:focus-visible {
 }
 
 /* --- Button Click Feedback --- */
-.btn.btn-primary {
+.btn.btn-primary,
+.btn.btn-primary:hover,
+.btn.btn-primary:focus,
+.btn.btn-primary:active,
+[class*="btn-primary"],
+[class*="btn-primary"]:hover {
+  color: #fff !important;
+}
+/* App store install/upgrade buttons */
+.app-detail-btn,
+.app-store-btn,
+button[class*="install"],
+button[class*="upgrade"],
+.modal-wrapper .btn:not(.btn-default):not(.btn-secondary),
+.modal-wrapper .btn:not(.btn-default):not(.btn-secondary):hover {
   color: #fff !important;
 }
 .btn:active {
@@ -300,9 +314,9 @@ select:focus-visible {
     0 0 0 1px rgba(0, 0, 0, 0.02) !important;
 }
 
-/* Button hover glow */
+/* Button hover glow — no filter to preserve text contrast */
 .btn.btn-primary:hover {
-  filter: brightness(1.08) !important;
+  opacity: 0.92 !important;
 }
 
 /* Switch glow when on */
