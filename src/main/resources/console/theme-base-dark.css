@@ -1,0 +1,181 @@
+/* ============================================
+   Theme Base: Dark — 暗色主题公共样式
+   被 dark, deepblue, aurora, neon 主题继承
+   各主题通过覆盖 CSS 变量来定制颜色
+   ============================================ */
+
+:root {
+  --ui-bg: #1a1a2e;
+  --ui-surface: rgba(30,30,50,0.8);
+  --ui-surface-hover: rgba(50,50,70,0.8);
+  --ui-border: rgba(255,255,255,0.06);
+  --ui-border-hover: rgba(255,255,255,0.12);
+  --ui-text: #e0e0f0;
+  --ui-text-secondary: #a0a0b8;
+  --ui-text-muted: #666680;
+  --ui-primary: #8b5cf6;
+  --ui-primary-soft: rgba(139,92,246,0.1);
+  --ui-shadow: rgba(0,0,0,0.2);
+  --ui-shadow-hover: rgba(0,0,0,0.3);
+  --ui-scrollbar: rgba(255,255,255,0.15);
+  --ui-scrollbar-hover: rgba(255,255,255,0.25);
+  --ui-overlay: rgba(0,0,0,0.6);
+}
+
+/* === 1. Body === */
+body { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
+
+/* === 2. Sidebar === */
+.sidebar { background: var(--ui-bg) !important; border-right: 1px solid var(--ui-border) !important; }
+.sidebar__logo-container img, .sidebar__logo-container svg { filter: brightness(1.8) !important; }
+.sidebar__search { background-color: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+.sidebar__search:hover { border-color: var(--ui-border-hover) !important; }
+.sidebar__search-text, .sidebar__search-shortcut { color: var(--ui-text-muted) !important; }
+.sidebar__profile { border-top: 1px solid var(--ui-border) !important; }
+
+/* === 3. Menu === */
+.menu-container { color: var(--ui-text-secondary) !important; }
+.menu-item { transition: all 0.2s ease !important; }
+.menu-item:hover { background-color: var(--ui-surface-hover) !important; }
+.menu-item-title { color: var(--ui-text-secondary) !important; }
+.menu-item-title:hover { color: var(--ui-text) !important; }
+.menu-item-title.active { background: var(--ui-primary-soft) !important; color: var(--ui-text) !important; font-weight: 600 !important; }
+.menu-icon-collapse { color: var(--ui-text-muted) !important; }
+.menu-icon-collapse:hover { color: var(--ui-text) !important; }
+
+/* === 4. Main Content === */
+.main-content { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
+.main-content__footer { opacity: 0.4 !important; }
+.main-content__footer:hover { opacity: 1 !important; }
+.main-content__footer a, .main-content__footer span { color: var(--ui-text-muted) !important; }
+
+/* === 5. Page Header === */
+.page-header { background: var(--ui-bg) !important; border-bottom: 1px solid var(--ui-border) !important; }
+.page-header__title { color: var(--ui-text) !important; }
+
+/* === 6. Cards === */
+.card-wrapper { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; box-shadow: 0 1px 3px var(--ui-shadow) !important; }
+.card-wrapper:hover { box-shadow: 0 4px 12px var(--ui-shadow-hover) !important; border-color: var(--ui-border-hover) !important; }
+.card-header { border-bottom: 1px solid var(--ui-border) !important; }
+.card-header-title, .card-body { color: var(--ui-text) !important; }
+.card-footer { border-top: 1px solid var(--ui-border) !important; }
+
+/* === 7. Buttons === */
+.btn { color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
+.btn:hover { background-color: var(--ui-surface-hover) !important; }
+.btn-secondary, .btn-default { background: var(--ui-surface) !important; color: var(--ui-text-secondary) !important; border-color: var(--ui-border) !important; }
+.btn-secondary:hover, .btn-default:hover { background: var(--ui-surface-hover) !important; border-color: var(--ui-border-hover) !important; }
+
+/* === 8. Entity List === */
+.entity-wrapper { border-radius: 0.5rem !important; transition: all 0.2s ease !important; }
+.entity-wrapper:hover { background-color: var(--ui-surface-hover) !important; }
+.entity-wrapper.entity-selected, .entity-wrapper.is-selected { background-color: var(--ui-primary-soft) !important; }
+.entity-field-title, .entity-field-body-title { color: var(--ui-text) !important; }
+.entity-field-description { color: var(--ui-text-secondary) !important; }
+.entity-dropdown-trigger { color: var(--ui-text-muted) !important; }
+.entity-dropdown-trigger:hover { color: var(--ui-text) !important; }
+
+/* === 9. Forms === */
+input[type="text"], input[type="email"], input[type="password"],
+input[type="url"], input[type="search"], input[type="number"],
+textarea, .formkit-outer select {
+  background: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text) !important;
+}
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+input[type="url"]:focus, input[type="search"]:focus, input[type="number"]:focus,
+textarea:focus, .formkit-outer select:focus {
+  border-color: var(--ui-primary) !important; box-shadow: 0 0 0 3px var(--ui-primary-soft) !important;
+}
+input::placeholder, textarea::placeholder { color: var(--ui-text-muted) !important; }
+.formkit-label { color: var(--ui-text) !important; }
+.formkit-help { color: var(--ui-text-muted) !important; }
+
+/* === 10. Dropdown Options (critical!) === */
+.formkit-option, .formkit-listbox .formkit-option,
+[data-type="select"] [role="option"],
+[role="option"], li[role="option"],
+.formkit-listbox-option {
+  color: var(--ui-text) !important; background-color: var(--ui-surface) !important;
+}
+.formkit-option:hover, .formkit-option[aria-selected="true"],
+.formkit-option[data-is-active="true"],
+[data-type="select"] [role="option"]:hover,
+[role="option"]:hover, [role="option"][aria-selected="true"],
+[role="option"][data-is-active="true"],
+li[role="option"]:hover, li[role="option"][aria-selected="true"],
+.formkit-listbox-option:hover, .formkit-listbox-option[data-is-active="true"] {
+  background-color: var(--ui-surface-hover) !important; color: var(--ui-text) !important;
+}
+.formkit-listbox, .formkit-dropdown-wrapper,
+[data-type="select"] .formkit-inner {
+  background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important;
+}
+.formkit-outer select option { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
+
+/* === 11. Modal === */
+.modal-wrapper .modal-layer { backdrop-filter: blur(12px) !important; background: var(--ui-overlay) !important; }
+.modal-wrapper .modal-content { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+
+/* === 12. Toast / Alert === */
+.toast-body { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+.alert-default { background: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text) !important; }
+
+/* === 13. Tags === */
+.tag-default { border-color: var(--ui-border) !important; color: var(--ui-text-secondary) !important; }
+
+/* === 14. Dropdown Menu === */
+.v-popper--theme-dropdown .v-popper__inner { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; box-shadow: 0 8px 24px var(--ui-shadow) !important; }
+.dropdown-content { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; }
+.dropdown-item-wrapper { color: var(--ui-text) !important; }
+.dropdown-item-wrapper:hover, .dropdown-item-wrapper.active { background-color: var(--ui-surface-hover) !important; }
+.dropdown-item-wrapper--danger { color: #ff4466 !important; }
+.dropdown-item-wrapper--danger:hover { background-color: rgba(255,68,102,0.1) !important; }
+
+/* === 15. Scrollbar === */
+* { scrollbar-color: var(--ui-scrollbar) transparent !important; }
+::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-hover) !important; }
+
+/* === 16. Table === */
+tbody tr:nth-child(even) { background-color: var(--ui-surface) !important; }
+tbody tr:hover { background-color: var(--ui-surface-hover) !important; }
+th { color: var(--ui-text-secondary) !important; border-color: var(--ui-border) !important; }
+td { border-color: var(--ui-border) !important; }
+
+/* === 17. Code === */
+pre { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+
+/* === 18. Editor === */
+.ProseMirror { background: var(--ui-bg) !important; color: var(--ui-text) !important; }
+
+/* === 19. Tooltip === */
+.v-popper--theme-tooltip .v-popper__inner { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+
+/* === 20. Description List === */
+.description-item-wrapper:hover { background-color: var(--ui-surface-hover) !important; }
+.description-item__label { color: var(--ui-text-muted) !important; }
+
+/* === 21. Pagination === */
+.pagination-button { color: var(--ui-text-secondary) !important; }
+.pagination-button:hover { background-color: var(--ui-surface-hover) !important; }
+
+/* === 22. Tabs === */
+.tabbar-item { color: var(--ui-text-secondary) !important; }
+.tabbar-item:hover { color: var(--ui-text) !important; }
+.tabbar-default .tabbar-item-active { color: var(--ui-text) !important; }
+
+/* === 23. Tailwind Overrides === */
+body .divide-gray-100 > * + * { border-color: var(--ui-border) !important; }
+body .ring-\[\#eaecf0\] { --tw-ring-color: var(--ui-border) !important; }
+body .border-\[\#eaecf0\] { border-color: var(--ui-border) !important; }
+body .bg-white { background-color: var(--ui-surface) !important; }
+body .text-gray-900, body .text-gray-800, body .text-gray-700 { color: var(--ui-text) !important; }
+body .text-gray-600, body .text-gray-500 { color: var(--ui-text-secondary) !important; }
+body .text-gray-400, body .text-gray-300 { color: var(--ui-text-muted) !important; }
+body .border-gray-100, body .border-gray-200, body .border-gray-300 { border-color: var(--ui-border) !important; }
+
+/* === 24. User Profile === */
+.user-profile { background-color: var(--ui-bg) !important; }
+.user-profile .user-profile-name { color: var(--ui-text) !important; }
+.user-profile .user-profile-role { color: var(--ui-text-muted) !important; }

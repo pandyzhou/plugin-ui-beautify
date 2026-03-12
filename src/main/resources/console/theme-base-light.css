@@ -1,0 +1,229 @@
+/* ============================================
+   Theme Base: Light — 浅色主题公共样式
+   被 default, ocean, sakura, minimal 主题继承
+   各主题通过覆盖 CSS 变量来定制颜色
+   ============================================ */
+
+:root {
+  --ui-bg: #f8fafc;
+  --ui-surface: #ffffff;
+  --ui-surface-hover: #f1f5f9;
+  --ui-border: rgba(0,0,0,0.06);
+  --ui-border-hover: rgba(0,0,0,0.1);
+  --ui-text: #1e293b;
+  --ui-text-secondary: #64748b;
+  --ui-text-muted: #94a3b8;
+  --ui-primary: #6366f1;
+  --ui-primary-soft: rgba(99,102,241,0.08);
+  --ui-shadow: rgba(0,0,0,0.04);
+  --ui-shadow-hover: rgba(0,0,0,0.08);
+  --ui-scrollbar: rgba(148,163,184,0.3);
+  --ui-scrollbar-hover: rgba(148,163,184,0.5);
+  --ui-overlay: rgba(255,255,255,0.8);
+}
+
+/* === 1. Sidebar === */
+.sidebar {
+  background: var(--ui-surface) !important;
+  border-right: 1px solid var(--ui-border) !important;
+}
+.sidebar__search {
+  background-color: var(--ui-surface-hover) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.sidebar__search:hover {
+  border-color: var(--ui-border-hover) !important;
+}
+.sidebar__profile {
+  border-top: 1px solid var(--ui-border) !important;
+}
+
+/* === 2. Menu === */
+.menu-item:hover {
+  background-color: var(--ui-surface-hover) !important;
+}
+.menu-item-title {
+  color: var(--ui-text-secondary) !important;
+}
+.menu-item-title.active {
+  color: var(--ui-text) !important;
+  background: var(--ui-primary-soft) !important;
+  font-weight: 600 !important;
+}
+
+/* === 3. Main Content === */
+.main-content {
+  color: var(--ui-text) !important;
+}
+.main-content__footer {
+  opacity: 0.5 !important;
+  transition: opacity 0.2s ease !important;
+}
+.main-content__footer:hover { opacity: 1 !important; }
+
+/* === 4. Page Header === */
+.page-header {
+  background: var(--ui-overlay) !important;
+  border-bottom: 1px solid var(--ui-border) !important;
+}
+.page-header__title { color: var(--ui-text) !important; }
+
+/* === 5. Cards === */
+.card-wrapper {
+  background: var(--ui-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: 0 1px 3px var(--ui-shadow) !important;
+}
+.card-wrapper:hover {
+  box-shadow: 0 4px 12px var(--ui-shadow-hover) !important;
+  border-color: var(--ui-border-hover) !important;
+}
+.card-header { border-bottom: 1px solid var(--ui-border) !important; }
+.card-footer { border-top: 1px solid var(--ui-border) !important; }
+
+/* === 6. Buttons === */
+.btn {
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+.btn-secondary, .btn-default {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text-secondary) !important;
+}
+.btn-secondary:hover, .btn-default:hover {
+  background: var(--ui-surface-hover) !important;
+  border-color: var(--ui-border-hover) !important;
+}
+
+/* === 7. Entity List === */
+.entity-wrapper {
+  border-radius: 0.625rem !important;
+  transition: all 0.2s ease !important;
+}
+.entity-wrapper:hover {
+  background-color: var(--ui-surface-hover) !important;
+}
+.entity-wrapper.entity-selected,
+.entity-wrapper.is-selected {
+  background-color: var(--ui-primary-soft) !important;
+}
+
+/* === 8. Forms === */
+input[type="text"], input[type="email"], input[type="password"],
+input[type="url"], input[type="search"], input[type="number"],
+textarea, .formkit-outer select {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+input[type="url"]:focus, input[type="search"]:focus, input[type="number"]:focus,
+textarea:focus, .formkit-outer select:focus {
+  border-color: var(--ui-primary) !important;
+  box-shadow: 0 0 0 3px var(--ui-primary-soft) !important;
+}
+.formkit-label { color: var(--ui-text) !important; }
+.formkit-help { color: var(--ui-text-muted) !important; }
+
+/* === 9. Dropdown Options (critical for readability) === */
+.formkit-option, .formkit-listbox .formkit-option,
+[data-type="select"] [role="option"],
+[role="option"], li[role="option"],
+.formkit-listbox-option {
+  color: var(--ui-text) !important;
+  background-color: var(--ui-surface) !important;
+}
+.formkit-option:hover, .formkit-option[aria-selected="true"],
+.formkit-option[data-is-active="true"],
+[data-type="select"] [role="option"]:hover,
+[role="option"]:hover, [role="option"][aria-selected="true"],
+[role="option"][data-is-active="true"],
+li[role="option"]:hover, li[role="option"][aria-selected="true"],
+.formkit-listbox-option:hover, .formkit-listbox-option[data-is-active="true"] {
+  background-color: var(--ui-surface-hover) !important;
+  color: var(--ui-text) !important;
+}
+.formkit-listbox, .formkit-dropdown-wrapper,
+[data-type="select"] .formkit-inner {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+
+/* === 10. Modal === */
+.modal-wrapper .modal-layer {
+  backdrop-filter: blur(12px) !important;
+  background: rgba(0,0,0,0.3) !important;
+}
+.modal-wrapper .modal-content {
+  background: var(--ui-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+/* === 11. Toast / Alert === */
+.toast-body {
+  background: var(--ui-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.alert-default {
+  background: var(--ui-surface-hover) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+/* === 12. Tags === */
+.tag-default {
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text-secondary) !important;
+}
+
+/* === 13. Dropdown Menu === */
+.v-popper--theme-dropdown .v-popper__inner {
+  background: var(--ui-surface) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+.dropdown-content {
+  background: var(--ui-surface) !important;
+}
+.dropdown-item-wrapper { color: var(--ui-text) !important; }
+.dropdown-item-wrapper:hover,
+.dropdown-item-wrapper.active {
+  background-color: var(--ui-surface-hover) !important;
+}
+
+/* === 14. Scrollbar === */
+* { scrollbar-color: var(--ui-scrollbar) transparent !important; }
+::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-hover) !important; }
+
+/* === 15. Table === */
+tbody tr:nth-child(even) { background-color: var(--ui-surface-hover) !important; }
+tbody tr:hover { background-color: var(--ui-primary-soft) !important; }
+
+/* === 16. Code === */
+pre { background: var(--ui-surface-hover) !important; color: var(--ui-text) !important; }
+code:not(pre code) { background: var(--ui-surface-hover) !important; color: var(--ui-text) !important; }
+
+/* === 17. Editor === */
+.ProseMirror { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+
+/* === 18. Tooltip === */
+.v-popper--theme-tooltip .v-popper__inner {
+  background: var(--ui-text) !important;
+  color: var(--ui-surface) !important;
+}
+
+/* === 19. Description List === */
+.description-item-wrapper:hover { background-color: var(--ui-surface-hover) !important; }
+.description-item__label { color: var(--ui-text-muted) !important; }
+
+/* === 20. Pagination === */
+.pagination-button { color: var(--ui-text-secondary) !important; }
+.pagination-button:hover { background-color: var(--ui-surface-hover) !important; }
+
+/* === 21. Tabs === */
+.tabbar-item { color: var(--ui-text-secondary) !important; }
+.tabbar-item:hover { color: var(--ui-text) !important; }
+.tabbar-default .tabbar-item-active { color: var(--ui-text) !important; }

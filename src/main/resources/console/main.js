@@ -4,13 +4,15 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.5.4";
+  var PLUGIN_VERSION = "1.6.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
   var BASE_URL = "/plugins/" + PLUGIN_NAME + "/assets/console/";
   var CONFIG_URL = "/apis/api.console.halo.run/v1alpha1/plugins/" + PLUGIN_NAME + "/json-config";
   var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"];
+  var DARK_THEMES = ["dark", "deepblue", "aurora", "neon"];
+  var BASE_LINK_ID = "ui-beautify-base-css";
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -83,6 +85,21 @@
       root.style.transition = "background-color 0.35s ease, color 0.35s ease";
       setTimeout(function() { root.style.transition = ""; }, 500);
 
+      /* Load base CSS (light or dark) */
+      var isDark = DARK_THEMES.indexOf(theme) !== -1;
+      var baseName = isDark ? "theme-base-dark" : "theme-base-light";
+      var existingBase = document.getElementById(BASE_LINK_ID);
+      if (!existingBase || existingBase.dataset.base !== baseName) {
+        if (existingBase) existingBase.remove();
+        var baseLink = document.createElement("link");
+        baseLink.id = BASE_LINK_ID;
+        baseLink.rel = "stylesheet";
+        baseLink.dataset.base = baseName;
+        baseLink.href = BASE_URL + baseName + ".css?v=" + PLUGIN_VERSION;
+        document.head.appendChild(baseLink);
+      }
+
+      /* Load theme-specific CSS */
       if (existing) existing.remove();
       var link = document.createElement("link");
       link.id = LINK_ID;
