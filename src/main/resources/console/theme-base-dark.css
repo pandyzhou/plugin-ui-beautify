@@ -112,9 +112,34 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 }
 .formkit-outer select option { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
 
-/* === 11. Modal === */
+/* === 11. Modal (deep coverage) === */
 .modal-wrapper .modal-layer { backdrop-filter: blur(12px) !important; background: var(--ui-overlay) !important; }
-.modal-wrapper .modal-content { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+.modal-wrapper .modal-content,
+.modal-content, .modal-body, .modal-wrapper .modal-body,
+.dialog-wrapper, .dialog-content { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+.modal-header { border-bottom: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
+.modal-header-title { color: var(--ui-text) !important; }
+.modal-header-actions button { color: var(--ui-text-muted) !important; }
+.modal-header-actions button:hover { background-color: var(--ui-surface-hover) !important; }
+.modal-footer { border-top: 1px solid var(--ui-border) !important; }
+/* Modal inner panels, tabs, search, cards */
+.modal-wrapper [class*="bg-white"],
+.modal-wrapper [class*="bg-gray"],
+.dialog-wrapper [class*="bg-white"],
+.dialog-wrapper [class*="bg-gray"] { background-color: var(--ui-surface) !important; }
+.modal-wrapper input, .modal-wrapper textarea, .modal-wrapper select,
+.dialog-wrapper input, .dialog-wrapper textarea { background: var(--ui-bg) !important; color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
+.modal-wrapper .card-wrapper, .dialog-wrapper .card-wrapper { background: var(--ui-bg) !important; }
+.modal-wrapper .entity-wrapper, .dialog-wrapper .entity-wrapper { background: var(--ui-bg) !important; }
+.modal-wrapper .entity-wrapper:hover { background: var(--ui-surface-hover) !important; }
+/* Plugin store / upgrade modal specific */
+.modal-wrapper .tabbar-item { color: var(--ui-text-secondary) !important; }
+.modal-wrapper .tabbar-item:hover { color: var(--ui-text) !important; }
+.modal-wrapper .tabbar-item-active, .modal-wrapper .tabbar-item--active { color: var(--ui-text) !important; }
+.modal-wrapper .pagination-button { background: var(--ui-surface) !important; color: var(--ui-text-secondary) !important; border-color: var(--ui-border) !important; }
+.modal-wrapper a { color: var(--ui-primary) !important; }
+.dialog-title { color: var(--ui-text) !important; }
+.dialog-description { color: var(--ui-text-secondary) !important; }
 
 /* === 12. Toast / Alert === */
 .toast-body { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
@@ -169,16 +194,55 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 .tabbar-default .tabbar-item-active { color: var(--ui-text) !important; }
 
 /* === 23. Tailwind Overrides === */
-body .divide-gray-100 > * + * { border-color: var(--ui-border) !important; }
-body .ring-\[\#eaecf0\] { --tw-ring-color: var(--ui-border) !important; }
-body .border-\[\#eaecf0\] { border-color: var(--ui-border) !important; }
-body .bg-white { background-color: var(--ui-surface) !important; }
+body .bg-white, body [class*="bg-white"] { background-color: var(--ui-surface) !important; }
+body .bg-gray-50, body [class*="bg-gray-50"] { background-color: var(--ui-bg) !important; }
+body .bg-gray-100, body [class*="bg-gray-100"] { background-color: var(--ui-surface) !important; }
+body .bg-gray-200, body [class*="bg-gray-200"] { background-color: var(--ui-surface-hover) !important; }
+body .hover\:bg-gray-50:hover { background-color: var(--ui-surface-hover) !important; }
+body .hover\:bg-gray-100:hover { background-color: var(--ui-surface-hover) !important; }
 body .text-gray-900, body .text-gray-800, body .text-gray-700 { color: var(--ui-text) !important; }
 body .text-gray-600, body .text-gray-500 { color: var(--ui-text-secondary) !important; }
 body .text-gray-400, body .text-gray-300 { color: var(--ui-text-muted) !important; }
+body .text-black { color: var(--ui-text) !important; }
 body .border-gray-100, body .border-gray-200, body .border-gray-300 { border-color: var(--ui-border) !important; }
+body .divide-gray-100 > * + *, body .divide-gray-200 > * + * { border-color: var(--ui-border) !important; }
+body .ring-\[\#eaecf0\] { --tw-ring-color: var(--ui-border) !important; }
+body .ring-1 { --tw-ring-color: var(--ui-border) !important; }
+body .border-\[\#eaecf0\] { border-color: var(--ui-border) !important; }
+body .shadow-sm, body [class*="shadow-sm"] { box-shadow: 0 1px 3px var(--ui-shadow) !important; }
+body .shadow, body .shadow-md { box-shadow: 0 4px 12px var(--ui-shadow) !important; }
 
 /* === 24. User Profile === */
 .user-profile { background-color: var(--ui-bg) !important; }
 .user-profile .user-profile-name { color: var(--ui-text) !important; }
 .user-profile .user-profile-role { color: var(--ui-text-muted) !important; }
+
+/* === 25. Misc — catch remaining white elements === */
+/* Empty state */
+.empty-wrapper { color: var(--ui-text-secondary) !important; }
+.empty-title { color: var(--ui-text) !important; }
+.empty-message { color: var(--ui-text-muted) !important; }
+/* Widget cards */
+.widget-card { background-color: var(--ui-surface) !important; }
+/* Avatar */
+.avatar-wrapper { background-color: var(--ui-surface-hover) !important; }
+/* Kbd */
+kbd, .kbd { border-color: var(--ui-border) !important; background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+/* Skeleton shimmer */
+.skeleton, [class*="animate-pulse"] { background: linear-gradient(90deg, var(--ui-surface) 25%, var(--ui-surface-hover) 50%, var(--ui-surface) 75%) !important; }
+/* Switch */
+.switch-wrapper .switch-inner { background-color: var(--ui-surface-hover) !important; }
+.switch-inner[aria-checked="true"] { background-color: var(--ui-primary) !important; }
+/* Checkbox/Radio unchecked */
+input[type="checkbox"], input[type="radio"] { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
+input[type="checkbox"]:checked, input[type="radio"]:checked { background-color: var(--ui-primary) !important; border-color: var(--ui-primary) !important; }
+/* Global search modal */
+.search-modal, [class*="search-modal"], [class*="command-palette"] { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
+/* Breadcrumb */
+.breadcrumb, [class*="breadcrumb"] { color: var(--ui-text-secondary) !important; }
+/* Badge */
+.badge, [class*="badge"] { background-color: var(--ui-surface-hover) !important; color: var(--ui-text-secondary) !important; }
+/* Divider */
+hr, .divider { border-color: var(--ui-border) !important; }
+/* Noise overlay fix */
+.main-content::before { opacity: 0.02 !important; filter: invert(1) !important; }
