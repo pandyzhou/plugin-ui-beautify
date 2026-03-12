@@ -424,7 +424,11 @@ textarea::placeholder {
 }
 .formkit-option:hover,
 .formkit-option[aria-selected="true"],
-[data-type="select"] [role="option"]:hover {
+.formkit-option[data-is-active="true"],
+[data-type="select"] [role="option"]:hover,
+[role="option"]:hover, [role="option"][aria-selected="true"],
+[role="option"][data-is-active="true"],
+li[role="option"]:hover, li[role="option"][aria-selected="true"] {
   background-color: #334155 !important;
   color: #e2e8f0 !important;
 }
