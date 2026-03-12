@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.3.3";
+  var PLUGIN_VERSION = "1.3.4";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -66,16 +66,24 @@
       .then(function(data) {
         if (data && data.basic) {
           applyCustomCss(data.basic.customCss || "");
-          /* Read feature toggles from features group */
+          /* Read feature toggles — with backward compat for v1.2.x→v1.3.x migration.
+             In v1.2.x all toggles were in "basic" group. In v1.3.3+ they moved to "features".
+             If "features" group exists, use it. Otherwise fall back to "basic" for each field. */
           var f = data.features || {};
-          enableEffects = f.enableEffects !== false;
-          enableCursorGlow = f.enableCursorGlow !== false;
-          enablePageTransition = f.enablePageTransition !== false;
-          enableListAnimation = f.enableListAnimation !== false;
-          enableMacOSCards = f.enableMacOSCards !== false;
-          enable3DCards = f.enable3DCards !== false;
-          enableWallpaper = f.enableWallpaper !== false;
-          enableWelcomeBanner = f.enableWelcomeBanner !== false;
+          var b = data.basic;
+          function readToggle(name) {
+            if (data.features && f[name] !== undefined) return f[name] !== false;
+            if (b[name] !== undefined) return b[name] !== false;
+            return true; /* default on */
+          }
+          enableEffects = readToggle("enableEffects");
+          enableCursorGlow = readToggle("enableCursorGlow");
+          enablePageTransition = readToggle("enablePageTransition");
+          enableListAnimation = readToggle("enableListAnimation");
+          enableMacOSCards = readToggle("enableMacOSCards");
+          enable3DCards = readToggle("enable3DCards");
+          enableWallpaper = readToggle("enableWallpaper");
+          enableWelcomeBanner = readToggle("enableWelcomeBanner");
           /* Apply toggle states */
           applyToggleStates();
           return data.basic.consoleTheme || "default";
@@ -939,9 +947,12 @@
     });
     document.body.appendChild(zenBtn);
 
-    /* Show button only on editor pages */
+    /* Show button only on editor pages — check both ProseMirror and editor route */
     setInterval(function() {
-      var isEditor = !!document.querySelector(".ProseMirror");
+      var isEditor = !!document.querySelector(".ProseMirror") ||
+                     location.pathname.indexOf("/editor") > -1 ||
+                     location.pathname.indexOf("/posts/editor") > -1 ||
+                     location.pathname.indexOf("/pages/editor") > -1;
       zenBtn.style.display = isEditor ? "block" : "none";
       if (!isEditor) document.body.classList.remove("ui-zen-mode");
     }, 500);
@@ -1034,6 +1045,7 @@
      ============================================ */
   (function initWelcomeBanner() {
     function createBanner() {
+      if (!enableWelcomeBanner) return;
       var dashboard = document.querySelector(".dashboard");
       if (!dashboard || dashboard.querySelector("#ui-welcome-banner")) return;
 
@@ -1045,7 +1057,6 @@
       else if (hour < 18) { greeting = "下午好"; emoji = "🌅"; gradient = "linear-gradient(135deg, #fa709a, #fee140)"; }
       else { greeting = "晚上好"; emoji = "🌆"; gradient = "linear-gradient(135deg, #a18cd1, #fbc2eb)"; }
 
-      /* Try to get username */
       var userName = "";
       var userEl = document.querySelector(".sidebar__profile .profile-name") ||
                    document.querySelector("[class*='profile'] [class*='name']") ||
@@ -1057,7 +1068,8 @@
       banner.style.cssText =
         "background:" + gradient + ";border-radius:16px;padding:28px 32px;" +
         "margin-bottom:20px;color:#fff;position:relative;overflow:hidden;" +
-        "box-shadow:0 8px 32px rgba(0,0,0,0.12);";
+        "box-shadow:0 8px 32px rgba(0,0,0,0.12);" +
+        "animation:_ui_pageIn 0.3s ease forwards;";
       banner.innerHTML =
         '<div style="position:relative;z-index:1;">' +
         '<div style="font-size:2.5rem;margin-bottom:4px;">' + emoji + '</div>' +
@@ -1070,24 +1082,24 @@
       dashboard.prepend(banner);
     }
 
-    /* Retry until dashboard loads */
-    var bannerRetry = setInterval(function() {
-      if (document.querySelector(".dashboard")) {
+    /* Use MutationObserver for instant detection instead of polling */
+    var bannerObserver = new MutationObserver(function() {
+      if (document.querySelector(".dashboard") && !document.querySelector("#ui-welcome-banner")) {
         createBanner();
-        clearInterval(bannerRetry);
       }
-    }, 500);
-    setTimeout(function() { clearInterval(bannerRetry); }, 15000);
+    });
+    bannerObserver.observe(document.body, { childList: true, subtree: true });
 
-    /* Re-inject on route change */
-    var lastBannerPath = "";
+    /* Also try immediately and on route change */
+    createBanner();
+    var lastBannerPath = location.pathname;
     setInterval(function() {
       var p = location.pathname;
       if (p !== lastBannerPath) {
         lastBannerPath = p;
-        setTimeout(createBanner, 800);
+        setTimeout(createBanner, 150);
       }
-    }, 300);
+    }, 200);
   })();
   /* ============================================
      BIG FEATURE 10: DYNAMIC WALLPAPER
