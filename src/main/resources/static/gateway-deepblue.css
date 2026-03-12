@@ -1,0 +1,73 @@
+/* ============================================
+   Gateway Theme: Deep Blue — 深海静谧
+   ============================================ */
+
+/* Background gradient */
+body.login-page,
+body.signup-page {
+  background: linear-gradient(135deg, #0f172a 0%, #0c1222 40%, #1e293b 100%) !important;
+}
+
+/* Orbs */
+.halo-orb-1 {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25), transparent 70%) !important;
+}
+.halo-orb-2 {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.2), transparent 70%) !important;
+}
+.halo-orb-3 {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%) !important;
+}
+
+/* Form wrapper */
+.halo-form-wrapper {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(56, 189, 248, 0.05) !important;
+}
+
+/* Form title */
+.halo-form-wrapper h1,
+.halo-form-wrapper .form-title {
+  color: #e2e8f0 !important;
+}
+
+/* Input fields */
+.halo-form input[type="text"],
+.halo-form input[type="email"],
+.halo-form input[type="password"] {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid rgba(56, 189, 248, 0.2) !important;
+  color: #e2e8f0 !important;
+}
+.halo-form input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15), 0 0 15px rgba(56, 189, 248, 0.08) !important;
+}
+
+/* Submit button */
+.halo-form button[type="submit"] {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3) !important;
+}
+.halo-form button[type="submit"]:hover {
+  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Links */
+.halo-form a {
+  color: #38bdf8 !important;
+}
+
+/* Labels */
+.halo-form label {
+  color: #94a3b8 !important;
+}
+
+/* Alert */
+.halo-form .alert {
+  background: rgba(56, 189, 248, 0.1) !important;
+  border: 1px solid rgba(56, 189, 248, 0.2) !important;
+  color: #7dd3fc !important;
+}

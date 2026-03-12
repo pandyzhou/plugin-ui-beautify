@@ -3,14 +3,14 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.2.3";
+  var PLUGIN_VERSION = "1.3.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
   var BASE_URL = "/plugins/" + PLUGIN_NAME + "/assets/console/";
   var CONFIG_URL = "/apis/api.console.halo.run/v1alpha1/plugins/" +
     PLUGIN_NAME + "/json-config";
-  var VALID_THEMES = ["default", "ocean", "dark", "sakura", "minimal", "aurora"];
+  var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora"];
   var currentTheme = null;
   var enableEffects = true;
   var enableCursorGlow = true;
@@ -259,6 +259,43 @@
             p.y = h + 10;
             p.x = Math.random() * w;
             p.size = 3 + Math.random() * 6;
+          }
+        }
+      },
+
+      deepblue: {
+        count: 15,
+        color: function() {
+          var colors = ["rgba(56,189,248,", "rgba(14,165,233,", "rgba(99,102,241,", "rgba(129,140,248,"];
+          var c = colors[Math.floor(Math.random() * colors.length)];
+          return c + (0.06 + Math.random() * 0.1).toFixed(2) + ")";
+        },
+        size: function() { return 2 + Math.random() * 5; },
+        speed: function() { return 0.1 + Math.random() * 0.3; },
+        draw: function(ctx, p) {
+          /* Bioluminescent glow */
+          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+          grd.addColorStop(0, p.color);
+          grd.addColorStop(1, "transparent");
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+          /* Core */
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(200,220,255,0.4)";
+          ctx.fill();
+        },
+        update: function(p, w, h) {
+          p.y -= p.vy * 0.3;
+          p.x += Math.sin(p.wobble) * 0.4;
+          p.wobble += 0.015;
+          /* Pulsate */
+          p.size += Math.sin(p.wobble * 2) * 0.02;
+          if (p.y < -30) {
+            p.y = h + 20;
+            p.x = Math.random() * w;
           }
         }
       },
@@ -572,6 +609,7 @@
         "default": "rgba(76,203,160,0.12)",
         "sakura": "rgba(236,72,153,0.12)",
         "ocean": "rgba(59,130,246,0.12)",
+        "deepblue": "rgba(56,189,248,0.15)",
         "dark": "rgba(139,92,246,0.15)",
         "aurora": "rgba(168,85,247,0.15)",
         "minimal": "rgba(0,0,0,0.04)"

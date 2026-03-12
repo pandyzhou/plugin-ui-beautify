@@ -15,8 +15,10 @@ spec:
           options:
             - label: "🌿 默认 — 薄荷清新"
               value: "default"
-            - label: "🌊 深邃蓝 — 专业冷静"
+            - label: "🌊 天空蓝 — 清爽明亮"
               value: "ocean"
+            - label: "🔵 深邃蓝 — 深海静谧"
+              value: "deepblue"
             - label: "🌙 暗夜 — 深色护眼"
               value: "dark"
             - label: "🌸 樱花 — 温暖柔和"
@@ -60,8 +62,10 @@ spec:
           options:
             - label: "🌿 默认 — 薄荷清新"
               value: "default"
-            - label: "🌊 深邃蓝 — 专业冷静"
+            - label: "🌊 天空蓝 — 清爽明亮"
               value: "ocean"
+            - label: "🔵 深邃蓝 — 深海静谧"
+              value: "deepblue"
             - label: "🌙 暗夜 — 深色护眼"
               value: "dark"
             - label: "🌸 樱花 — 温暖柔和"
