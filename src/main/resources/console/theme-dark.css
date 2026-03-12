@@ -137,9 +137,7 @@ body {
 /* === 6. Page Header === */
 .page-header {
   border-bottom: 1px solid #45475a !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  background: rgba(30, 30, 46, 0.92) !important;
+  background: rgba(30, 30, 46, 0.95) !important;
 }
 .page-header__title {
   color: #cdd6f4 !important;

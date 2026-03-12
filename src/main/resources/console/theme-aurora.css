@@ -146,9 +146,7 @@ body {
 /* === 6. Page Header === */
 .page-header {
   border-bottom: 1px solid rgba(168, 85, 247, 0.1) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  background: rgba(15, 15, 26, 0.9) !important;
+  background: rgba(15, 15, 26, 0.95) !important;
 }
 .page-header__title {
   color: #e2e8f0 !important;
@@ -157,11 +155,10 @@ body {
 /* === 7. Card === */
 .card-wrapper {
   border-radius: 1rem !important;
-  background: rgba(26, 26, 46, 0.8) !important;
+  background: rgba(26, 26, 46, 0.92) !important;
   background-color: #1a1a2e !important;
   border: 1px solid rgba(168, 85, 247, 0.12) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(168, 85, 247, 0.05) !important;
-  backdrop-filter: blur(8px) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
   position: relative;
   overflow: hidden;
