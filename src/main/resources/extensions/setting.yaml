@@ -27,6 +27,8 @@ spec:
               value: "minimal"
             - label: "🌌 极光 — 紫粉科技"
               value: "aurora"
+            - label: "✨ 霓虹 — 赛博动漫"
+              value: "neon"
             - label: "🖥️ 跟随系统 — 自动切换明暗"
               value: "auto"
         - $formkit: checkbox
@@ -54,6 +56,8 @@ spec:
               value: "minimal"
             - label: "🌌 极光 — 紫粉科技"
               value: "aurora"
+            - label: "✨ 霓虹 — 赛博动漫"
+              value: "neon"
         - $formkit: textarea
           label: "自定义 CSS"
           name: customCss

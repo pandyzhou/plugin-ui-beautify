@@ -65,10 +65,12 @@
   width: 3px !important;
 }
 .menu-label {
-  color: #3b82f6 !important;
-  font-size: 0.7rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  color: #1e40af !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding-left: 10px !important;
+  border-left: 3px solid rgba(59, 130, 246, 0.4) !important;
 }
 
 /* === 3. Main Content — 渐变背景 + 装饰光斑 === */

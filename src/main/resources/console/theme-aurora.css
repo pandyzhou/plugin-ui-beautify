@@ -96,10 +96,12 @@ body {
   color: inherit !important;
 }
 .menu-label {
-  color: #7c8599 !important;
-  font-size: 0.7rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  color: #4b5563 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding-left: 10px !important;
+  border-left: 3px solid rgba(168, 85, 247, 0.4) !important;
 }
 .menu-icon-collapse {
   color: #7c8599 !important;

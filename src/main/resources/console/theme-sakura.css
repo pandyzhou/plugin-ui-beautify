@@ -65,10 +65,12 @@
   width: 3px !important;
 }
 .menu-label {
-  color: #ec4899 !important;
-  font-size: 0.7rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  color: #9d174d !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding-left: 10px !important;
+  border-left: 3px solid rgba(236, 72, 153, 0.4) !important;
 }
 
 /* === 3. Main Content — 渐变背景 + 装饰光斑 === */
@@ -101,10 +103,12 @@
   border: 1px solid rgba(236, 72, 153, 0.08) !important;
   box-shadow: 0 1px 3px rgba(236, 72, 153, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  background: rgba(255, 255, 255, 0.88) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 .card-wrapper:hover {
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.12), 0 0 0 1px rgba(236, 72, 153, 0.08) !important;
   border-color: rgba(236, 72, 153, 0.18) !important;
 }
 .card-header {
@@ -125,7 +129,7 @@
   border: none !important;
 }
 .btn.btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35) !important;
 }
 
 .btn.btn-default {

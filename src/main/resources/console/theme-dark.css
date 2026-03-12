@@ -89,7 +89,12 @@ body {
   color: inherit !important;
 }
 .menu-label {
-  color: #7f849c !important;
+  color: #a5adc4 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding-left: 10px !important;
+  border-left: 3px solid rgba(139, 92, 246, 0.4) !important;
 }
 .menu-icon-collapse {
   color: #7f849c !important;

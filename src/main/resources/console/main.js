@@ -1,1189 +1,1085 @@
-/* UI Beautify — Theme Loader + Particle Effects (v1.1.2) */
+/* UI Beautify — Modular Architecture (v1.3.5) */
 (function() {
   "use strict";
 
+  /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.3.4";
+  var PLUGIN_VERSION = "1.5.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
   var BASE_URL = "/plugins/" + PLUGIN_NAME + "/assets/console/";
-  var CONFIG_URL = "/apis/api.console.halo.run/v1alpha1/plugins/" +
-    PLUGIN_NAME + "/json-config";
-  var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora"];
-  var currentTheme = null;
-  var enableEffects = true;
-  var enableCursorGlow = true;
-  var enablePageTransition = true;
-  var enableListAnimation = true;
-  var enableMacOSCards = true;
-  var enable3DCards = true;
-  var enableWallpaper = true;
-  var enableWelcomeBanner = true;
+  var CONFIG_URL = "/apis/api.console.halo.run/v1alpha1/plugins/" + PLUGIN_NAME + "/json-config";
+  var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"];
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  /* ========== Theme CSS Loading ========== */
+  /* ========== APP CORE — Config, Router, Module Registry ========== */
 
-  function resolveAutoTheme(theme) {
-    if (theme !== "auto") return theme;
-    return darkMql.matches ? "dark" : "default";
-  }
+  var App = {
+    /* --- State --- */
+    currentTheme: null,
+    toggles: {},          /* { enableEffects: true, enableCursorGlow: true, ... } */
+    _modules: [],         /* registered module descriptors */
+    _lastPath: "",        /* for route change detection */
+    _routeTimer: null,
+    _mutationObs: null,
+    _mutationCbs: [],     /* modules that need DOM mutation notifications */
 
-  function applyTransition() {
-    var root = document.documentElement;
-    root.style.transition =
-      "background-color 0.35s ease, color 0.35s ease";
-    setTimeout(function() { root.style.transition = ""; }, 500);
-  }
-
-  function loadThemeCSS(theme) {
-    theme = resolveAutoTheme(theme);
-    if (VALID_THEMES.indexOf(theme) === -1) theme = "default";
-
-    var existing = document.getElementById(LINK_ID);
-    if (existing && existing.dataset.theme === theme) {
-      FX.apply(theme);
-      return;
-    }
-
-    applyTransition();
-    if (existing) existing.remove();
-
-    var link = document.createElement("link");
-    link.id = LINK_ID;
-    link.rel = "stylesheet";
-    link.dataset.theme = theme;
-    link.href = BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION;
-    document.head.appendChild(link);
-
-    FX.apply(theme);
-  }
-
-  function fetchConfig() {
-    return fetch(CONFIG_URL)
-      .then(function(res) { return res.ok ? res.json() : null; })
-      .then(function(data) {
-        if (data && data.basic) {
-          applyCustomCss(data.basic.customCss || "");
-          /* Read feature toggles — with backward compat for v1.2.x→v1.3.x migration.
-             In v1.2.x all toggles were in "basic" group. In v1.3.3+ they moved to "features".
-             If "features" group exists, use it. Otherwise fall back to "basic" for each field. */
-          var f = data.features || {};
-          var b = data.basic;
-          function readToggle(name) {
-            if (data.features && f[name] !== undefined) return f[name] !== false;
-            if (b[name] !== undefined) return b[name] !== false;
-            return true; /* default on */
+    /* --- Config --- */
+    fetchConfig: function() {
+      var self = this;
+      return fetch(CONFIG_URL)
+        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(data) {
+          if (data && data.basic) {
+            self._applyCustomCss(data.basic.customCss || "");
+            var f = data.features || {};
+            var b = data.basic;
+            function readToggle(name) {
+              if (data.features && f[name] !== undefined) return f[name] !== false;
+              if (b[name] !== undefined) return b[name] !== false;
+              return true;
+            }
+            self.toggles.enableEffects = readToggle("enableEffects");
+            self.toggles.enableCursorGlow = readToggle("enableCursorGlow");
+            self.toggles.enablePageTransition = readToggle("enablePageTransition");
+            self.toggles.enableListAnimation = readToggle("enableListAnimation");
+            self.toggles.enableMacOSCards = readToggle("enableMacOSCards");
+            self.toggles.enable3DCards = readToggle("enable3DCards");
+            self.toggles.enableWallpaper = readToggle("enableWallpaper");
+            self.toggles.enableWelcomeBanner = readToggle("enableWelcomeBanner");
+            self._applyToggleStates();
+            return data.basic.consoleTheme || "default";
           }
-          enableEffects = readToggle("enableEffects");
-          enableCursorGlow = readToggle("enableCursorGlow");
-          enablePageTransition = readToggle("enablePageTransition");
-          enableListAnimation = readToggle("enableListAnimation");
-          enableMacOSCards = readToggle("enableMacOSCards");
-          enable3DCards = readToggle("enable3DCards");
-          enableWallpaper = readToggle("enableWallpaper");
-          enableWelcomeBanner = readToggle("enableWelcomeBanner");
-          /* Apply toggle states */
-          applyToggleStates();
-          return data.basic.consoleTheme || "default";
-        }
-        return "default";
-      })
-      .catch(function() { return "default"; });
-  }
+          return "default";
+        })
+        .catch(function() { return "default"; });
+    },
 
-  function applyCustomCss(css) {
-    var existing = document.getElementById(CUSTOM_STYLE_ID);
-    if (existing) existing.remove();
-    if (!css || !css.trim()) return;
-    /* Basic sanitization — block dangerous CSS patterns */
-    var sanitized = css
-      .replace(/expression\s*\(/gi, "/* blocked */")
-      .replace(/javascript\s*:/gi, "/* blocked */")
-      .replace(/@import\b/gi, "/* blocked */")
-      .replace(/behavior\s*:/gi, "/* blocked */")
-      .replace(/-moz-binding\s*:/gi, "/* blocked */");
-    var style = document.createElement("style");
-    style.id = CUSTOM_STYLE_ID;
-    style.textContent = sanitized;
-    document.head.appendChild(style);
-  }
+    isEnabled: function(toggleName) {
+      return this.toggles[toggleName] !== false;
+    },
 
-  /* Toggle states for performance features */
-  function applyToggleStates() {
-    /* Cursor glow */
-    var glowEl = document.getElementById("ui-beautify-cursor-glow");
-    if (glowEl) glowEl.style.display = enableCursorGlow ? "" : "none";
-    /* List animation */
-    var listStyleEl = document.getElementById("ui-beautify-list-anim");
-    if (listStyleEl) listStyleEl.disabled = !enableListAnimation;
-    /* Page transition */
-    var pageStyleEl = document.getElementById("ui-beautify-page-anim");
-    if (pageStyleEl) pageStyleEl.disabled = !enablePageTransition;
-    /* macOS cards — remove injected elements if disabled */
-    var macLights = document.querySelectorAll(".ui-traffic-lights");
-    macLights.forEach(function(el) {
-      if (!enableMacOSCards) {
-        var header = el.parentElement;
-        if (header) header.style.paddingLeft = "";
-        el.remove();
+    /* --- Theme --- */
+    resolveTheme: function(theme) {
+      if (theme !== "auto") return theme;
+      return darkMql.matches ? "dark" : "default";
+    },
+
+    loadThemeCSS: function(theme) {
+      theme = this.resolveTheme(theme);
+      if (VALID_THEMES.indexOf(theme) === -1) theme = "default";
+
+      var existing = document.getElementById(LINK_ID);
+      if (existing && existing.dataset.theme === theme) {
+        FX.apply(theme);
+        this._notifyThemeChange(theme);
+        return;
       }
-    });
-    /* 3D cards — clear transforms */
-    if (!enable3DCards) {
-      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) {
-        el.style.transform = "";
-      });
-    }
-    /* Wallpaper */
-    var wallEl = document.getElementById("ui-beautify-wallpaper");
-    if (wallEl) wallEl.style.display = enableWallpaper ? "" : "none";
-    /* Aurora background */
-    var auroraEl = document.getElementById("ui-beautify-aurora-bg");
-    if (auroraEl) auroraEl.style.display = enableWallpaper ? "" : "none";
-    /* Welcome banner */
-    var bannerEl = document.getElementById("ui-welcome-banner");
-    if (bannerEl) bannerEl.style.display = enableWelcomeBanner ? "" : "none";
-    /* Sidebar overhaul */
-    var sidebarStyle = document.getElementById("ui-beautify-sidebar-overhaul");
-    if (sidebarStyle) sidebarStyle.disabled = !enableMacOSCards;
-  }
 
-  /* ========== Particle Effects Engine ========== */
+      /* Smooth transition */
+      var root = document.documentElement;
+      root.style.transition = "background-color 0.35s ease, color 0.35s ease";
+      setTimeout(function() { root.style.transition = ""; }, 500);
+
+      if (existing) existing.remove();
+      var link = document.createElement("link");
+      link.id = LINK_ID;
+      link.rel = "stylesheet";
+      link.dataset.theme = theme;
+      link.href = BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION;
+      document.head.appendChild(link);
+
+      FX.apply(theme);
+      this._notifyThemeChange(theme);
+    },
+
+    /* --- Module Registry --- */
+    register: function(mod) {
+      this._modules.push(mod);
+    },
+
+    _initModules: function() {
+      var self = this;
+      this._modules.forEach(function(mod) {
+        if (mod.skipIfReducedMotion && reducedMotion.matches) return;
+        if (mod.toggle && !self.isEnabled(mod.toggle)) return;
+        try { mod.init(self); } catch(e) { console.warn("[ui-beautify] Module " + mod.id + " init error:", e); }
+      });
+    },
+
+    /* --- Router (single poller replaces all setIntervals) --- */
+    _startRouter: function() {
+      var self = this;
+      this._lastPath = location.pathname + location.hash;
+      this._routeTimer = setInterval(function() {
+        var cur = location.pathname + location.hash;
+        if (cur !== self._lastPath) {
+          self._lastPath = cur;
+          self._notifyRouteChange(cur);
+        }
+      }, 120);
+    },
+
+    /* --- Unified MutationObserver --- */
+    _startMutationObserver: function() {
+      var self = this;
+      var debounce = null;
+      this._mutationObs = new MutationObserver(function() {
+        if (debounce) clearTimeout(debounce);
+        debounce = setTimeout(function() {
+          self._mutationCbs.forEach(function(cb) {
+            try { cb(); } catch(e) {}
+          });
+        }, 250);
+      });
+      this._mutationObs.observe(document.body, { childList: true, subtree: true });
+    },
+
+    onMutation: function(cb) {
+      this._mutationCbs.push(cb);
+    },
+
+    /* --- Notifications --- */
+    _notifyThemeChange: function(theme) {
+      this._modules.forEach(function(mod) {
+        if (mod.onThemeChange) {
+          try { mod.onThemeChange(theme); } catch(e) {}
+        }
+      });
+    },
+
+    _notifyRouteChange: function(path) {
+      this._modules.forEach(function(mod) {
+        if (mod.onRouteChange) {
+          try { mod.onRouteChange(path); } catch(e) {}
+        }
+      });
+    },
+
+    /* --- Toggle States (disable/enable modules at runtime) --- */
+    _applyToggleStates: function() {
+      var self = this;
+      this._modules.forEach(function(mod) {
+        if (mod.toggle && mod.onToggle) {
+          try { mod.onToggle(self.isEnabled(mod.toggle)); } catch(e) {}
+        }
+      });
+    },
+
+    /* --- Custom CSS --- */
+    _applyCustomCss: function(css) {
+      var existing = document.getElementById(CUSTOM_STYLE_ID);
+      if (existing) existing.remove();
+      if (!css || !css.trim()) return;
+      var sanitized = css
+        .replace(/expression\s*\(/gi, "/* blocked */")
+        .replace(/javascript\s*:/gi, "/* blocked */")
+        .replace(/@import\b/gi, "/* blocked */")
+        .replace(/behavior\s*:/gi, "/* blocked */")
+        .replace(/-moz-binding\s*:/gi, "/* blocked */");
+      var style = document.createElement("style");
+      style.id = CUSTOM_STYLE_ID;
+      style.textContent = sanitized;
+      document.head.appendChild(style);
+    },
+
+    /* --- Toast --- */
+    showRefreshHint: function() {
+      if (document.getElementById("ui-beautify-refresh-toast")) return;
+      if (!document.getElementById("ui-toast-keyframes")) {
+        var ks = document.createElement("style");
+        ks.id = "ui-toast-keyframes";
+        ks.textContent = "@keyframes uiToastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}"
+          + "@keyframes uiToastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(16px)}}";
+        document.head.appendChild(ks);
+      }
+      var toast = document.createElement("div");
+      toast.id = "ui-beautify-refresh-toast";
+      toast.style.cssText = "position:fixed;bottom:32px;right:32px;z-index:99999;"
+        + "display:flex;align-items:center;gap:10px;padding:12px 20px;"
+        + "background:rgba(30,30,30,0.88);backdrop-filter:blur(12px);"
+        + "color:#fff;border-radius:12px;font-size:13px;font-weight:500;"
+        + "box-shadow:0 8px 32px rgba(0,0,0,0.25);cursor:pointer;"
+        + "animation:uiToastIn .35s ease;font-family:system-ui,sans-serif;";
+      toast.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">'
+        + '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>'
+        + '<span>设置已保存，刷新页面以完整应用</span>'
+        + '<span style="background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:6px;font-size:12px;">刷新</span>';
+      toast.addEventListener("click", function() { location.reload(); });
+      var timer = setTimeout(function() { dismissToast(toast); }, 8000);
+      toast.addEventListener("mouseenter", function() { clearTimeout(timer); });
+      toast.addEventListener("mouseleave", function() {
+        timer = setTimeout(function() { dismissToast(toast); }, 3000);
+      });
+      document.body.appendChild(toast);
+
+      function dismissToast(el) {
+        if (!el || !el.parentNode) return;
+        el.style.animation = "uiToastOut .3s ease forwards";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+      }
+    }
+  };
+
+  /* ========== PARTICLE EFFECTS ENGINE ========== */
 
   var FX = {
-    canvas: null,
-    ctx: null,
-    raf: null,
-    particles: [],
-    config: null,
-    w: 0,
-    h: 0,
+    canvas: null, ctx: null, raf: null,
+    particles: [], config: null, w: 0, h: 0,
 
     THEMES: {
       sakura: {
         count: 22,
         color: function() {
-          var colors = [
-            "rgba(236,72,153,0.18)",
-            "rgba(244,114,182,0.15)",
-            "rgba(251,191,210,0.2)",
-            "rgba(253,164,200,0.16)"
-          ];
-          return colors[Math.floor(Math.random() * colors.length)];
+          var c = ["rgba(236,72,153,0.18)","rgba(244,114,182,0.15)","rgba(251,191,210,0.2)","rgba(253,164,200,0.16)"];
+          return c[Math.floor(Math.random() * c.length)];
         },
         size: function() { return 6 + Math.random() * 10; },
         speed: function() { return 0.3 + Math.random() * 0.6; },
         draw: function(ctx, p) {
-          /* 5-petal sakura flower */
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+          ctx.fillStyle = p.color; ctx.beginPath();
           for (var i = 0; i < 5; i++) {
-            var angle = (i * 72 - 90) * Math.PI / 180;
-            var r = p.size * 0.5;
-            ctx.ellipse(
-              Math.cos(angle) * r * 0.5,
-              Math.sin(angle) * r * 0.5,
-              r * 0.45, r * 0.25,
-              angle, 0, Math.PI * 2
-            );
+            var a = (i * 72 - 90) * Math.PI / 180, r = p.size * 0.5;
+            ctx.ellipse(Math.cos(a)*r*0.5, Math.sin(a)*r*0.5, r*0.45, r*0.25, a, 0, Math.PI*2);
           }
-          ctx.fill();
-          ctx.restore();
+          ctx.fill(); ctx.restore();
         },
         update: function(p, w, h) {
-          p.y += p.vy;
-          p.x += Math.sin(p.wobble) * 0.5;
-          p.wobble += 0.015;
-          p.rot += p.rotSpeed;
+          p.y += p.vy; p.x += Math.sin(p.wobble) * 0.5;
+          p.wobble += 0.015; p.rot += p.rotSpeed;
           if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
         }
       },
-
       dark: {
         count: 35,
-        color: function() {
-          var a = 0.15 + Math.random() * 0.35;
-          return "rgba(139,92,246," + a.toFixed(2) + ")";
-        },
+        color: function() { return "rgba(139,92,246," + (0.15 + Math.random() * 0.35).toFixed(2) + ")"; },
         size: function() { return 1 + Math.random() * 2.5; },
         speed: function() { return 0; },
         draw: function(ctx, p) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = p.color.replace(
-            /[\d.]+\)$/,
-            (p.alpha * p.baseAlpha).toFixed(2) + ")"
-          );
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color.replace(/[\d.]+\)$/, (p.alpha * p.baseAlpha).toFixed(2) + ")");
           ctx.fill();
         },
-        update: function(p) {
-          /* twinkle */
-          p.phase += p.phaseSpeed;
-          p.alpha = 0.3 + Math.sin(p.phase) * 0.7;
-        }
+        update: function(p) { p.phase += p.phaseSpeed; p.alpha = 0.3 + Math.sin(p.phase) * 0.7; }
       },
-
       aurora: {
         count: 4,
         color: function() {
-          var colors = [
-            "rgba(168,85,247,0.06)",
-            "rgba(236,72,153,0.05)",
-            "rgba(139,92,246,0.05)",
-            "rgba(192,132,252,0.04)"
-          ];
-          return colors[Math.floor(Math.random() * colors.length)];
+          var c = ["rgba(168,85,247,0.06)","rgba(236,72,153,0.05)","rgba(139,92,246,0.05)","rgba(192,132,252,0.04)"];
+          return c[Math.floor(Math.random() * c.length)];
         },
         size: function() { return 80 + Math.random() * 120; },
         speed: function() { return 0.15 + Math.random() * 0.2; },
         draw: function(ctx, p) {
-          var grd = ctx.createRadialGradient(
-            p.x, p.y, 0, p.x, p.y, p.size
-          );
-          grd.addColorStop(0, p.color);
-          grd.addColorStop(1, "transparent");
-          ctx.fillStyle = grd;
-          ctx.fillRect(
-            p.x - p.size, p.y - p.size,
-            p.size * 2, p.size * 2
-          );
+          var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+          g.addColorStop(0, p.color); g.addColorStop(1, "transparent");
+          ctx.fillStyle = g; ctx.fillRect(p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
         },
         update: function(p, w, h) {
-          p.x += Math.sin(p.wobble) * 0.4;
-          p.y += Math.cos(p.wobble * 0.7) * 0.2;
-          p.wobble += 0.005;
-          /* wrap */
-          if (p.x < -p.size) p.x = w + p.size;
-          if (p.x > w + p.size) p.x = -p.size;
-          if (p.y < -p.size) p.y = h + p.size;
-          if (p.y > h + p.size) p.y = -p.size;
+          p.x += Math.sin(p.wobble) * 0.4; p.y += Math.cos(p.wobble * 0.7) * 0.2; p.wobble += 0.005;
+          if (p.x < -p.size) p.x = w + p.size; if (p.x > w + p.size) p.x = -p.size;
+          if (p.y < -p.size) p.y = h + p.size; if (p.y > h + p.size) p.y = -p.size;
         }
       },
-
       ocean: {
         count: 18,
-        color: function() {
-          var a = 0.08 + Math.random() * 0.12;
-          return "rgba(59,130,246," + a.toFixed(2) + ")";
-        },
+        color: function() { return "rgba(59,130,246," + (0.08 + Math.random() * 0.12).toFixed(2) + ")"; },
         size: function() { return 3 + Math.random() * 6; },
         speed: function() { return 0.2 + Math.random() * 0.5; },
         draw: function(ctx, p) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = p.color;
-          ctx.fill();
-          /* highlight */
-          ctx.beginPath();
-          ctx.arc(
-            p.x - p.size * 0.25,
-            p.y - p.size * 0.25,
-            p.size * 0.3, 0, Math.PI * 2
-          );
-          ctx.fillStyle = "rgba(255,255,255,0.3)";
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x - p.size*0.25, p.y - p.size*0.25, p.size*0.3, 0, Math.PI*2);
+          ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.fill();
         },
         update: function(p, w, h) {
-          p.y -= p.vy;
-          p.x += Math.sin(p.wobble) * 0.3;
-          p.wobble += 0.02;
-          /* shrink as rising */
-          p.size *= 0.9998;
-          if (p.y < -20 || p.size < 1) {
-            p.y = h + 10;
-            p.x = Math.random() * w;
-            p.size = 3 + Math.random() * 6;
-          }
+          p.y -= p.vy; p.x += Math.sin(p.wobble) * 0.3; p.wobble += 0.02; p.size *= 0.9998;
+          if (p.y < -20 || p.size < 1) { p.y = h + 10; p.x = Math.random() * w; p.size = 3 + Math.random() * 6; }
         }
       },
-
       deepblue: {
         count: 15,
         color: function() {
-          var colors = ["rgba(56,189,248,", "rgba(14,165,233,", "rgba(99,102,241,", "rgba(129,140,248,"];
-          var c = colors[Math.floor(Math.random() * colors.length)];
-          return c + (0.06 + Math.random() * 0.1).toFixed(2) + ")";
+          var c = ["rgba(56,189,248,","rgba(14,165,233,","rgba(99,102,241,","rgba(129,140,248,"];
+          return c[Math.floor(Math.random()*c.length)] + (0.06+Math.random()*0.1).toFixed(2) + ")";
         },
         size: function() { return 2 + Math.random() * 5; },
         speed: function() { return 0.1 + Math.random() * 0.3; },
         draw: function(ctx, p) {
-          /* Bioluminescent glow */
-          var grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
-          grd.addColorStop(0, p.color);
-          grd.addColorStop(1, "transparent");
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = grd;
-          ctx.fill();
-          /* Core */
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(200,220,255,0.4)";
-          ctx.fill();
+          var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size*3);
+          g.addColorStop(0, p.color); g.addColorStop(1, "transparent");
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2); ctx.fillStyle = g; ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size*0.5, 0, Math.PI*2);
+          ctx.fillStyle = "rgba(200,220,255,0.4)"; ctx.fill();
         },
         update: function(p, w, h) {
-          p.y -= p.vy * 0.3;
-          p.x += Math.sin(p.wobble) * 0.4;
-          p.wobble += 0.015;
-          /* Pulsate */
+          p.y -= p.vy * 0.3; p.x += Math.sin(p.wobble) * 0.4; p.wobble += 0.015;
           p.size += Math.sin(p.wobble * 2) * 0.02;
-          if (p.y < -30) {
-            p.y = h + 20;
-            p.x = Math.random() * w;
-          }
+          if (p.y < -30) { p.y = h + 20; p.x = Math.random() * w; }
         }
       },
-
+      neon: {
+        count: 30,
+        color: function() {
+          var c = ["rgba(255,0,110,","rgba(0,255,255,","rgba(185,103,255,","rgba(5,255,161,"];
+          return c[Math.floor(Math.random()*c.length)] + (0.15+Math.random()*0.25).toFixed(2) + ")";
+        },
+        size: function() { return 1 + Math.random() * 2.5; },
+        speed: function() { return 0; },
+        draw: function(ctx, p) {
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+          ctx.fillStyle = p.color; ctx.fill();
+          /* neon glow */
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2);
+          var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size*3);
+          g.addColorStop(0, p.color.replace(/[\d.]+\)$/, "0.15)")); g.addColorStop(1, "transparent");
+          ctx.fillStyle = g; ctx.fill();
+        },
+        update: function(p, w, h) {
+          p.phase += p.phaseSpeed; p.alpha = 0.4 + Math.sin(p.phase) * 0.6;
+          p.x += Math.sin(p.wobble) * 0.3; p.y += Math.cos(p.wobble * 0.6) * 0.2;
+          p.wobble += 0.004;
+          if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10;
+          if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
+        }
+      },
       "default": {
         count: 12,
-        color: function() {
-          var a = 0.06 + Math.random() * 0.08;
-          return "rgba(76,203,160," + a.toFixed(2) + ")";
-        },
+        color: function() { return "rgba(76,203,160," + (0.06 + Math.random() * 0.08).toFixed(2) + ")"; },
         size: function() { return 15 + Math.random() * 30; },
         speed: function() { return 0; },
         draw: function(ctx, p) {
-          var grd = ctx.createRadialGradient(
-            p.x, p.y, 0, p.x, p.y, p.size
-          );
-          grd.addColorStop(0, p.color);
-          grd.addColorStop(1, "transparent");
-          ctx.fillStyle = grd;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
+          var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+          g.addColorStop(0, p.color); g.addColorStop(1, "transparent");
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
         },
         update: function(p, w, h) {
-          p.x += Math.sin(p.wobble) * 0.2;
-          p.y += Math.cos(p.wobble * 0.8) * 0.15;
+          p.x += Math.sin(p.wobble) * 0.2; p.y += Math.cos(p.wobble * 0.8) * 0.15;
           p.wobble += 0.003 + Math.random() * 0.002;
-          if (p.x < -p.size) p.x = w + p.size;
-          if (p.x > w + p.size) p.x = -p.size;
-          if (p.y < -p.size) p.y = h + p.size;
-          if (p.y > h + p.size) p.y = -p.size;
+          if (p.x < -p.size) p.x = w + p.size; if (p.x > w + p.size) p.x = -p.size;
+          if (p.y < -p.size) p.y = h + p.size; if (p.y > h + p.size) p.y = -p.size;
         }
       }
     },
 
     createParticle: function(cfg, w, h) {
       return {
-        x: Math.random() * w,
-        y: Math.random() * h,
-        size: cfg.size(),
-        color: cfg.color(),
-        vy: cfg.speed(),
-        vx: 0,
-        rot: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.02,
-        wobble: Math.random() * Math.PI * 2,
-        phase: Math.random() * Math.PI * 2,
-        phaseSpeed: 0.01 + Math.random() * 0.02,
-        alpha: 1,
-        baseAlpha: 0.15 + Math.random() * 0.35
+        x: Math.random()*w, y: Math.random()*h, size: cfg.size(), color: cfg.color(),
+        vy: cfg.speed(), vx: 0, rot: Math.random()*Math.PI*2,
+        rotSpeed: (Math.random()-0.5)*0.02, wobble: Math.random()*Math.PI*2,
+        phase: Math.random()*Math.PI*2, phaseSpeed: 0.01+Math.random()*0.02,
+        alpha: 1, baseAlpha: 0.15+Math.random()*0.35
       };
     },
-
     init: function(theme) {
-      var cfg = this.THEMES[theme];
-      if (!cfg) return;
-
+      var cfg = this.THEMES[theme]; if (!cfg) return;
       this.destroy();
-
-      var canvas = document.createElement("canvas");
-      canvas.id = CANVAS_ID;
-      canvas.style.cssText =
-        "position:fixed;top:0;left:0;width:100%;height:100%;" +
-        "pointer-events:none;z-index:0;opacity:1;";
-      document.body.appendChild(canvas);
-
-      this.canvas = canvas;
-      this.ctx = canvas.getContext("2d");
-      this.config = cfg;
-      this.resize();
-      this.particles = [];
-
-      for (var i = 0; i < cfg.count; i++) {
-        this.particles.push(
-          this.createParticle(cfg, this.w, this.h)
-        );
-      }
-
+      var c = document.createElement("canvas"); c.id = CANVAS_ID;
+      c.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:0;opacity:1;";
+      document.body.appendChild(c);
+      this.canvas = c; this.ctx = c.getContext("2d"); this.config = cfg;
+      this.resize(); this.particles = [];
+      for (var i = 0; i < cfg.count; i++) this.particles.push(this.createParticle(cfg, this.w, this.h));
       var self = this;
-      window.addEventListener("resize", this._onResize = function() {
-        self.resize();
-      });
-
+      window.addEventListener("resize", this._onResize = function() { self.resize(); });
       this.loop();
     },
-
     resize: function() {
       if (!this.canvas) return;
-      this.w = window.innerWidth;
-      this.h = window.innerHeight;
-      this.canvas.width = this.w;
-      this.canvas.height = this.h;
+      this.w = window.innerWidth - 260; this.h = window.innerHeight;
+      this.canvas.width = this.w; this.canvas.height = this.h;
     },
-
     loop: function() {
       var self = this;
-      this.raf = requestAnimationFrame(function frame() {
-        self.render();
-        self.raf = requestAnimationFrame(frame);
-      });
+      this.raf = requestAnimationFrame(function frame() { self.render(); self.raf = requestAnimationFrame(frame); });
     },
-
     render: function() {
-      var ctx = this.ctx;
-      var cfg = this.config;
-      if (!ctx || !cfg) return;
-
+      var ctx = this.ctx, cfg = this.config; if (!ctx || !cfg) return;
       ctx.clearRect(0, 0, this.w, this.h);
-
-      for (var i = 0; i < this.particles.length; i++) {
-        var p = this.particles[i];
-        cfg.update(p, this.w, this.h);
-        cfg.draw(ctx, p);
-      }
+      for (var i = 0; i < this.particles.length; i++) { var p = this.particles[i]; cfg.update(p, this.w, this.h); cfg.draw(ctx, p); }
     },
-
     destroy: function() {
-      if (this.raf) {
-        cancelAnimationFrame(this.raf);
-        this.raf = null;
-      }
-      if (this._onResize) {
-        window.removeEventListener("resize", this._onResize);
-        this._onResize = null;
-      }
-      if (this.canvas && this.canvas.parentNode) {
-        this.canvas.parentNode.removeChild(this.canvas);
-      }
-      this.canvas = null;
-      this.ctx = null;
-      this.particles = [];
-      this.config = null;
+      if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+      if (this._onResize) { window.removeEventListener("resize", this._onResize); this._onResize = null; }
+      if (this.canvas && this.canvas.parentNode) this.canvas.parentNode.removeChild(this.canvas);
+      this.canvas = null; this.ctx = null; this.particles = []; this.config = null;
     },
-
     apply: function(theme) {
-      theme = resolveAutoTheme(theme);
-      if (!enableEffects || reducedMotion.matches || theme === "minimal") {
-        this.destroy();
-        return;
-      }
+      theme = App.resolveTheme(theme);
+      if (!App.isEnabled("enableEffects") || reducedMotion.matches || theme === "minimal") { this.destroy(); return; }
       this.init(theme);
     }
   };
 
-  /* ========== Bootstrap ========== */
+  /* ========== BOOTSTRAP + INTERCEPT ========== */
 
-  fetchConfig().then(function(theme) {
-    currentTheme = theme;
-    loadThemeCSS(theme);
-  });
+  /* Config is loaded once after modules are registered — see INIT section below */
 
   darkMql.addEventListener("change", function() {
-    if (currentTheme === "auto") {
-      loadThemeCSS("auto");
-    }
+    if (App.currentTheme === "auto") App.loadThemeCSS("auto");
   });
+  reducedMotion.addEventListener("change", function() { FX.apply(App.currentTheme); });
 
-  reducedMotion.addEventListener("change", function() {
-    FX.apply(currentTheme);
-  });
+  /* Intercept config save */
+  function onPluginSettingSaved() {
+    setTimeout(function() {
+      App.fetchConfig().then(function(newTheme) {
+        if (newTheme !== App.currentTheme) { App.currentTheme = newTheme; App.loadThemeCSS(newTheme); }
+        else { FX.apply(newTheme); }
+        App.showRefreshHint();
+      }).catch(function() {});
+    }, 300);
+  }
 
-  /* Intercept config save — apply new theme without reload */
   var originalFetch = window.fetch;
   window.fetch = function() {
-    var url = arguments[0];
-    var options = arguments[1];
-
-    /* Handle Request objects */
-    var urlStr = typeof url === "string" ? url
-      : (url && url.url) ? url.url : "";
-    var method = (options && options.method)
-      ? options.method
-      : (url && url.method) ? url.method : "GET";
-
-    if (urlStr.indexOf(CONFIG_URL) !== -1
-        && method.toUpperCase() === "PUT") {
-      return originalFetch.apply(this, arguments).then(function(response) {
-        if (response.ok || response.status === 204) {
-          setTimeout(function() {
-            fetchConfig().then(function(newTheme) {
-              if (newTheme !== currentTheme) {
-                currentTheme = newTheme;
-                loadThemeCSS(newTheme);
-              } else {
-                FX.apply(newTheme);
-              }
-            }).catch(function() {});
-          }, 300);
-        }
-        return response;
-      }).catch(function(err) {
-        return Promise.reject(err);
-      });
+    var url = arguments[0], options = arguments[1];
+    var urlStr = typeof url === "string" ? url : (url && url.url) ? url.url : "";
+    var method = (options && options.method) ? options.method : (url && url.method) ? url.method : "GET";
+    if (method.toUpperCase() === "PUT" && (urlStr.indexOf(CONFIG_URL) !== -1 || urlStr.indexOf(PLUGIN_NAME) !== -1)) {
+      return originalFetch.apply(this, arguments).then(function(r) { if (r.ok || r.status === 204) onPluginSettingSaved(); return r; });
     }
-
     return originalFetch.apply(this, arguments);
   };
 
-  /* ============================================
-     PAGE TRANSITION — fade in on route change
-     ============================================ */
-  (function initPageTransition() {
-    if (reducedMotion.matches) return;
-    var mainContent = null;
-    var observer = new MutationObserver(function() {
-      if (!mainContent) mainContent = document.querySelector(".main-content");
-      if (!mainContent) return;
-      mainContent.style.animation = "none";
-      void mainContent.offsetHeight; /* trigger reflow */
-      mainContent.style.animation = "_ui_pageIn 0.3s ease forwards";
-    });
-    /* Observe route changes via URL hash/path changes */
-    var lastPath = location.pathname + location.hash;
-    setInterval(function() {
-      var curPath = location.pathname + location.hash;
-      if (curPath !== lastPath) {
-        lastPath = curPath;
-        if (mainContent && !reducedMotion.matches && enablePageTransition) {
-          mainContent.style.animation = "none";
-          void mainContent.offsetHeight;
-          mainContent.style.animation = "_ui_pageIn 0.3s ease forwards";
-        }
-      }
-    }, 100);
-    /* Inject keyframes */
-    var pageStyle = document.createElement("style");
-    pageStyle.id = "ui-beautify-page-anim";
-    pageStyle.textContent =
-      "@keyframes _ui_pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }";
-    document.head.appendChild(pageStyle);
-  })();
-
-  /* ============================================
-     STAGGERED LIST ENTRANCE
-     ============================================ */
-  (function initStaggeredList() {
-    if (reducedMotion.matches) return;
-    var staggerStyle = document.createElement("style");
-    staggerStyle.id = "ui-beautify-list-anim";
-    staggerStyle.textContent =
-      "@keyframes _ui_staggerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
-      ".entity-wrapper:nth-child(-n+8) { animation: _ui_staggerIn 0.2s ease both; }" +
-      ".entity-wrapper:nth-child(1) { animation-delay: 0ms; }" +
-      ".entity-wrapper:nth-child(2) { animation-delay: 25ms; }" +
-      ".entity-wrapper:nth-child(3) { animation-delay: 50ms; }" +
-      ".entity-wrapper:nth-child(4) { animation-delay: 75ms; }" +
-      ".entity-wrapper:nth-child(5) { animation-delay: 100ms; }" +
-      ".entity-wrapper:nth-child(6) { animation-delay: 125ms; }" +
-      ".entity-wrapper:nth-child(7) { animation-delay: 150ms; }" +
-      ".entity-wrapper:nth-child(8) { animation-delay: 175ms; }";
-    document.head.appendChild(staggerStyle);
-  })();
-
-  /* ============================================
-     CURSOR GLOW — soft light follows mouse
-     ============================================ */
-  (function initCursorGlow() {
-    if (reducedMotion.matches) return;
-    var glow = document.createElement("div");
-    glow.id = "ui-beautify-cursor-glow";
-    glow.style.cssText =
-      "position:fixed;width:300px;height:300px;border-radius:50%;" +
-      "pointer-events:none;z-index:0;opacity:0;" +
-      "background:radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%);" +
-      "transition:opacity 0.3s ease;transform:translate(-50%,-50%);will-change:left,top;";
-    document.body.appendChild(glow);
-
-    var mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
-    var visible = false, rafId = null, idleTimer = null;
-
-    function lerp(a, b, t) { return a + (b - a) * t; }
-
-    function animate() {
-      glowX = lerp(glowX, mouseX, 0.25);
-      glowY = lerp(glowY, mouseY, 0.25);
-      glow.style.left = glowX + "px";
-      glow.style.top = glowY + "px";
-      /* Stop when close enough (idle) */
-      if (Math.abs(glowX - mouseX) < 0.5 && Math.abs(glowY - mouseY) < 0.5) {
-        rafId = null;
-        return;
-      }
-      rafId = requestAnimationFrame(animate);
+  var origXHROpen = XMLHttpRequest.prototype.open;
+  var origXHRSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open = function(m, u) { this._uiM = m; this._uiU = u; return origXHROpen.apply(this, arguments); };
+  XMLHttpRequest.prototype.send = function() {
+    var xhr = this;
+    if (xhr._uiM && xhr._uiU && xhr._uiM.toUpperCase() === "PUT" &&
+        (xhr._uiU.indexOf(PLUGIN_NAME) !== -1 || xhr._uiU.indexOf(CONFIG_URL) !== -1)) {
+      xhr.addEventListener("load", function() { if (xhr.status >= 200 && xhr.status < 300) onPluginSettingSaved(); });
     }
+    return origXHRSend.apply(this, arguments);
+  };
 
-    document.addEventListener("mousemove", function(e) {
-      if (!enableCursorGlow) {
-        glow.style.opacity = "0";
-        return;
-      }
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!visible) {
-        glowX = mouseX; glowY = mouseY;
-        glow.style.opacity = "1";
-        visible = true;
-      }
-      if (!rafId) rafId = requestAnimationFrame(animate);
-    });
-    document.addEventListener("mouseleave", function() {
-      glow.style.opacity = "0"; visible = false;
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    });
+  /* --- Module: Page Transition --- */
+  App.register({
+    id: "pageTransition", toggle: "enablePageTransition", skipIfReducedMotion: true,
+    _styleEl: null,
+    init: function() {
+      this._styleEl = document.createElement("style");
+      this._styleEl.id = "ui-beautify-page-anim";
+      this._styleEl.textContent = "@keyframes _ui_pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}";
+      document.head.appendChild(this._styleEl);
+    },
+    onRouteChange: function() {
+      if (!App.isEnabled("enablePageTransition")) return;
+      var mc = document.querySelector(".main-content");
+      if (mc) { mc.style.animation = "none"; void mc.offsetHeight; mc.style.animation = "_ui_pageIn 0.3s ease forwards"; }
+    },
+    onToggle: function(on) { if (this._styleEl) this._styleEl.disabled = !on; }
+  });
 
-    /* Update glow color based on theme */
-    function updateGlowColor(theme) {
-      var colors = {
-        "default": "rgba(76,203,160,0.12)",
-        "sakura": "rgba(236,72,153,0.12)",
-        "ocean": "rgba(59,130,246,0.12)",
-        "deepblue": "rgba(56,189,248,0.15)",
-        "dark": "rgba(139,92,246,0.15)",
-        "aurora": "rgba(168,85,247,0.15)",
-        "minimal": "rgba(0,0,0,0.04)"
+  /* --- Module: Staggered List Animation --- */
+  App.register({
+    id: "listAnimation", toggle: "enableListAnimation", skipIfReducedMotion: true,
+    _styleEl: null,
+    init: function() {
+      this._styleEl = document.createElement("style");
+      this._styleEl.id = "ui-beautify-list-anim";
+      var css = "@keyframes _ui_staggerIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}";
+      for (var i = 1; i <= 8; i++) css += ".entity-wrapper:nth-child(" + i + "){animation:_ui_staggerIn 0.2s ease both;animation-delay:" + ((i-1)*25) + "ms}";
+      this._styleEl.textContent = css;
+      document.head.appendChild(this._styleEl);
+    },
+    onToggle: function(on) { if (this._styleEl) this._styleEl.disabled = !on; }
+  });
+
+  /* --- Module: Cursor Glow --- */
+  App.register({
+    id: "cursorGlow", toggle: "enableCursorGlow", skipIfReducedMotion: true,
+    _el: null, _mouseX: 0, _mouseY: 0, _glowX: 0, _glowY: 0, _visible: false, _rafId: null,
+    _COLORS: {
+      "default":"rgba(76,203,160,0.12)","sakura":"rgba(236,72,153,0.12)","ocean":"rgba(59,130,246,0.12)",
+      "deepblue":"rgba(56,189,248,0.15)","dark":"rgba(139,92,246,0.15)","aurora":"rgba(168,85,247,0.15)",
+      "minimal":"rgba(0,0,0,0.04)","neon":"rgba(255,0,110,0.18)"
+    },
+    init: function() {
+      var self = this;
+      this._el = document.createElement("div");
+      this._el.id = "ui-beautify-cursor-glow";
+      this._el.style.cssText = "position:fixed;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:0;opacity:0;"
+        + "background:radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%);"
+        + "transition:opacity 0.3s ease;transform:translate(-50%,-50%);will-change:left,top;";
+      document.body.appendChild(this._el);
+
+      this._onMove = function(e) {
+        if (!App.isEnabled("enableCursorGlow")) { self._el.style.opacity = "0"; return; }
+        self._mouseX = e.clientX; self._mouseY = e.clientY;
+        if (!self._visible) { self._glowX = self._mouseX; self._glowY = self._mouseY; self._el.style.opacity = "1"; self._visible = true; }
+        if (!self._rafId) self._rafId = requestAnimationFrame(function anim() {
+          self._glowX += (self._mouseX - self._glowX) * 0.25;
+          self._glowY += (self._mouseY - self._glowY) * 0.25;
+          self._el.style.left = self._glowX + "px"; self._el.style.top = self._glowY + "px";
+          if (Math.abs(self._glowX - self._mouseX) < 0.5 && Math.abs(self._glowY - self._mouseY) < 0.5) { self._rafId = null; return; }
+          self._rafId = requestAnimationFrame(anim);
+        });
       };
-      var c = colors[theme] || colors["default"];
-      glow.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
-    }
-    /* Expose for theme switch */
-    window._uiBeautifyUpdateGlow = updateGlowColor;
-  })();
+      this._onLeave = function() {
+        self._el.style.opacity = "0"; self._visible = false;
+        if (self._rafId) { cancelAnimationFrame(self._rafId); self._rafId = null; }
+      };
+      document.addEventListener("mousemove", this._onMove);
+      document.addEventListener("mouseleave", this._onLeave);
+    },
+    onThemeChange: function(theme) {
+      if (!this._el) return;
+      var c = this._COLORS[theme] || this._COLORS["default"];
+      this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
+    },
+    onToggle: function(on) { if (this._el) this._el.style.display = on ? "" : "none"; }
+  });
 
-  /* ============================================
-     ENHANCED PARTICLES — shooting stars, wind, fish
-     ============================================ */
-  (function enhanceParticles() {
-    /* Shooting star for dark theme */
-    var origApply = FX.apply.bind(FX);
-    var shootingStarInterval = null;
+  /* --- Module: Enhanced Particles (shooting stars + wind) --- */
+  App.register({
+    id: "enhancedParticles", skipIfReducedMotion: true,
+    _shootInterval: null, _windInterval: null,
+    init: function() {},
+    onThemeChange: function(theme) {
+      var self = this;
+      clearInterval(this._shootInterval); clearInterval(this._windInterval);
+      this._shootInterval = null; this._windInterval = null;
 
-    FX.apply = function(theme) {
-      origApply(theme);
-      clearInterval(shootingStarInterval);
-
-      /* Update cursor glow color */
-      if (window._uiBeautifyUpdateGlow) {
-        window._uiBeautifyUpdateGlow(theme);
-      }
-
-      if (theme === "dark" && !reducedMotion.matches) {
-        shootingStarInterval = setInterval(function() {
+      if (theme === "dark" || theme === "neon") {
+        var starColor = theme === "neon" ? "#ff006e" : "#a78bfa";
+        var starGlow = theme === "neon" ? "#00ffff" : "#c4b5fd";
+        this._shootInterval = setInterval(function() {
           if (!FX.ctx || !FX.canvas) return;
-          var ctx = FX.ctx;
-          var startX = Math.random() * FX.w;
-          var startY = Math.random() * FX.h * 0.3;
-          var len = 60 + Math.random() * 80;
-          var angle = Math.PI / 4 + Math.random() * 0.3;
-          var frames = 0;
-          var maxFrames = 20;
-
-          function drawStar() {
-            if (frames >= maxFrames) return;
-            var progress = frames / maxFrames;
-            var alpha = progress < 0.5 ? progress * 2 : (1 - progress) * 2;
-            var x = startX + Math.cos(angle) * len * progress;
-            var y = startY + Math.sin(angle) * len * progress;
-
-            ctx.save();
-            ctx.globalAlpha = alpha * 0.6;
-            ctx.strokeStyle = "#a78bfa";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x - Math.cos(angle) * 20, y - Math.sin(angle) * 20);
-            ctx.stroke();
-            /* bright head */
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = "#c4b5fd";
-            ctx.beginPath();
-            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-
-            frames++;
-            requestAnimationFrame(drawStar);
-          }
-          drawStar();
-        }, 4000 + Math.random() * 6000);
+          var ctx = FX.ctx, startX = Math.random()*FX.w, startY = Math.random()*FX.h*0.3;
+          var len = 60+Math.random()*80, angle = Math.PI/4+Math.random()*0.3, frames = 0;
+          (function drawStar() {
+            if (frames >= 20) return;
+            var t = frames/20, alpha = t < 0.5 ? t*2 : (1-t)*2;
+            var x = startX+Math.cos(angle)*len*t, y = startY+Math.sin(angle)*len*t;
+            ctx.save(); ctx.globalAlpha = alpha*0.6; ctx.strokeStyle = starColor; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-Math.cos(angle)*20, y-Math.sin(angle)*20); ctx.stroke();
+            ctx.globalAlpha = alpha; ctx.fillStyle = starGlow;
+            ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2); ctx.fill(); ctx.restore();
+            frames++; requestAnimationFrame(drawStar);
+          })();
+        }, theme === "neon" ? 3000 : 5000);
       }
 
-      /* Wind gust for sakura */
-      if (theme === "sakura" && !reducedMotion.matches && FX.particles) {
-        setInterval(function() {
-          FX.particles.forEach(function(p) {
-            p.vx += 1.5; /* push right */
-            setTimeout(function() { p.vx -= 1.5; }, 2000);
+      if (theme === "sakura" && FX.particles) {
+        this._windInterval = setInterval(function() {
+          FX.particles.forEach(function(p) { p.vx += 1.5; setTimeout(function() { p.vx -= 1.5; }, 2000); });
+        }, 10000);
+      }
+    }
+  });
+
+  /* --- Module: Aurora Dynamic Background --- */
+  App.register({
+    id: "auroraBackground", toggle: "enableWallpaper", skipIfReducedMotion: true,
+    _el: null, _angle: 0, _rafId: null,
+    _GRADIENTS: {
+      "default":"radial-gradient(ellipse at 40% 40%,rgba(76,203,160,0.06) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(54,179,137,0.04) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(76,203,160,0.03) 0%,transparent 60%)",
+      "sakura":"radial-gradient(ellipse at 40% 40%,rgba(236,72,153,0.06) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(219,39,119,0.04) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(244,114,182,0.03) 0%,transparent 60%)",
+      "ocean":"radial-gradient(ellipse at 40% 40%,rgba(59,130,246,0.06) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(37,99,235,0.04) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(96,165,250,0.03) 0%,transparent 60%)",
+      "deepblue":"radial-gradient(ellipse at 40% 40%,rgba(56,189,248,0.08) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(14,165,233,0.05) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(99,102,241,0.04) 0%,transparent 60%)",
+      "dark":"radial-gradient(ellipse at 40% 40%,rgba(139,92,246,0.05) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(124,58,237,0.03) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(167,139,250,0.02) 0%,transparent 60%)",
+      "aurora":"radial-gradient(ellipse at 40% 40%,rgba(168,85,247,0.06) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(236,72,153,0.04) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(129,140,248,0.03) 0%,transparent 60%)",
+      "neon":"radial-gradient(ellipse at 40% 40%,rgba(255,0,110,0.08) 0%,transparent 60%),radial-gradient(ellipse at 75% 25%,rgba(0,255,255,0.05) 0%,transparent 60%),radial-gradient(ellipse at 55% 75%,rgba(185,103,255,0.04) 0%,transparent 60%)",
+      "minimal":"none"
+    },
+    init: function() {
+      var self = this;
+      /* Outer clip container — fixed to main content area */
+      this._el = document.createElement("div");
+      this._el.id = "ui-beautify-aurora-bg";
+      this._el.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:-1;overflow:hidden;";
+      /* Inner gradient layer — animated inside the clip */
+      this._inner = document.createElement("div");
+      this._inner.style.cssText = "position:absolute;top:-20%;left:-20%;width:140%;height:140%;opacity:0.3;will-change:transform;";
+      this._el.appendChild(this._inner);
+      document.body.prepend(this._el);
+      this._angle = 0;
+      (function animate() {
+        self._angle += 0.001;
+        var x = Math.sin(self._angle)*3, y = Math.cos(self._angle*0.7)*2, r = Math.sin(self._angle*0.3)*1.5;
+        if (self._inner) self._inner.style.transform = "translate("+x+"%,"+y+"%) rotate("+r+"deg)";
+        self._rafId = requestAnimationFrame(animate);
+      })();
+    },
+    onThemeChange: function(theme) {
+      if (!this._inner) return;
+      this._inner.style.background = this._GRADIENTS[theme] || this._GRADIENTS["default"];
+      this._inner.style.opacity = theme === "minimal" ? "0" : "0.3";
+    },
+    onToggle: function(on) { if (this._el) this._el.style.display = on ? "" : "none"; }
+  });
+
+  /* --- Module: macOS Window Cards --- */
+  App.register({
+    id: "macosCards", toggle: "enableMacOSCards",
+    init: function(app) {
+      var self = this;
+      this._scan = function() {
+        if (!App.isEnabled("enableMacOSCards")) return;
+        /* Only inject inside dashboard grid cards, not other pages */
+        document.querySelectorAll(".vue-grid-item .card-header").forEach(function(header) {
+          if (header.querySelector(".ui-traffic-lights")) return;
+          var c = document.createElement("div"); c.className = "ui-traffic-lights";
+          c.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;pointer-events:none;";
+          ["#ff5f57","#febc2e","#28c840"].forEach(function(col) {
+            var d = document.createElement("span");
+            d.style.cssText = "width:11px;height:11px;border-radius:50%;background:"+col+";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);";
+            c.appendChild(d);
           });
-        }, 8000 + Math.random() * 5000);
-      }
-    };
-
-  /* ============================================
-     BIG FEATURE 1: AURORA DYNAMIC BACKGROUND
-     Multi-layer gradient that slowly moves
-     ============================================ */
-  (function initAuroraBackground() {
-    if (reducedMotion.matches) return;
-    var aurora = document.createElement("div");
-    aurora.id = "ui-beautify-aurora-bg";
-    aurora.style.cssText =
-      "position:fixed;top:0;left:0;width:200%;height:200%;" +
-      "pointer-events:none;z-index:-1;opacity:0.5;" +
-      "will-change:transform;";
-    document.body.prepend(aurora);
-
-    function updateAuroraColors(theme) {
-      var gradients = {
-        "default": "radial-gradient(ellipse at 20% 50%, rgba(76,203,160,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(54,179,137,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(76,203,160,0.06) 0%, transparent 50%)",
-        "sakura": "radial-gradient(ellipse at 20% 50%, rgba(236,72,153,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(219,39,119,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(244,114,182,0.06) 0%, transparent 50%)",
-        "ocean": "radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(37,99,235,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(96,165,250,0.06) 0%, transparent 50%)",
-        "deepblue": "radial-gradient(ellipse at 20% 50%, rgba(56,189,248,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(14,165,233,0.1) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(99,102,241,0.08) 0%, transparent 50%)",
-        "dark": "radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(167,139,250,0.04) 0%, transparent 50%)",
-        "aurora": "radial-gradient(ellipse at 20% 50%, rgba(168,85,247,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(236,72,153,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(129,140,248,0.06) 0%, transparent 50%)",
-        "minimal": "none"
+          header.style.position = "relative"; header.style.paddingLeft = "72px"; header.prepend(c);
+        });
       };
-      aurora.style.background = gradients[theme] || gradients["default"];
-      if (theme === "minimal") aurora.style.opacity = "0";
-      else aurora.style.opacity = "0.5";
-    }
-
-    var angle = 0;
-    function animateAurora() {
-      angle += 0.001;
-      var x = Math.sin(angle) * 5;
-      var y = Math.cos(angle * 0.7) * 3;
-      var r = Math.sin(angle * 0.3) * 2;
-      aurora.style.transform = "translate(" + x + "%, " + y + "%) rotate(" + r + "deg)";
-      requestAnimationFrame(animateAurora);
-    }
-    animateAurora();
-    window._uiBeautifyUpdateAurora = updateAuroraColors;
-  })();
-  /* ============================================
-     BIG FEATURE 2: macOS WINDOW CARDS
-     Traffic light dots on card headers
-     ============================================ */
-  (function initMacOSCards() {
-    function injectTrafficLights(header) {
-      if (!enableMacOSCards) return;
-      if (header.querySelector(".ui-traffic-lights")) return;
-      var container = document.createElement("div");
-      container.className = "ui-traffic-lights";
-      container.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;pointer-events:none;";
-      var colors = ["#ff5f57", "#febc2e", "#28c840"];
-      for (var i = 0; i < 3; i++) {
-        var dot = document.createElement("span");
-        dot.style.cssText = "width:11px;height:11px;border-radius:50%;background:" + colors[i] + ";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);";
-        container.appendChild(dot);
+      this._scan();
+      app.onMutation(this._scan);
+    },
+    onToggle: function(on) {
+      if (!on) {
+        document.querySelectorAll(".ui-traffic-lights").forEach(function(el) {
+          var h = el.parentElement; if (h) h.style.paddingLeft = ""; el.remove();
+        });
       }
-      header.style.position = "relative";
-      header.style.paddingLeft = "72px";
-      header.prepend(container);
     }
+  });
 
-    function scanAndInject() {
-      if (!enableMacOSCards) return;
-      document.querySelectorAll(".card-header").forEach(injectTrafficLights);
-    }
+  /* --- Module: Sidebar Overhaul --- */
+  App.register({
+    id: "sidebarOverhaul", toggle: "enableMacOSCards",
+    _styleEl: null,
+    init: function() {
+      this._styleEl = document.createElement("style");
+      this._styleEl.id = "ui-beautify-sidebar-overhaul";
+      this._styleEl.textContent =
+        ".sidebar .menu-item-title{margin:3px 10px!important;padding:9px 12px!important;border-radius:10px!important;border:1px solid transparent!important;transition:all .25s cubic-bezier(.4,0,.2,1)!important}" +
+        ".sidebar .menu-item-title:hover{border-color:rgba(128,128,128,0.1)!important;box-shadow:0 2px 8px rgba(0,0,0,0.04)!important}" +
+        ".sidebar .menu-item-title.active{box-shadow:0 2px 12px rgba(0,0,0,0.06)!important}" +
+        ".sidebar .menu-icon svg{width:22px!important;height:22px!important;transition:transform .2s ease!important}" +
+        ".sidebar .menu-item-title:hover .menu-icon svg{transform:scale(1.15)!important}" +
+        ".sidebar .menu-label{margin-top:16px!important;padding:6px 22px 4px!important;font-size:13px!important;font-weight:700!important;letter-spacing:0.5px!important;opacity:0.85!important;text-shadow:0 0 0 currentColor!important}";
+      document.head.appendChild(this._styleEl);
+    },
+    onToggle: function(on) { if (this._styleEl) this._styleEl.disabled = !on; }
+  });
 
-    scanAndInject();
-    var macDebounce = null;
-    var macObserver = new MutationObserver(function() {
-      if (macDebounce) clearTimeout(macDebounce);
-      macDebounce = setTimeout(scanAndInject, 300);
-    });
-    macObserver.observe(document.body, { childList: true, subtree: true });
-  })();
-  /* ============================================
-     BIG FEATURE 3: SIDEBAR OVERHAUL
-     Card-style menu items + enlarged icons
-     ============================================ */
-  (function initSidebarOverhaul() {
-    var sidebarStyle = document.createElement("style");
-    sidebarStyle.id = "ui-beautify-sidebar-overhaul";
-    sidebarStyle.textContent =
-      ".sidebar .menu-item-title {" +
-      "  margin: 3px 10px !important;" +
-      "  padding: 9px 12px !important;" +
-      "  border-radius: 10px !important;" +
-      "  border: 1px solid transparent !important;" +
-      "  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;" +
-      "}" +
-      ".sidebar .menu-item-title:hover {" +
-      "  border-color: rgba(128,128,128,0.1) !important;" +
-      "  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;" +
-      "}" +
-      ".sidebar .menu-item-title.active {" +
-      "  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;" +
-      "}" +
-      ".sidebar .menu-icon svg {" +
-      "  width: 22px !important;" +
-      "  height: 22px !important;" +
-      "  transition: transform 0.2s ease !important;" +
-      "}" +
-      ".sidebar .menu-item-title:hover .menu-icon svg {" +
-      "  transform: scale(1.15) !important;" +
-      "}" +
-      ".sidebar .menu-label {" +
-      "  margin-top: 16px !important;" +
-      "  padding: 6px 22px 4px !important;" +
-      "  font-size: 10px !important;" +
-      "  text-transform: uppercase !important;" +
-      "  letter-spacing: 1.5px !important;" +
-      "  opacity: 0.5 !important;" +
-      "}";
-    document.head.appendChild(sidebarStyle);
-  })();
-  /* ============================================
-     BIG FEATURE 4: DASHBOARD VISUAL OVERHAUL
-     Gradient cards + large numbers + sparklines
-     ============================================ */
-  (function initDashboardOverhaul() {
-    var dashStyle = document.createElement("style");
-    dashStyle.id = "ui-beautify-dashboard";
-    dashStyle.textContent =
-      ".dashboard .vue-grid-item > div {" +
-      "  overflow: hidden !important;" +
-      "  position: relative !important;" +
-      "}" +
-      ".dashboard [class*='text-2xl']," +
-      ".dashboard [class*='text-3xl'] {" +
-      "  font-size: 2.25rem !important;" +
-      "  font-weight: 800 !important;" +
-      "  letter-spacing: -0.03em !important;" +
-      "}" +
-      ".dashboard .rounded-full[class*='bg-gray-100']," +
-      ".dashboard .rounded-full[class*='bg-gray'] {" +
-      "  width: 48px !important;" +
-      "  height: 48px !important;" +
-      "  display: flex !important;" +
-      "  align-items: center !important;" +
-      "  justify-content: center !important;" +
-      "}" +
-      ".dashboard .rounded-full[class*='bg-gray-100'] svg," +
-      ".dashboard .rounded-full[class*='bg-gray'] svg {" +
-      "  width: 24px !important;" +
-      "  height: 24px !important;" +
-      "}";
-    document.head.appendChild(dashStyle);
-
-    /* Inject sparklines */
-    function injectSparklines() {
-      var cards = document.querySelectorAll(".dashboard .vue-grid-item > div");
+  /* --- Module: Dashboard Visual Overhaul + Sparklines --- */
+  App.register({
+    id: "dashboardOverhaul",
+    _styleEl: null, _retryTimer: null,
+    init: function() {
+      this._styleEl = document.createElement("style");
+      this._styleEl.id = "ui-beautify-dashboard";
+      this._styleEl.textContent =
+        ".dashboard .vue-grid-item>div{overflow:hidden!important;position:relative!important}" +
+        ".dashboard [class*='text-2xl'],.dashboard [class*='text-3xl']{font-size:2.25rem!important;font-weight:800!important;letter-spacing:-0.03em!important}" +
+        ".dashboard .rounded-full[class*='bg-gray-100'],.dashboard .rounded-full[class*='bg-gray']{width:48px!important;height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important}" +
+        ".dashboard .rounded-full[class*='bg-gray-100'] svg,.dashboard .rounded-full[class*='bg-gray'] svg{width:24px!important;height:24px!important}";
+      document.head.appendChild(this._styleEl);
+      this._tryInject();
+    },
+    _injectSparklines: function() {
+      var cards = document.querySelectorAll(".dashboard .vue-grid-item > div"), idx = 0;
       cards.forEach(function(card) {
         if (card.querySelector(".ui-sparkline")) return;
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 120 30");
-        svg.setAttribute("class", "ui-sparkline");
-        svg.style.cssText = "position:absolute;bottom:0;left:0;width:100%;height:35px;opacity:0.15;pointer-events:none;";
-        var points = [];
-        for (var i = 0; i < 20; i++) {
-          points.push((i / 19 * 120).toFixed(1) + "," + (5 + Math.random() * 20).toFixed(1));
-        }
-        svg.innerHTML = '<polyline points="' + points.join(" ") + '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
-        card.appendChild(svg);
+        svg.setAttribute("viewBox", "0 0 120 24"); svg.setAttribute("class", "ui-sparkline");
+        svg.style.cssText = "position:absolute;bottom:0;left:0;width:100%;height:28px;opacity:0.08;pointer-events:none;";
+        var off = idx * 1.3, pts = [];
+        for (var i = 0; i < 24; i++) pts.push((i/23*120).toFixed(1)+","+(12+Math.sin(i/23*Math.PI*2+off)*8).toFixed(1));
+        svg.innerHTML = '<polyline points="'+pts.join(" ")+'" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>';
+        card.appendChild(svg); idx++;
       });
+    },
+    _tryInject: function() {
+      var self = this;
+      this._retryTimer = setInterval(function() {
+        if (document.querySelector(".dashboard .vue-grid-item")) { self._injectSparklines(); clearInterval(self._retryTimer); }
+      }, 500);
+      setTimeout(function() { clearInterval(self._retryTimer); }, 15000);
+    },
+    onRouteChange: function(path) {
+      if (path.indexOf("/console") > -1) { var self = this; setTimeout(function() { self._injectSparklines(); }, 800); }
     }
+  });
 
-    /* Retry until dashboard loads */
-    var dashRetry = setInterval(function() {
-      if (document.querySelector(".dashboard .vue-grid-item")) {
-        injectSparklines();
-        clearInterval(dashRetry);
-      }
-    }, 500);
-    setTimeout(function() { clearInterval(dashRetry); }, 15000);
+  /* --- Module: Zen Mode Editor --- */
+  App.register({
+    id: "zenMode",
+    _styleEl: null, _btn: null, _checkTimer: null,
+    init: function() {
+      this._styleEl = document.createElement("style");
+      this._styleEl.id = "ui-beautify-zen";
+      this._styleEl.textContent =
+        "body.ui-zen-mode .sidebar{transform:translateX(-100%)!important;transition:transform .5s cubic-bezier(.4,0,.2,1)!important}" +
+        "body.ui-zen-mode .main-content{margin-left:0!important;width:100%!important;transition:margin-left .5s ease!important}" +
+        "body.ui-zen-mode .page-header{opacity:0!important;height:0!important;overflow:hidden!important;transition:opacity .3s ease,height .3s ease!important}" +
+        "body.ui-zen-mode .page-header:hover{opacity:1!important;height:auto!important}" +
+        "body.ui-zen-mode .editor-header{opacity:0.3!important;transition:opacity .3s ease!important}" +
+        "body.ui-zen-mode .editor-header:hover{opacity:1!important}" +
+        "body.ui-zen-mode .ProseMirror{max-width:48rem!important;margin:0 auto!important;padding:2rem!important;min-height:80vh!important}" +
+        "body.ui-zen-mode .editor-entry-extra{display:none!important}" +
+        "body.ui-zen-mode #ui-zen-btn{background:#ef4444!important}" +
+        "body.ui-zen-mode #ui-zen-btn::after{content:'退出 Zen'}" +
+        "body:not(.ui-zen-mode) #ui-zen-btn::after{content:'🧘 Zen'}";
+      document.head.appendChild(this._styleEl);
 
-    /* Re-inject on route change */
-    var lastDashPath = "";
-    setInterval(function() {
-      var p = location.pathname;
-      if (p !== lastDashPath && p.indexOf("/console") > -1) {
-        lastDashPath = p;
-        setTimeout(injectSparklines, 800);
-      }
-    }, 300);
-  })();
-  /* ============================================
-     BIG FEATURE 5: ZEN MODE EDITOR
-     Immersive full-screen writing experience
-     ============================================ */
-  (function initZenMode() {
-    var zenStyle = document.createElement("style");
-    zenStyle.id = "ui-beautify-zen";
-    zenStyle.textContent =
-      "body.ui-zen-mode .sidebar { transform: translateX(-100%) !important; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important; }" +
-      "body.ui-zen-mode .main-content { margin-left: 0 !important; width: 100% !important; transition: margin-left 0.5s ease !important; }" +
-      "body.ui-zen-mode .page-header { opacity: 0 !important; height: 0 !important; overflow: hidden !important; transition: opacity 0.3s ease, height 0.3s ease !important; }" +
-      "body.ui-zen-mode .page-header:hover { opacity: 1 !important; height: auto !important; }" +
-      "body.ui-zen-mode .editor-header { opacity: 0.3 !important; transition: opacity 0.3s ease !important; }" +
-      "body.ui-zen-mode .editor-header:hover { opacity: 1 !important; }" +
-      "body.ui-zen-mode .ProseMirror { max-width: 48rem !important; margin: 0 auto !important; padding: 2rem !important; min-height: 80vh !important; }" +
-      "body.ui-zen-mode .editor-entry-extra { display: none !important; }" +
-      "body.ui-zen-mode #ui-zen-btn { background: #ef4444 !important; }" +
-      "body.ui-zen-mode #ui-zen-btn::after { content: '退出 Zen'; }" +
-      "body:not(.ui-zen-mode) #ui-zen-btn::after { content: '🧘 Zen'; }";
-    document.head.appendChild(zenStyle);
+      this._btn = document.createElement("button");
+      this._btn.id = "ui-zen-btn";
+      this._btn.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 20px;border-radius:24px;border:none;cursor:pointer;"
+        + "font-size:14px;font-weight:600;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);"
+        + "box-shadow:0 4px 16px rgba(102,126,234,0.4);transition:all .3s ease;display:none;";
+      this._btn.addEventListener("click", function() { document.body.classList.toggle("ui-zen-mode"); });
+      document.body.appendChild(this._btn);
 
-    var zenBtn = document.createElement("button");
-    zenBtn.id = "ui-zen-btn";
-    zenBtn.style.cssText =
-      "position:fixed;bottom:24px;right:24px;z-index:9999;" +
-      "padding:10px 20px;border-radius:24px;border:none;cursor:pointer;" +
-      "font-size:14px;font-weight:600;color:#fff;" +
-      "background:linear-gradient(135deg,#667eea,#764ba2);" +
-      "box-shadow:0 4px 16px rgba(102,126,234,0.4);" +
-      "transition:all 0.3s ease;display:none;";
-    zenBtn.addEventListener("click", function() {
-      document.body.classList.toggle("ui-zen-mode");
-    });
-    document.body.appendChild(zenBtn);
+      var btn = this._btn;
+      this._checkTimer = setInterval(function() {
+        var isEditor = !!document.querySelector(".ProseMirror") || location.pathname.indexOf("/editor") > -1;
+        btn.style.display = isEditor ? "block" : "none";
+        if (!isEditor) document.body.classList.remove("ui-zen-mode");
+      }, 500);
 
-    /* Show button only on editor pages — check both ProseMirror and editor route */
-    setInterval(function() {
-      var isEditor = !!document.querySelector(".ProseMirror") ||
-                     location.pathname.indexOf("/editor") > -1 ||
-                     location.pathname.indexOf("/posts/editor") > -1 ||
-                     location.pathname.indexOf("/pages/editor") > -1;
-      zenBtn.style.display = isEditor ? "block" : "none";
-      if (!isEditor) document.body.classList.remove("ui-zen-mode");
-    }, 500);
-
-    /* ESC to exit */
-    document.addEventListener("keydown", function(e) {
-      if (e.key === "Escape") document.body.classList.remove("ui-zen-mode");
-    });
-  })();
-  /* ============================================
-     BIG FEATURE 6: 3D CARD TILT ON HOVER
-     Perspective tilt following mouse position
-     ============================================ */
-  (function init3DCards() {
-    if (reducedMotion.matches) return;
-
-    document.addEventListener("mousemove", function(e) {
-      if (!enable3DCards) return;
-      /* Only tilt small dashboard cards, not full-page cards */
-      var cards = document.querySelectorAll(".dashboard .vue-grid-item > div");
-      cards.forEach(function(card) {
-        var rect = card.getBoundingClientRect();
-        if (rect.width > 600) return; /* Skip large cards */
-        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
-        var x = (e.clientX - rect.left) / rect.width - 0.5;
-        var y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transition = "transform 0.15s ease-out";
-        card.style.transform = "perspective(800px) rotateY(" + (x * 3).toFixed(2) + "deg) rotateX(" + (-y * 3).toFixed(2) + "deg)";
-      });
-    });
-
-    document.addEventListener("mouseout", function(e) {
-      var card = e.target.closest(".dashboard .vue-grid-item > div");
-      if (card && !card.contains(e.relatedTarget)) {
-        card.style.transform = "";
-      }
-    });
-  })();
-  /* ============================================
-     BIG FEATURE 7: RAINBOW GLOW BORDERS
-     Rotating conic-gradient on hover/focus
-     ============================================ */
-  (function initRainbowBorders() {
-    if (reducedMotion.matches) return;
-    var rbStyle = document.createElement("style");
-    rbStyle.textContent =
-      "@keyframes _ui_rainbowSpin { 0% { --_rb_angle: 0deg; } 100% { --_rb_angle: 360deg; } }" +
-      "@property --_rb_angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }" +
-      ".card-wrapper { position: relative !important; }" +
-      ".card-wrapper:hover::before {" +
-      "  content: '' !important; position: absolute !important;" +
-      "  inset: -2px !important; border-radius: inherit !important; z-index: -1 !important;" +
-      "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
-      "  animation: _ui_rainbowSpin 6s linear infinite !important;" +
-      "  opacity: 0.15 !important; filter: blur(12px) !important;" +
-      "}";
-    document.head.appendChild(rbStyle);
-  })();
-  /* ============================================
-     BIG FEATURE 8: PAGE SLIDE TRANSITION
-     Slide-in from right on route change
-     ============================================ */
-  (function initSlideTransition() {
-    if (reducedMotion.matches) return;
-    var slideStyle = document.createElement("style");
-    slideStyle.id = "ui-beautify-slide-transition";
-    slideStyle.textContent =
-      "@keyframes _ui_slideIn { from { opacity: 0; transform: translateX(30px) scale(0.98); } to { opacity: 1; transform: translateX(0) scale(1); } }" +
-      "@keyframes _ui_slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-20px); } }";
-    document.head.appendChild(slideStyle);
-
-    var lastSlide = location.pathname;
-    setInterval(function() {
-      if (!enablePageTransition) return;
-      var cur = location.pathname;
-      if (cur !== lastSlide) {
-        lastSlide = cur;
-        var mc = document.querySelector(".main-content");
-        if (mc) {
-          mc.style.animation = "none";
-          void mc.offsetHeight;
-          mc.style.animation = "_ui_slideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards";
-        }
-      }
-    }, 100);
-  })();
-  /* ============================================
-     BIG FEATURE 9: WELCOME BANNER
-     Time-based greeting on dashboard
-     ============================================ */
-  (function initWelcomeBanner() {
-    function createBanner() {
-      if (!enableWelcomeBanner) return;
-      var dashboard = document.querySelector(".dashboard");
-      if (!dashboard || dashboard.querySelector("#ui-welcome-banner")) return;
-
-      var hour = new Date().getHours();
-      var greeting, emoji, gradient;
-      if (hour < 6) { greeting = "夜深了"; emoji = "🌙"; gradient = "linear-gradient(135deg, #1a1a2e, #16213e)"; }
-      else if (hour < 12) { greeting = "早上好"; emoji = "☀️"; gradient = "linear-gradient(135deg, #f093fb, #f5576c)"; }
-      else if (hour < 14) { greeting = "中午好"; emoji = "🌤️"; gradient = "linear-gradient(135deg, #4facfe, #00f2fe)"; }
-      else if (hour < 18) { greeting = "下午好"; emoji = "🌅"; gradient = "linear-gradient(135deg, #fa709a, #fee140)"; }
-      else { greeting = "晚上好"; emoji = "🌆"; gradient = "linear-gradient(135deg, #a18cd1, #fbc2eb)"; }
-
-      var userName = "";
-      var userEl = document.querySelector(".sidebar__profile .profile-name") ||
-                   document.querySelector("[class*='profile'] [class*='name']") ||
-                   document.querySelector(".sidebar__profile span");
-      if (userEl) userName = "，" + userEl.textContent.trim();
-
-      var banner = document.createElement("div");
-      banner.id = "ui-welcome-banner";
-      banner.style.cssText =
-        "background:" + gradient + ";border-radius:16px;padding:28px 32px;" +
-        "margin-bottom:20px;color:#fff;position:relative;overflow:hidden;" +
-        "box-shadow:0 8px 32px rgba(0,0,0,0.12);" +
-        "animation:_ui_pageIn 0.3s ease forwards;";
-      banner.innerHTML =
-        '<div style="position:relative;z-index:1;">' +
-        '<div style="font-size:2.5rem;margin-bottom:4px;">' + emoji + '</div>' +
-        '<div style="font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;">' + greeting + userName + '</div>' +
-        '<div style="font-size:0.9rem;opacity:0.8;margin-top:6px;">' + new Date().toLocaleDateString("zh-CN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) + '</div>' +
-        '</div>' +
-        '<div style="position:absolute;top:-20%;right:-5%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.1);"></div>' +
-        '<div style="position:absolute;bottom:-30%;right:15%;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>';
-
-      dashboard.prepend(banner);
+      document.addEventListener("keydown", function(e) { if (e.key === "Escape") document.body.classList.remove("ui-zen-mode"); });
     }
+  });
 
-    /* Use MutationObserver for instant detection instead of polling */
-    var bannerObserver = new MutationObserver(function() {
-      if (document.querySelector(".dashboard") && !document.querySelector("#ui-welcome-banner")) {
-        createBanner();
-      }
-    });
-    bannerObserver.observe(document.body, { childList: true, subtree: true });
-
-    /* Also try immediately and on route change */
-    createBanner();
-    var lastBannerPath = location.pathname;
-    setInterval(function() {
-      var p = location.pathname;
-      if (p !== lastBannerPath) {
-        lastBannerPath = p;
-        setTimeout(createBanner, 150);
-      }
-    }, 200);
-  })();
-  /* ============================================
-     BIG FEATURE 10: DYNAMIC WALLPAPER
-     Particle network with connecting lines
-     ============================================ */
-  (function initDynamicWallpaper() {
-    if (reducedMotion.matches) return;
-    var wallCanvas = document.createElement("canvas");
-    wallCanvas.id = "ui-beautify-wallpaper";
-    wallCanvas.style.cssText =
-      "position:fixed;top:0;left:0;width:100%;height:100%;" +
-      "pointer-events:none;z-index:-2;opacity:0.4;";
-    document.body.prepend(wallCanvas);
-    var wCtx = wallCanvas.getContext("2d");
-    var wParticles = [];
-    var WALL_COUNT = 40;
-    var wallColor = "59,130,246";
-
-    function wallResize() {
-      wallCanvas.width = window.innerWidth;
-      wallCanvas.height = window.innerHeight;
+  /* --- Module: 3D Card Tilt --- */
+  App.register({
+    id: "card3D", toggle: "enable3DCards", skipIfReducedMotion: true,
+    init: function() {
+      this._onMove = function(e) {
+        if (!App.isEnabled("enable3DCards")) return;
+        document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(card) {
+          var r = card.getBoundingClientRect();
+          if (r.width > 600 || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+          var x = (e.clientX-r.left)/r.width-0.5, y = (e.clientY-r.top)/r.height-0.5;
+          card.style.transition = "transform .15s ease-out";
+          card.style.transform = "perspective(800px) rotateY("+(x*3).toFixed(2)+"deg) rotateX("+(-y*3).toFixed(2)+"deg)";
+        });
+      };
+      this._onOut = function(e) {
+        var card = e.target.closest(".dashboard .vue-grid-item > div");
+        if (card && !card.contains(e.relatedTarget)) card.style.transform = "";
+      };
+      document.addEventListener("mousemove", this._onMove);
+      document.addEventListener("mouseout", this._onOut);
+    },
+    onToggle: function(on) {
+      if (!on) document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
     }
-    window.addEventListener("resize", wallResize);
-    wallResize();
+  });
 
-    for (var i = 0; i < WALL_COUNT; i++) {
-      wParticles.push({
-        x: Math.random() * wallCanvas.width,
-        y: Math.random() * wallCanvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: 1 + Math.random() * 1.5
-      });
+  /* --- Module: Rainbow Glow Borders --- */
+  App.register({
+    id: "rainbowBorders", skipIfReducedMotion: true,
+    init: function() {
+      var s = document.createElement("style");
+      s.textContent =
+        "@keyframes _ui_rainbowSpin{0%{--_rb_angle:0deg}100%{--_rb_angle:360deg}}" +
+        "@property --_rb_angle{syntax:'<angle>';initial-value:0deg;inherits:false}" +
+        ".dashboard .card-wrapper{position:relative!important}" +
+        ".dashboard .card-wrapper:hover::before{content:''!important;position:absolute!important;inset:-2px!important;border-radius:inherit!important;z-index:-1!important;" +
+        "background:conic-gradient(from var(--_rb_angle),#ff6b6b,#feca57,#48dbfb,#ff9ff3,#54a0ff,#5f27cd,#ff6b6b)!important;" +
+        "animation:_ui_rainbowSpin 6s linear infinite!important;opacity:0.15!important;filter:blur(12px)!important}";
+      document.head.appendChild(s);
     }
+  });
 
-    function wallDraw() {
-      wCtx.clearRect(0, 0, wallCanvas.width, wallCanvas.height);
-      for (var i = 0; i < wParticles.length; i++) {
-        var p = wParticles[i];
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > wallCanvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > wallCanvas.height) p.vy *= -1;
+  /* --- Module: Page Slide Transition --- */
+  App.register({
+    id: "slideTransition", toggle: "enablePageTransition", skipIfReducedMotion: true,
+    init: function() {
+      var s = document.createElement("style");
+      s.id = "ui-beautify-slide-transition";
+      s.textContent = "@keyframes _ui_slideIn{from{opacity:0;transform:translateX(30px) scale(0.98)}to{opacity:1;transform:translateX(0) scale(1)}}";
+      document.head.appendChild(s);
+    },
+    onRouteChange: function() {
+      if (!App.isEnabled("enablePageTransition")) return;
+      var mc = document.querySelector(".main-content");
+      if (mc) { mc.style.animation = "none"; void mc.offsetHeight; mc.style.animation = "_ui_slideIn .35s cubic-bezier(.22,1,.36,1) forwards"; }
+    }
+  });
 
-        wCtx.beginPath();
-        wCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        wCtx.fillStyle = "rgba(" + wallColor + ",0.5)";
-        wCtx.fill();
+  /* --- Module: Welcome Banner --- */
+  App.register({
+    id: "welcomeBanner", toggle: "enableWelcomeBanner",
+    init: function(app) {
+      var self = this;
+      this._create = function() {
+        if (!App.isEnabled("enableWelcomeBanner")) return;
+        var dash = document.querySelector(".dashboard");
+        if (!dash || dash.querySelector("#ui-welcome-banner")) return;
+        var h = new Date().getHours(), greeting, emoji, gradient;
+        if (h < 6) { greeting = "夜深了"; emoji = "🌙"; gradient = "linear-gradient(135deg,#1a1a2e,#16213e)"; }
+        else if (h < 12) { greeting = "早上好"; emoji = "☀️"; gradient = "linear-gradient(135deg,#f093fb,#f5576c)"; }
+        else if (h < 14) { greeting = "中午好"; emoji = "🌤️"; gradient = "linear-gradient(135deg,#4facfe,#00f2fe)"; }
+        else if (h < 18) { greeting = "下午好"; emoji = "🌅"; gradient = "linear-gradient(135deg,#fa709a,#fee140)"; }
+        else { greeting = "晚上好"; emoji = "🌆"; gradient = "linear-gradient(135deg,#a18cd1,#fbc2eb)"; }
+        var userName = "";
+        var userEl = document.querySelector(".sidebar__profile .profile-name") ||
+                     document.querySelector("[class*='profile'] [class*='name']") ||
+                     document.querySelector(".sidebar__profile span");
+        if (userEl) userName = "，" + userEl.textContent.trim();
+        var b = document.createElement("div"); b.id = "ui-welcome-banner";
+        b.style.cssText = "background:" + gradient + ";border-radius:16px;padding:28px 32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;"
+          + "box-shadow:0 8px 32px rgba(0,0,0,0.12);animation:_ui_pageIn .3s ease forwards;";
+        b.innerHTML = '<div style="position:relative;z-index:1">'
+          + '<div style="font-size:2.5rem;margin-bottom:4px">' + emoji + '</div>'
+          + '<div style="font-size:1.75rem;font-weight:700;letter-spacing:-0.02em">' + greeting + userName + '</div>'
+          + '<div style="font-size:0.9rem;opacity:0.8;margin-top:6px">' + new Date().toLocaleDateString("zh-CN", { weekday:"long", year:"numeric", month:"long", day:"numeric" }) + '</div>'
+          + '</div>'
+          + '<div style="position:absolute;top:-20%;right:-5%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.1)"></div>'
+          + '<div style="position:absolute;bottom:-30%;right:15%;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>';
+        dash.prepend(b);
+      };
+      this._create();
+      app.onMutation(this._create);
+    },
+    onRouteChange: function() { var self = this; setTimeout(function() { self._create(); }, 150); },
+    onToggle: function(on) { var el = document.getElementById("ui-welcome-banner"); if (el) el.style.display = on ? "" : "none"; }
+  });
 
-        for (var j = i + 1; j < wParticles.length; j++) {
-          var q = wParticles[j];
-          var dx = p.x - q.x, dy = p.y - q.y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 130) {
-            wCtx.beginPath();
-            wCtx.moveTo(p.x, p.y);
-            wCtx.lineTo(q.x, q.y);
-            wCtx.strokeStyle = "rgba(" + wallColor + "," + (0.12 * (1 - dist / 130)).toFixed(3) + ")";
-            wCtx.lineWidth = 0.5;
-            wCtx.stroke();
+  /* --- Module: Dynamic Wallpaper (particle network) --- */
+  App.register({
+    id: "wallpaper", toggle: "enableWallpaper", skipIfReducedMotion: true,
+    _canvas: null, _ctx: null, _particles: [], _color: "59,130,246", _rafId: null,
+    _COLORS: {
+      "default":"76,203,160","sakura":"236,72,153","ocean":"59,130,246",
+      "deepblue":"56,189,248","dark":"139,92,246","aurora":"168,85,247","minimal":"148,163,184","neon":"255,0,110"
+    },
+    init: function() {
+      var self = this;
+      this._canvas = document.createElement("canvas");
+      this._canvas.id = "ui-beautify-wallpaper";
+      this._canvas.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:-2;opacity:0.4;";
+      document.body.prepend(this._canvas);
+      this._ctx = this._canvas.getContext("2d");
+
+      this._onResize = function() { self._canvas.width = window.innerWidth - 260; self._canvas.height = window.innerHeight; };
+      window.addEventListener("resize", this._onResize);
+      this._onResize();
+
+      for (var i = 0; i < 40; i++) {
+        this._particles.push({
+          x: Math.random() * this._canvas.width, y: Math.random() * this._canvas.height,
+          vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, r: 1 + Math.random() * 1.5
+        });
+      }
+
+      (function draw() {
+        var c = self._canvas, ctx = self._ctx, ps = self._particles, col = self._color;
+        if (!c || !ctx) return;
+        ctx.clearRect(0, 0, c.width, c.height);
+        for (var i = 0; i < ps.length; i++) {
+          var p = ps[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > c.width) p.vx *= -1;
+          if (p.y < 0 || p.y > c.height) p.vy *= -1;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(" + col + ",0.5)"; ctx.fill();
+          for (var j = i + 1; j < ps.length; j++) {
+            var q = ps[j], dx = p.x - q.x, dy = p.y - q.y, dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 130) {
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = "rgba(" + col + "," + (0.12 * (1 - dist / 130)).toFixed(3) + ")";
+              ctx.lineWidth = 0.5; ctx.stroke();
+            }
           }
         }
-      }
-      requestAnimationFrame(wallDraw);
+        self._rafId = requestAnimationFrame(draw);
+      })();
+    },
+    onThemeChange: function(theme) { this._color = this._COLORS[theme] || this._COLORS["default"]; },
+    onToggle: function(on) { if (this._canvas) this._canvas.style.display = on ? "" : "none"; }
+  });
+
+  /* --- Module: Button Ripple Effect --- */
+  App.register({
+    id: "buttonRipple", skipIfReducedMotion: true,
+    init: function() {
+      var s = document.createElement("style");
+      s.textContent =
+        "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
+        "._ui_ripple-host{position:relative!important;overflow:hidden!important}" +
+        "._ui_ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
+      document.head.appendChild(s);
+      document.addEventListener("click", function(e) {
+        if (!App.isEnabled("enableEffects")) return;
+        var btn = e.target.closest("button, .btn, [role='button'], a.action-btn");
+        if (!btn) return;
+        btn.classList.add("_ui_ripple-host");
+        var r = btn.getBoundingClientRect(), size = Math.max(r.width, r.height);
+        var rip = document.createElement("span"); rip.className = "_ui_ripple";
+        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;";
+        btn.appendChild(rip);
+        setTimeout(function() { rip.remove(); }, 550);
+      });
     }
-    wallDraw();
+  });
 
-    window._uiBeautifyUpdateWallpaper = function(theme) {
-      var colors = {
-        "default": "76,203,160", "sakura": "236,72,153", "ocean": "59,130,246",
-        "deepblue": "56,189,248", "dark": "139,92,246", "aurora": "168,85,247",
-        "minimal": "148,163,184"
+  /* --- Module: Tab Sliding Indicator --- */
+  App.register({
+    id: "tabSlider", skipIfReducedMotion: true,
+    init: function(app) {
+      var s = document.createElement("style");
+      s.textContent =
+        "._ui_tab-bar{position:relative}" +
+        "._ui_tab-indicator{position:absolute;bottom:0;height:2px;border-radius:1px;transition:left .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:1}";
+      document.head.appendChild(s);
+
+      function setupTabBar(bar) {
+        if (bar.querySelector("._ui_tab-indicator")) return;
+        bar.classList.add("_ui_tab-bar");
+        var ind = document.createElement("div"); ind.className = "_ui_tab-indicator";
+        ind.style.background = "var(--color-primary, #4f46e5)";
+        bar.style.position = "relative"; bar.appendChild(ind);
+        function move() {
+          var active = bar.querySelector(".active, [aria-selected='true'], .router-link-active");
+          if (!active) { ind.style.width = "0"; return; }
+          var br = bar.getBoundingClientRect(), tr = active.getBoundingClientRect();
+          ind.style.left = (tr.left - br.left) + "px"; ind.style.width = tr.width + "px";
+        }
+        move();
+        bar.addEventListener("click", function() { setTimeout(move, 50); });
+        new MutationObserver(move).observe(bar, { attributes: true, subtree: true, attributeFilter: ["class", "aria-selected"] });
+      }
+
+      function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs").forEach(setupTabBar); }
+      scan();
+      app.onMutation(scan);
+    }
+  });
+
+  /* --- Module: Number Count-Up Animation --- */
+  App.register({
+    id: "countUp", skipIfReducedMotion: true,
+    _retryTimer: null,
+    init: function() {
+      var self = this;
+      this._retryTimer = setInterval(function() {
+        if (document.querySelector(".dashboard")) { self._scan(); clearInterval(self._retryTimer); }
+      }, 600);
+      setTimeout(function() { clearInterval(self._retryTimer); }, 15000);
+    },
+    _animateEl: function(el) {
+      if (el.dataset.uiCounted) return;
+      var text = el.textContent.trim();
+      var match = text.match(/^([\d,]+\.?\d*)(.*)$/);
+      if (!match) return;
+      var raw = match[1].replace(/,/g, ""), target = parseFloat(raw);
+      if (isNaN(target) || target === 0) return;
+      var suffix = match[2] || "", hasComma = match[1].indexOf(",") > -1;
+      var isFloat = raw.indexOf(".") > -1, decimals = isFloat ? (raw.split(".")[1] || "").length : 0;
+      el.dataset.uiCounted = "1";
+      var start = performance.now(), duration = Math.min(800, 300 + target * 0.5);
+      function tick(now) {
+        var t = Math.min((now - start) / duration, 1);
+        t = 1 - Math.pow(1 - t, 3);
+        var val = target * t;
+        var display = isFloat ? val.toFixed(decimals) : Math.round(val).toString();
+        if (hasComma) display = Number(display).toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        el.textContent = display + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    },
+    _scan: function() {
+      var self = this;
+      document.querySelectorAll(".dashboard [class*='text-2xl'], .dashboard [class*='text-3xl'], .dashboard .stat-number").forEach(function(el) { self._animateEl(el); });
+    },
+    onRouteChange: function(path) {
+      if (path.indexOf("/console") > -1) { var self = this; setTimeout(function() { self._scan(); }, 900); }
+    }
+  });
+
+  /* --- Module: Seasonal / Holiday Effects --- */
+  App.register({
+    id: "seasonalEffects", skipIfReducedMotion: true,
+    init: function() {
+      var now = new Date(), m = now.getMonth() + 1, d = now.getDate(), holiday = null;
+      if ((m === 1 && d >= 20) || (m === 2 && d <= 15)) holiday = "cny";
+      else if (m === 12 && d >= 20 && d <= 26) holiday = "christmas";
+      else if (m === 10 && d >= 28) holiday = "halloween";
+      else if (m === 2 && d >= 13 && d <= 15) holiday = "valentine";
+      else if ((m === 9 && d >= 15) || (m === 10 && d <= 5)) holiday = "midautumn";
+      if (!holiday) return;
+
+      var symbols = {
+        cny:["🧧","🎆","🏮","🎊","✨"], christmas:["❄️","🎄","⭐","🎁","✨"],
+        halloween:["🎃","👻","🦇","🕸️","✨"], valentine:["❤️","💕","💖","🌹","✨"],
+        midautumn:["🥮","🌕","🏮","🐇","✨"]
       };
-      wallColor = colors[theme] || colors["default"];
-    };
-  })();
-  /* Update all dynamic features on theme change */
-  var origLoadTheme = loadThemeCSS;
-  loadThemeCSS = function(theme) {
-    origLoadTheme(theme);
-    if (window._uiBeautifyUpdateAurora) window._uiBeautifyUpdateAurora(theme);
-    if (window._uiBeautifyUpdateWallpaper) window._uiBeautifyUpdateWallpaper(theme);
-  };
+      var pool = symbols[holiday] || ["✨"];
 
-  })();
+      var container = document.createElement("div");
+      container.id = "ui-seasonal-fx";
+      container.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99998;overflow:hidden;";
+      document.body.appendChild(container);
+
+      var ss = document.createElement("style");
+      ss.textContent = "@keyframes _ui_seasonFall{0%{transform:translateY(0) rotate(0deg);opacity:0.7}100%{transform:translateY(" + (window.innerHeight + 60) + "px) rotate(360deg);opacity:0}}";
+      document.head.appendChild(ss);
+
+      function spawn() {
+        if (container.children.length >= 12) return;
+        var el = document.createElement("span");
+        el.textContent = pool[Math.floor(Math.random() * pool.length)];
+        var x = Math.random()*100, dur = 6+Math.random()*6, size = 14+Math.random()*14, delay = Math.random()*2;
+        el.style.cssText = "position:absolute;top:-40px;left:"+x+"%;font-size:"+size+"px;opacity:0.7;pointer-events:none;animation:_ui_seasonFall "+dur+"s linear "+delay+"s forwards;";
+        container.appendChild(el);
+        setTimeout(function() { if (el.parentNode) el.remove(); }, (dur+delay)*1000+500);
+      }
+      for (var i = 0; i < 6; i++) spawn();
+      setInterval(spawn, 3000);
+      setTimeout(function() { if (container.parentNode) container.remove(); }, 120000);
+    }
+  });
+
+  /* --- Module: Settings Page Refresh Button --- */
+  App.register({
+    id: "settingsRefresh",
+    init: function() {
+      /* Show a fixed refresh button when on this plugin's settings page */
+    },
+    onRouteChange: function(path) {
+      var old = document.getElementById("ui-beautify-settings-refresh");
+      if (old) old.remove();
+      if (path.indexOf(PLUGIN_NAME) === -1) return;
+      setTimeout(function() {
+        if (document.getElementById("ui-beautify-settings-refresh")) return;
+        var btn = document.createElement("button");
+        btn.id = "ui-beautify-settings-refresh"; btn.type = "button";
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px">'
+          + '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>刷新页面';
+        btn.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;"
+          + "padding:10px 24px;border-radius:10px;border:1px solid rgba(128,128,128,0.2);"
+          + "background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);"
+          + "color:#333;font-size:13px;font-weight:500;cursor:pointer;"
+          + "box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:all .2s ease;font-family:system-ui,sans-serif;";
+        btn.addEventListener("mouseenter", function() { btn.style.boxShadow = "0 6px 24px rgba(0,0,0,0.12)"; });
+        btn.addEventListener("mouseleave", function() { btn.style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)"; });
+        btn.addEventListener("click", function() { location.reload(); });
+        document.body.appendChild(btn);
+      }, 500);
+    }
+  });
+
+  /* ========== INIT ALL MODULES ========== */
+  App._startMutationObserver();
+  App._startRouter();
+  App._initModules();
+
+  /* Load config → apply theme → re-apply toggles → trigger initial DOM scan */
+  App.fetchConfig().then(function(theme) {
+    App.currentTheme = theme;
+    App.loadThemeCSS(theme);
+    App._applyToggleStates();
+    /* Fire all mutation callbacks once so modules can scan existing DOM */
+    App._mutationCbs.forEach(function(cb) { try { cb(); } catch(e) {} });
+  });
+
 })();
 
 /* Plugin Module Registration */
@@ -1197,6 +1093,4 @@ try {
       extensionPoints: {},
     });
   })(HaloUiShared);
-} catch(e) {
-  /* HaloUiShared may not be available, theme loading still works */
-}
+} catch(e) {}
