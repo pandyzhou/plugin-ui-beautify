@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.6.1";
+  var PLUGIN_VERSION = "1.6.2";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -671,7 +671,7 @@
       this._styleEl.id = "ui-beautify-sidebar-overhaul";
       this._styleEl.textContent =
         ".sidebar .menu-item-title{margin:3px 10px!important;padding:9px 12px!important;border-radius:10px!important;border:1px solid transparent!important;transition:all .25s cubic-bezier(.4,0,.2,1)!important}" +
-        ".sidebar .menu-item-title:hover{border-color:rgba(128,128,128,0.1)!important;box-shadow:0 2px 8px rgba(0,0,0,0.04)!important}" +
+        ".sidebar .menu-item-title:hover{background-color:var(--ui-surface-hover,rgba(128,128,128,0.06))!important;border-color:transparent!important}" +
         ".sidebar .menu-item-title.active{box-shadow:0 2px 12px rgba(0,0,0,0.06)!important}" +
         ".sidebar .menu-icon svg{width:22px!important;height:22px!important;transition:transform .2s ease!important}" +
         ".sidebar .menu-item-title:hover .menu-icon svg{transform:scale(1.15)!important}" +

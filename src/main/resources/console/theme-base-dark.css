@@ -153,8 +153,11 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 .v-popper--theme-tooltip .v-popper__inner { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
 
 /* === 20. Description List === */
+.description-wrapper { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
+.description-item-wrapper { background-color: var(--ui-surface) !important; color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
 .description-item-wrapper:hover { background-color: var(--ui-surface-hover) !important; }
 .description-item__label { color: var(--ui-text-muted) !important; }
+.description-item__content { color: var(--ui-text) !important; }
 
 /* === 21. Pagination === */
 .pagination-button { color: var(--ui-text-secondary) !important; }
