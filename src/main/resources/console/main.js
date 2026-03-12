@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.2.0";
+  var PLUGIN_VERSION = "1.2.1";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -496,29 +496,47 @@
     glow.style.cssText =
       "position:fixed;width:300px;height:300px;border-radius:50%;" +
       "pointer-events:none;z-index:0;opacity:0;" +
-      "background:radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%);" +
-      "transition:opacity 0.3s ease;transform:translate(-50%,-50%);";
+      "background:radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%);" +
+      "transition:opacity 0.3s ease;transform:translate(-50%,-50%);will-change:left,top;";
     document.body.appendChild(glow);
 
-    var visible = false;
+    var mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+    var visible = false, rafId = null;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function animate() {
+      glowX = lerp(glowX, mouseX, 0.25);
+      glowY = lerp(glowY, mouseY, 0.25);
+      glow.style.left = glowX + "px";
+      glow.style.top = glowY + "px";
+      rafId = requestAnimationFrame(animate);
+    }
+
     document.addEventListener("mousemove", function(e) {
-      glow.style.left = e.clientX + "px";
-      glow.style.top = e.clientY + "px";
-      if (!visible) { glow.style.opacity = "1"; visible = true; }
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!visible) {
+        glowX = mouseX; glowY = mouseY;
+        glow.style.opacity = "1";
+        visible = true;
+        rafId = requestAnimationFrame(animate);
+      }
     });
     document.addEventListener("mouseleave", function() {
       glow.style.opacity = "0"; visible = false;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     });
 
     /* Update glow color based on theme */
     function updateGlowColor(theme) {
       var colors = {
-        "default": "rgba(76,203,160,0.06)",
-        "sakura": "rgba(236,72,153,0.06)",
-        "ocean": "rgba(59,130,246,0.06)",
-        "dark": "rgba(139,92,246,0.08)",
-        "aurora": "rgba(168,85,247,0.08)",
-        "minimal": "rgba(0,0,0,0.02)"
+        "default": "rgba(76,203,160,0.12)",
+        "sakura": "rgba(236,72,153,0.12)",
+        "ocean": "rgba(59,130,246,0.12)",
+        "dark": "rgba(139,92,246,0.15)",
+        "aurora": "rgba(168,85,247,0.15)",
+        "minimal": "rgba(0,0,0,0.04)"
       };
       var c = colors[theme] || colors["default"];
       glow.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
