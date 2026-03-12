@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.8.1";
+  var PLUGIN_VERSION = "1.8.2";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -15,6 +15,11 @@
   var BASE_LINK_ID = "ui-beautify-base-css";
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function getSidebarWidth() {
+    var sb = document.querySelector(".sidebar");
+    return sb ? sb.getBoundingClientRect().width : 260;
+  }
 
   /* ========== APP CORE — Config, Router, Module Registry ========== */
 
@@ -409,7 +414,7 @@
       var cfg = this.THEMES[theme]; if (!cfg) return;
       this.destroy();
       var c = document.createElement("canvas"); c.id = CANVAS_ID;
-      c.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:0;opacity:1;";
+      c.style.cssText = "position:fixed;top:0;left:" + getSidebarWidth() + "px;right:0;bottom:0;pointer-events:none;z-index:0;opacity:1;";
       document.body.appendChild(c);
       this.canvas = c; this.ctx = c.getContext("2d"); this.config = cfg;
       this.resize(); this.particles = [];
@@ -420,8 +425,10 @@
     },
     resize: function() {
       if (!this.canvas) return;
-      this.w = window.innerWidth - 260; this.h = window.innerHeight;
+      var sw = getSidebarWidth();
+      this.w = window.innerWidth - sw; this.h = window.innerHeight;
       this.canvas.width = this.w; this.canvas.height = this.h;
+      this.canvas.style.left = sw + "px";
     },
     loop: function() {
       var self = this;
@@ -454,15 +461,17 @@
   });
   reducedMotion.addEventListener("change", function() { FX.apply(App.currentTheme); });
 
-  /* Intercept config save */
+  /* Intercept config save (debounced) */
+  var _saveDebounce = null;
   function onPluginSettingSaved() {
-    setTimeout(function() {
+    clearTimeout(_saveDebounce);
+    _saveDebounce = setTimeout(function() {
       App.fetchConfig().then(function(newTheme) {
         if (newTheme !== App.currentTheme) { App.currentTheme = newTheme; App.loadThemeCSS(newTheme); }
         else { FX.apply(newTheme); }
         App.showRefreshHint();
       }).catch(function() {});
-    }, 300);
+    }, 500);
   }
 
   var originalFetch = window.fetch;
@@ -627,7 +636,7 @@
       /* Outer clip container — fixed to main content area */
       this._el = document.createElement("div");
       this._el.id = "ui-beautify-aurora-bg";
-      this._el.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:-1;overflow:hidden;";
+      this._el.style.cssText = "position:fixed;top:0;left:" + getSidebarWidth() + "px;right:0;bottom:0;pointer-events:none;z-index:-1;overflow:hidden;";
       /* Inner gradient layer — animated inside the clip */
       this._inner = document.createElement("div");
       this._inner.style.cssText = "position:absolute;top:-20%;left:-20%;width:140%;height:140%;opacity:0.3;will-change:transform;";
@@ -899,11 +908,11 @@
       var self = this;
       this._canvas = document.createElement("canvas");
       this._canvas.id = "ui-beautify-wallpaper";
-      this._canvas.style.cssText = "position:fixed;top:0;left:260px;right:0;bottom:0;pointer-events:none;z-index:-2;opacity:0.4;";
+      this._canvas.style.cssText = "position:fixed;top:0;left:" + getSidebarWidth() + "px;right:0;bottom:0;pointer-events:none;z-index:-2;opacity:0.4;";
       document.body.prepend(this._canvas);
       this._ctx = this._canvas.getContext("2d");
 
-      this._onResize = function() { self._canvas.width = window.innerWidth - 260; self._canvas.height = window.innerHeight; };
+      this._onResize = function() { var sw = getSidebarWidth(); self._canvas.width = window.innerWidth - sw; self._canvas.height = window.innerHeight; self._canvas.style.left = sw + "px"; };
       window.addEventListener("resize", this._onResize);
       this._onResize();
 
