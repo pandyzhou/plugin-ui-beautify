@@ -322,14 +322,19 @@ input::placeholder, textarea::placeholder { color: #666688 !important; }
 .formkit-option, .formkit-listbox .formkit-option,
 [data-type="select"] [role="option"] { color: #e0e0f0 !important; background-color: rgba(15, 15, 35, 0.95) !important; }
 .formkit-option:hover, .formkit-option[aria-selected="true"],
-[data-type="select"] [role="option"]:hover { background-color: rgba(255, 0, 110, 0.15) !important; color: #ffffff !important; }
+.formkit-option[data-is-active="true"],
+[data-type="select"] [role="option"]:hover,
+[role="option"]:hover, [role="option"][aria-selected="true"],
+[role="option"][data-is-active="true"],
+li[role="option"]:hover, li[role="option"][aria-selected="true"],
+.formkit-listbox-option:hover, .formkit-listbox-option[data-is-active="true"],
+[role="listbox"] [role="option"]:hover,
+[role="listbox"] [role="option"][aria-selected="true"] {
+  background-color: rgba(255, 0, 110, 0.2) !important;
+  color: #ffffff !important;
+}
 .formkit-outer select { background-color: rgba(15, 15, 35, 0.8) !important; color: #e0e0f0 !important; border-color: rgba(255, 0, 110, 0.15) !important; }
 .formkit-outer select option { background-color: #0d0d24 !important; color: #ffffff !important; }
-/* Ensure all select/listbox hover states have white text */
-[role="listbox"] [role="option"]:hover,
-[role="listbox"] [role="option"][aria-selected="true"],
-.formkit-listbox-option:hover,
-.formkit-listbox-option[data-is-active="true"] { background-color: rgba(255, 0, 110, 0.15) !important; color: #ffffff !important; }
 
 /* === 11. Tags, Toast, Alert, Pagination === */
 .tag-wrapper { border-radius: 0.375rem !important; }
