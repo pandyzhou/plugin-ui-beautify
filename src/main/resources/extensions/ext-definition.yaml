@@ -1,16 +1,6 @@
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
 metadata:
-  name: ui-beautify-theme-head-injector
-spec:
-  extensionPointName: template-head-processor
-  className: run.halo.ui.beautify.ThemeHeadInjector
-  displayName: "UI Beautify Theme Head Injector"
-  description: "Injects gateway beautification CSS into theme-rendered pages for consistent styling"
----
-apiVersion: plugin.halo.run/v1alpha1
-kind: ExtensionDefinition
-metadata:
   name: ui-beautify-gateway-style-injector
 spec:
   extensionPointName: additional-webfilter

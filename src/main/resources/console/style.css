@@ -344,12 +344,6 @@ a:hover {
   text-underline-offset: 3px !important;
 }
 
-/* Badge pulse */
-@keyframes _ui_pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
 /* === MULTI-LAYER SHADOW SYSTEM === */
 
 /* Elevated card — ambient + key + contact */
@@ -504,12 +498,6 @@ input[type="checkbox"]:checked {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-}
-
-/* === BREATHING GLOW === */
-@keyframes _ui_breathe {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
 }
 
 /* --- Reduced Motion --- */

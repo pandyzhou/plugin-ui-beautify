@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.8.3";
+  var PLUGIN_VERSION = "1.8.4";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -285,7 +285,7 @@
           ctx.fill(); ctx.restore();
         },
         update: function(p, w, h) {
-          p.y += p.vy; p.x += Math.sin(p.wobble) * 0.5;
+          p.y += p.vy; p.x += Math.sin(p.wobble) * 0.5 + (p.vx || 0);
           p.wobble += 0.015; p.rot += p.rotSpeed;
           if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
         }
