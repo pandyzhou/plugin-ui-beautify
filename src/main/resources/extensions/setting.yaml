@@ -5,7 +5,7 @@ metadata:
 spec:
   forms:
     - group: basic
-      label: 基本设置
+      label: 风格设置
       formSchema:
         - $formkit: select
           label: "Console 风格"
@@ -29,46 +29,6 @@ spec:
               value: "aurora"
             - label: "🖥️ 跟随系统 — 自动切换明暗"
               value: "auto"
-        - $formkit: checkbox
-          label: "启用动态装饰"
-          name: enableEffects
-          value: true
-          help: "开启后各主题会显示专属动态效果（樱花飘落、星空闪烁、气泡上浮等）"
-        - $formkit: checkbox
-          label: "启用光标光晕"
-          name: enableCursorGlow
-          value: true
-          help: "鼠标移动时显示主题色光晕跟随效果"
-        - $formkit: checkbox
-          label: "启用页面过渡动画"
-          name: enablePageTransition
-          value: true
-          help: "页面切换时的淡入过渡效果"
-        - $formkit: checkbox
-          label: "启用列表入场动画"
-          name: enableListAnimation
-          value: true
-          help: "列表项依次淡入的交错动画效果"
-        - $formkit: checkbox
-          label: "启用 macOS 窗口风格"
-          name: enableMacOSCards
-          value: true
-          help: "卡片标题栏显示 macOS 风格的红黄绿圆点装饰"
-        - $formkit: checkbox
-          label: "启用 3D 卡片倾斜"
-          name: enable3DCards
-          value: true
-          help: "鼠标悬停卡片时产生 3D 透视倾斜效果"
-        - $formkit: checkbox
-          label: "启用动态壁纸"
-          name: enableWallpaper
-          value: true
-          help: "背景层显示粒子连线网络动态壁纸"
-        - $formkit: checkbox
-          label: "启用欢迎横幅"
-          name: enableWelcomeBanner
-          value: true
-          help: "仪表盘顶部显示时间问候横幅"
         - $formkit: checkbox
           label: "启用网关页面美化"
           name: enableGateway
@@ -100,3 +60,46 @@ spec:
           value: ""
           help: "输入自定义 CSS 代码，会追加到 Console 页面中（高级用户使用）"
           rows: 6
+    - group: features
+      label: 功能开关
+      formSchema:
+        - $formkit: checkbox
+          label: "启用动态装饰"
+          name: enableEffects
+          value: true
+          help: "开启后各主题会显示专属动态效果（樱花飘落、星空闪烁、气泡上浮等）"
+        - $formkit: checkbox
+          label: "启用光标光晕"
+          name: enableCursorGlow
+          value: true
+          help: "鼠标移动时显示主题色光晕跟随效果"
+        - $formkit: checkbox
+          label: "启用页面过渡动画"
+          name: enablePageTransition
+          value: true
+          help: "页面切换时的淡入过渡效果"
+        - $formkit: checkbox
+          label: "启用列表入场动画"
+          name: enableListAnimation
+          value: true
+          help: "列表项依次淡入的交错动画效果"
+        - $formkit: checkbox
+          label: "启用 macOS 窗口风格"
+          name: enableMacOSCards
+          value: true
+          help: "卡片标题栏显示 macOS 风格的红黄绿圆点装饰"
+        - $formkit: checkbox
+          label: "启用 3D 卡片倾斜"
+          name: enable3DCards
+          value: true
+          help: "仪表盘卡片鼠标悬停时产生 3D 透视倾斜效果"
+        - $formkit: checkbox
+          label: "启用动态壁纸"
+          name: enableWallpaper
+          value: true
+          help: "背景层显示粒子连线网络动态壁纸"
+        - $formkit: checkbox
+          label: "启用欢迎横幅"
+          name: enableWelcomeBanner
+          value: true
+          help: "仪表盘顶部显示时间问候横幅"

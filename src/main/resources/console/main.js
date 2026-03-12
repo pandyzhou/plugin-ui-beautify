@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.3.2";
+  var PLUGIN_VERSION = "1.3.3";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -65,15 +65,17 @@
       .then(function(res) { return res.ok ? res.json() : null; })
       .then(function(data) {
         if (data && data.basic) {
-          enableEffects = data.basic.enableEffects !== false;
-          enableCursorGlow = data.basic.enableCursorGlow !== false;
-          enablePageTransition = data.basic.enablePageTransition !== false;
-          enableListAnimation = data.basic.enableListAnimation !== false;
-          enableMacOSCards = data.basic.enableMacOSCards !== false;
-          enable3DCards = data.basic.enable3DCards !== false;
-          enableWallpaper = data.basic.enableWallpaper !== false;
-          enableWelcomeBanner = data.basic.enableWelcomeBanner !== false;
           applyCustomCss(data.basic.customCss || "");
+          /* Read feature toggles from features group */
+          var f = data.features || {};
+          enableEffects = f.enableEffects !== false;
+          enableCursorGlow = f.enableCursorGlow !== false;
+          enablePageTransition = f.enablePageTransition !== false;
+          enableListAnimation = f.enableListAnimation !== false;
+          enableMacOSCards = f.enableMacOSCards !== false;
+          enable3DCards = f.enable3DCards !== false;
+          enableWallpaper = f.enableWallpaper !== false;
+          enableWelcomeBanner = f.enableWelcomeBanner !== false;
           /* Apply toggle states */
           applyToggleStates();
           return data.basic.consoleTheme || "default";
