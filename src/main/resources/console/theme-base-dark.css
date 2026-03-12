@@ -246,3 +246,55 @@ input[type="checkbox"]:checked, input[type="radio"]:checked { background-color: 
 hr, .divider { border-color: var(--ui-border) !important; }
 /* Noise overlay fix */
 .main-content::before { opacity: 0.02 !important; filter: invert(1) !important; }
+
+/* === 26. Upload / Dropzone === */
+.upload-area, [class*="upload"], [class*="dropzone"], [class*="drop-zone"],
+.attachment-upload, .file-upload-wrapper {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text-secondary) !important;
+}
+.upload-area:hover, [class*="upload"]:hover, [class*="dropzone"]:hover {
+  background-color: var(--ui-surface-hover) !important;
+  border-color: var(--ui-border-hover) !important;
+}
+
+/* === 27. Progress / Stepper === */
+.progress, [class*="progress-bar"], [role="progressbar"] {
+  background-color: var(--ui-surface-hover) !important;
+}
+.stepper, [class*="stepper"], [class*="step-item"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+/* === 28. App Store Plugin Cards === */
+.app-store-card, [class*="plugin-card"], [class*="store-item"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+/* === 29. Global Search (Ctrl+K) === */
+[class*="search-modal"] input,
+[class*="command-palette"] input {
+  background: var(--ui-bg) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-border) !important;
+}
+[class*="search-result"], [class*="search-item"] {
+  color: var(--ui-text) !important;
+}
+[class*="search-result"]:hover, [class*="search-item"]:hover {
+  background-color: var(--ui-surface-hover) !important;
+}
+
+/* === 30. Attachment / Image Preview === */
+.attachment-detail, [class*="attachment-detail"],
+.attachment-info { background-color: var(--ui-surface) !important; color: var(--ui-text) !important; }
+
+/* === 31. Comment Panel === */
+.comment-wrapper, [class*="comment-item"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}

@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.7.0";
+  var PLUGIN_VERSION = "1.7.1";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -1086,12 +1086,12 @@
         btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px">'
           + '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>刷新页面';
         btn.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;"
-          + "padding:10px 24px;border-radius:10px;border:1px solid rgba(128,128,128,0.2);"
-          + "background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);"
-          + "color:#333;font-size:13px;font-weight:500;cursor:pointer;"
-          + "box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:all .2s ease;font-family:system-ui,sans-serif;";
-        btn.addEventListener("mouseenter", function() { btn.style.boxShadow = "0 6px 24px rgba(0,0,0,0.12)"; });
-        btn.addEventListener("mouseleave", function() { btn.style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)"; });
+          + "padding:10px 24px;border-radius:10px;border:1px solid var(--ui-border,rgba(128,128,128,0.2));"
+          + "background:var(--ui-surface,rgba(255,255,255,0.9));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);"
+          + "color:var(--ui-text,#333);font-size:13px;font-weight:500;cursor:pointer;"
+          + "box-shadow:0 4px 20px var(--ui-shadow,rgba(0,0,0,0.08));transition:all .2s ease;font-family:system-ui,sans-serif;";
+        btn.addEventListener("mouseenter", function() { btn.style.boxShadow = "0 6px 24px var(--ui-shadow-hover,rgba(0,0,0,0.12))"; });
+        btn.addEventListener("mouseleave", function() { btn.style.boxShadow = "0 4px 20px var(--ui-shadow,rgba(0,0,0,0.08))"; });
         btn.addEventListener("click", function() { location.reload(); });
         document.body.appendChild(btn);
       }, 500);
