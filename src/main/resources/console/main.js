@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.8.0";
+  var PLUGIN_VERSION = "1.8.1";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -99,13 +99,22 @@
         document.head.appendChild(baseLink);
       }
 
-      /* Load theme-specific CSS — insert after base to ensure correct cascade */
-      if (existing) existing.remove();
+      /* Load theme-specific CSS — insert after base, remove old after new loads */
       var link = document.createElement("link");
-      link.id = LINK_ID;
+      link.id = LINK_ID + "-loading";
       link.rel = "stylesheet";
       link.dataset.theme = theme;
       link.href = BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION;
+      var oldLink = existing;
+      link.onload = function() {
+        link.id = LINK_ID;
+        if (oldLink && oldLink.parentNode) oldLink.remove();
+      };
+      /* Fallback: if onload doesn't fire within 2s, force swap */
+      setTimeout(function() {
+        link.id = LINK_ID;
+        if (oldLink && oldLink.parentNode) oldLink.remove();
+      }, 2000);
       var baseEl = document.getElementById(BASE_LINK_ID);
       if (baseEl && baseEl.nextSibling) { baseEl.parentNode.insertBefore(link, baseEl.nextSibling); }
       else { document.head.appendChild(link); }
@@ -193,11 +202,15 @@
       if (existing) existing.remove();
       if (!css || !css.trim()) return;
       var sanitized = css
+        .replace(/<\/style/gi, "/* blocked */")
+        .replace(/<script/gi, "/* blocked */")
         .replace(/expression\s*\(/gi, "/* blocked */")
         .replace(/javascript\s*:/gi, "/* blocked */")
         .replace(/@import\b/gi, "/* blocked */")
+        .replace(/@charset\b/gi, "/* blocked */")
         .replace(/behavior\s*:/gi, "/* blocked */")
-        .replace(/-moz-binding\s*:/gi, "/* blocked */");
+        .replace(/-moz-binding\s*:/gi, "/* blocked */")
+        .replace(/url\s*\(\s*["']?\s*data\s*:/gi, "url(/* blocked */");
       var style = document.createElement("style");
       style.id = CUSTOM_STYLE_ID;
       style.textContent = sanitized;
@@ -457,7 +470,7 @@
     var url = arguments[0], options = arguments[1];
     var urlStr = typeof url === "string" ? url : (url && url.url) ? url.url : "";
     var method = (options && options.method) ? options.method : (url && url.method) ? url.method : "GET";
-    if (method.toUpperCase() === "PUT" && (urlStr.indexOf(CONFIG_URL) !== -1 || urlStr.indexOf(PLUGIN_NAME) !== -1)) {
+    if (method.toUpperCase() === "PUT" && urlStr.indexOf(CONFIG_URL) !== -1) {
       return originalFetch.apply(this, arguments).then(function(r) { if (r.ok || r.status === 204) onPluginSettingSaved(); return r; });
     }
     return originalFetch.apply(this, arguments);
@@ -469,7 +482,7 @@
   XMLHttpRequest.prototype.send = function() {
     var xhr = this;
     if (xhr._uiM && xhr._uiU && xhr._uiM.toUpperCase() === "PUT" &&
-        (xhr._uiU.indexOf(PLUGIN_NAME) !== -1 || xhr._uiU.indexOf(CONFIG_URL) !== -1)) {
+        xhr._uiU.indexOf(CONFIG_URL) !== -1) {
       xhr.addEventListener("load", function() { if (xhr.status >= 200 && xhr.status < 300) onPluginSettingSaved(); });
     }
     return origXHRSend.apply(this, arguments);

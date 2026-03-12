@@ -210,7 +210,7 @@
     }
   };
 
-  var cfg = THEMES[theme];
+  var cfg = THEMES[theme] || THEMES["default"];
   if (!cfg) return;
 
   for (var i = 0; i < cfg.count; i++) {

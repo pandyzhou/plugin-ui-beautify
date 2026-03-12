@@ -1,0 +1,51 @@
+/* Gateway Neon — deep dark + neon pink/cyan */
+.gateway-page {
+  background: linear-gradient(135deg, #0a0a1a 0%, #0d0d24 40%, #0a0a1a 100%) !important;
+}
+.gateway-page::before {
+  background: radial-gradient(circle, #ff006e 0%, transparent 70%);
+  opacity: 0.2;
+}
+.gateway-page::after {
+  background: radial-gradient(circle, #00ffff 0%, transparent 70%);
+  opacity: 0.15;
+}
+.halo-form-wrapper {
+  background: rgba(15, 15, 35, 0.85) !important;
+  border: 1px solid rgba(255, 0, 110, 0.2) !important;
+  color: #e0e0f0;
+}
+.form-title {
+  color: #e0e0f0 !important;
+}
+.halo-form .form-input {
+  background: rgba(15, 15, 35, 0.8) !important;
+  border-color: rgba(255, 0, 110, 0.15) !important;
+  color: #e0e0f0 !important;
+}
+.halo-form .form-input:focus-within {
+  border-color: #ff006e !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 110, 0.15), 0 0 16px rgba(255, 0, 110, 0.08) !important;
+  background: rgba(15, 15, 35, 0.9) !important;
+}
+.halo-form button[type="submit"] {
+  background: linear-gradient(135deg, #ff006e, #b967ff) !important;
+  box-shadow: 0 2px 12px rgba(255, 0, 110, 0.35) !important;
+}
+.halo-form button[type="submit"]:hover {
+  box-shadow: 0 6px 24px rgba(255, 0, 110, 0.45), 0 0 40px rgba(185, 103, 255, 0.15) !important;
+}
+.halo-form input[type="checkbox"]:checked {
+  background-color: #ff006e !important;
+  border-color: #ff006e !important;
+}
+.pill-items li {
+  border-color: rgba(255, 0, 110, 0.15) !important;
+  color: #e0e0f0 !important;
+}
+.pill-items li:hover {
+  border-color: rgba(255, 0, 110, 0.4) !important;
+  background: rgba(255, 0, 110, 0.1) !important;
+}
+a { color: #00ffff !important; }
+a:hover { color: #05ffa1 !important; }
