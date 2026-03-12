@@ -43,5 +43,5 @@
   border-color: #8b5cf6 !important;
   background: rgba(139, 92, 246, 0.1) !important;
 }
-a { color: #b4befe !important; }
-a:hover { color: #cdd6f4 !important; }
+.gateway-page a { color: #b4befe !important; }
+.gateway-page a:hover { color: #cdd6f4 !important; }

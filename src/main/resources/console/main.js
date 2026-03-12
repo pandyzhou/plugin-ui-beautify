@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.8.2";
+  var PLUGIN_VERSION = "1.8.3";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -576,7 +576,19 @@
       var c = this._COLORS[theme] || this._COLORS["default"];
       this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
     },
-    onToggle: function(on) { if (this._el) this._el.style.display = on ? "" : "none"; }
+    onToggle: function(on) {
+      if (!this._el) return;
+      if (on) {
+        this._el.style.display = "";
+        document.addEventListener("mousemove", this._onMove);
+        document.addEventListener("mouseleave", this._onLeave);
+      } else {
+        this._el.style.display = "none"; this._el.style.opacity = "0"; this._visible = false;
+        if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+        document.removeEventListener("mousemove", this._onMove);
+        document.removeEventListener("mouseleave", this._onLeave);
+      }
+    }
   });
 
   /* --- Module: Enhanced Particles (shooting stars + wind) --- */

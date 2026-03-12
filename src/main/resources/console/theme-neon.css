@@ -28,10 +28,10 @@
 .sidebar {
   background: linear-gradient(180deg, #0a0a1a, #0d0d24) !important;
   box-shadow: 4px 0 30px rgba(255, 0, 110, 0.08) !important;
-  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
 }
 .sidebar__logo-container { filter: brightness(1.8) saturate(1.2) !important; }
-.sidebar__search { backdrop-filter: blur(8px) !important; }
+.sidebar__search { -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; }
 .sidebar__search:hover { box-shadow: 0 0 12px rgba(255, 0, 110, 0.15) !important; }
 .sidebar__profile::before {
   content: "" !important; position: absolute !important; top: -70px !important; left: 0 !important; right: 0 !important; height: 70px !important;
@@ -55,8 +55,7 @@
 
 /* === Page Header — neon border-image === */
 .page-header {
-  backdrop-filter: blur(12px) !important;
-  border-image: linear-gradient(90deg, transparent, rgba(255, 0, 110, 0.25), rgba(0, 255, 255, 0.15), transparent) 1 !important;
+  -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
 }
 .page-header__title { text-shadow: 0 0 20px rgba(255, 0, 110, 0.2) !important; }
 .dashboard .card-wrapper { border: 1px solid rgba(0, 255, 255, 0.1) !important; }
@@ -64,7 +63,7 @@
 
 /* === Card — glassmorphism + neon top line === */
 .card-wrapper {
-  border-radius: 0.75rem !important; backdrop-filter: blur(12px) !important;
+  border-radius: 0.75rem !important; -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
   position: relative !important; overflow: hidden !important;
 }
 .card-wrapper::before {
@@ -96,7 +95,7 @@
 
 /* === Modal — neon glow === */
 .modal-wrapper .modal-content, .modal-content {
-  border-radius: 1rem !important; backdrop-filter: blur(12px) !important;
+  border-radius: 1rem !important; -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 110, 0.1) !important;
 }
 
@@ -108,7 +107,7 @@
 .tag-wrapper:hover { box-shadow: 0 0 10px rgba(0, 255, 255, 0.2) !important; }
 
 /* === Toast — neon glow === */
-.toast-body { backdrop-filter: blur(12px) !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 110, 0.1) !important; }
+.toast-body { -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 110, 0.1) !important; }
 
 /* === Links — cyan/mint === */
 a:not(.btn) { color: #00ffff !important; }
