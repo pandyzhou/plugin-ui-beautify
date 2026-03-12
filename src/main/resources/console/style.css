@@ -290,10 +290,219 @@ select:focus-visible {
   border-image: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.15), transparent) 1 !important;
 }
 
+/* === GLOW EFFECTS === */
+
+/* Card hover glow */
+.card-wrapper:hover {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Button hover glow */
+.btn.btn-primary:hover {
+  filter: brightness(1.08) !important;
+}
+
+/* Switch glow when on */
+.switch-inner[aria-checked="true"] {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Selected entity glow */
+.entity-wrapper.is-selected,
+.entity-wrapper.entity-selected {
+  box-shadow: inset 3px 0 0 currentColor !important;
+}
+
+/* Input focus glow ring */
+.formkit-outer input:focus,
+.formkit-outer textarea:focus {
+  box-shadow:
+    0 0 0 2px rgba(99, 102, 241, 0.15),
+    0 0 8px rgba(99, 102, 241, 0.08) !important;
+}
+
+/* Link hover glow underline */
+a:hover {
+  text-decoration-color: currentColor !important;
+  text-underline-offset: 3px !important;
+}
+
+/* Badge pulse */
+@keyframes _ui_pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* === MULTI-LAYER SHADOW SYSTEM === */
+
+/* Elevated card — ambient + key + contact */
+.card-wrapper {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Sidebar right edge shadow */
+.sidebar {
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Input inset shadow */
+.formkit-outer input,
+.formkit-outer textarea {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Button press — outer to inset */
+.btn:active {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transform: scale(0.97) !important;
+}
+
+/* === NOISE TEXTURE OVERLAY === */
+.main-content::before {
+  content: "" !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: 0.015 !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") !important;
+}
+
+/* === TYPOGRAPHY ENHANCEMENT === */
+
+/* Title weight hierarchy */
+h1, .text-2xl { font-weight: 700 !important; letter-spacing: -0.02em !important; }
+h2, .text-xl { font-weight: 600 !important; letter-spacing: -0.01em !important; }
+h3, .text-lg { font-weight: 600 !important; }
+
+/* Tabular numbers for stats */
+.widget-card [class*="text-2xl"],
+.widget-card [class*="text-3xl"],
+.stat-value,
+[class*="font-bold"][class*="text-"] {
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Content line height */
+.entity-field-description,
+.formkit-help,
+p {
+  line-height: 1.7 !important;
+}
+
+/* Code font ligatures */
+code, pre, .ProseMirror code {
+  font-feature-settings: "liga" on, "calt" on !important;
+}
+
+/* Blockquote style */
+blockquote {
+  border-left: 3px solid currentColor !important;
+  padding-left: 1rem !important;
+  font-style: italic !important;
+  opacity: 0.85 !important;
+}
+
+/* Kbd key style */
+kbd, .kbd {
+  display: inline-block !important;
+  padding: 2px 6px !important;
+  font-size: 0.75rem !important;
+  font-family: inherit !important;
+  line-height: 1.4 !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.04) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+  vertical-align: middle !important;
+}
+
+/* === INTERACTION FEEDBACK === */
+
+/* Button gradient shift on hover */
+.btn.btn-primary {
+  background-size: 200% 100% !important;
+  background-position: 0% 0% !important;
+  transition: all 0.3s ease !important;
+}
+.btn.btn-primary:hover {
+  background-position: 100% 0% !important;
+}
+
+/* Input caret color */
+input, textarea {
+  caret-color: currentColor !important;
+}
+
+/* Checkbox check bounce */
+input[type="checkbox"]:checked {
+  animation: _ui_checkBounce 0.2s ease !important;
+}
+@keyframes _ui_checkBounce {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Scroll bottom fade */
+.entity-list-wrapper {
+  mask-image: linear-gradient(to bottom, black 90%, transparent 100%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%) !important;
+}
+
+/* Skeleton shimmer */
+@keyframes _ui_shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton,
+[class*="animate-pulse"] {
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: _ui_shimmer 1.5s ease infinite !important;
+}
+
+/* Tooltip arrow */
+.v-popper--theme-tooltip .v-popper__arrow-container {
+  display: block !important;
+}
+
+/* === TABS GLASSMORPHISM === */
+.tabbar-wrapper .tabbar-item.tabbar-item--active {
+  background: rgba(255, 255, 255, 0.6) !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* === DYNAMIC GRADIENT BACKGROUND === */
+@keyframes _ui_gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === BREATHING GLOW === */
+@keyframes _ui_breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
 /* --- Reduced Motion --- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+  .main-content::before { display: none !important; }
 }

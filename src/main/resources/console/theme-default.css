@@ -407,3 +407,45 @@ body .border-gray-200 {
 .card-header { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }
 .card-footer { border-image: linear-gradient(90deg, transparent, rgba(76, 203, 160, 0.15), transparent) 1 !important; }
 [class*="rounded-full"][class*="bg-gray-100"] { background-color: rgba(76, 203, 160, 0.12) !important; }
+
+/* === GLOW & DEPTH === */
+.card-wrapper:hover {
+  box-shadow:
+    0 0 0 1px rgba(76, 203, 160, 0.08),
+    0 4px 12px rgba(76, 203, 160, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.04) !important;
+}
+.btn.btn-primary {
+  background: linear-gradient(135deg, #4ccba0, #36b389, #4ccba0) !important;
+  background-size: 200% 100% !important;
+  box-shadow: 0 2px 8px rgba(76, 203, 160, 0.35), 0 0 20px rgba(76, 203, 160, 0.1) !important;
+}
+.btn.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(76, 203, 160, 0.45), 0 0 30px rgba(76, 203, 160, 0.15) !important;
+}
+.switch-inner[aria-checked="true"] {
+  box-shadow: 0 0 12px rgba(76, 203, 160, 0.35) !important;
+}
+.formkit-outer input:focus,
+.formkit-outer textarea:focus {
+  border-color: #4ccba0 !important;
+  box-shadow: 0 0 0 3px rgba(76, 203, 160, 0.12), 0 0 12px rgba(76, 203, 160, 0.06) !important;
+}
+.sidebar {
+  box-shadow: 4px 0 20px rgba(76, 203, 160, 0.06) !important;
+}
+/* Dynamic gradient background */
+.main-content {
+  background-size: 400% 400% !important;
+  animation: _ui_gradientShift 20s ease infinite !important;
+}
+/* Active tab glow */
+.tabbar-wrapper .tabbar-item.tabbar-item--active {
+  background: rgba(76, 203, 160, 0.08) !important;
+  box-shadow: 0 1px 4px rgba(76, 203, 160, 0.1), inset 0 0 0 1px rgba(76, 203, 160, 0.12) !important;
+}
+/* Kbd */
+kbd, .kbd {
+  border-color: rgba(76, 203, 160, 0.2) !important;
+  background: rgba(76, 203, 160, 0.05) !important;
+}

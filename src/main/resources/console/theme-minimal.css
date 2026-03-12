@@ -273,3 +273,19 @@ body .border-\[\#eaecf0\] {
 .entity-wrapper:hover { border-left-color: #9ca3af !important; }
 .formkit-outer select:focus { border-color: #6b7280 !important; box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.15) !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(107, 114, 128, 0.15), transparent) 1 !important; }
+
+/* === GLOW & DEPTH === */
+.card-wrapper:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+.sidebar {
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.03) !important;
+}
+kbd, .kbd {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+/* No noise texture for minimal */
+.main-content::before {
+  display: none !important;
+}

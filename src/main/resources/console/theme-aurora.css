@@ -707,3 +707,50 @@ input[type="radio"]:checked {
 .card-header { border-image: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.1), transparent) 1 !important; }
 .card-footer { border-image: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.1), transparent) 1 !important; }
 [class*="rounded-full"][class*="bg-gray-100"] { background-color: rgba(168, 85, 247, 0.12) !important; }
+
+/* === GLOW & DEPTH === */
+.card-wrapper:hover {
+  box-shadow:
+    0 0 0 1px rgba(168, 85, 247, 0.15),
+    0 4px 16px rgba(168, 85, 247, 0.1),
+    0 0 30px rgba(236, 72, 153, 0.05) !important;
+}
+.btn.btn-primary {
+  background: linear-gradient(135deg, #a855f7, #ec4899, #a855f7) !important;
+  background-size: 200% 100% !important;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4), 0 0 25px rgba(236, 72, 153, 0.12) !important;
+}
+.btn.btn-primary:hover {
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(236, 72, 153, 0.18) !important;
+}
+.switch-inner[aria-checked="true"] {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4) !important;
+}
+.formkit-outer input:focus,
+.formkit-outer textarea:focus {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2), 0 0 15px rgba(168, 85, 247, 0.1) !important;
+}
+.sidebar {
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3) !important;
+}
+.page-header__title {
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.15) !important;
+}
+.tabbar-wrapper .tabbar-item.tabbar-item--active {
+  background: rgba(168, 85, 247, 0.12) !important;
+  box-shadow: 0 1px 6px rgba(168, 85, 247, 0.15), inset 0 0 0 1px rgba(168, 85, 247, 0.2) !important;
+}
+kbd, .kbd {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  background: rgba(168, 85, 247, 0.1) !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+}
+.skeleton, [class*="animate-pulse"] {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%) !important;
+}
+.main-content::before {
+  opacity: 0.025 !important;
+  filter: invert(1) !important;
+}

@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.1.11";
+  var PLUGIN_VERSION = "1.2.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -429,6 +429,173 @@
 
     return originalFetch.apply(this, arguments);
   };
+
+  /* ============================================
+     PAGE TRANSITION — fade in on route change
+     ============================================ */
+  (function initPageTransition() {
+    if (reducedMotion.matches) return;
+    var mainContent = null;
+    var observer = new MutationObserver(function() {
+      if (!mainContent) mainContent = document.querySelector(".main-content");
+      if (!mainContent) return;
+      mainContent.style.animation = "none";
+      void mainContent.offsetHeight; /* trigger reflow */
+      mainContent.style.animation = "_ui_pageIn 0.3s ease forwards";
+    });
+    /* Observe route changes via URL hash/path changes */
+    var lastPath = location.pathname + location.hash;
+    setInterval(function() {
+      var curPath = location.pathname + location.hash;
+      if (curPath !== lastPath) {
+        lastPath = curPath;
+        if (mainContent && !reducedMotion.matches) {
+          mainContent.style.animation = "none";
+          void mainContent.offsetHeight;
+          mainContent.style.animation = "_ui_pageIn 0.3s ease forwards";
+        }
+      }
+    }, 100);
+    /* Inject keyframes */
+    var pageStyle = document.createElement("style");
+    pageStyle.textContent =
+      "@keyframes _ui_pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }";
+    document.head.appendChild(pageStyle);
+  })();
+
+  /* ============================================
+     STAGGERED LIST ENTRANCE
+     ============================================ */
+  (function initStaggeredList() {
+    if (reducedMotion.matches) return;
+    var staggerStyle = document.createElement("style");
+    staggerStyle.textContent =
+      "@keyframes _ui_staggerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
+      ".entity-wrapper { animation: _ui_staggerIn 0.25s ease both; }" +
+      ".entity-wrapper:nth-child(1) { animation-delay: 0ms; }" +
+      ".entity-wrapper:nth-child(2) { animation-delay: 30ms; }" +
+      ".entity-wrapper:nth-child(3) { animation-delay: 60ms; }" +
+      ".entity-wrapper:nth-child(4) { animation-delay: 90ms; }" +
+      ".entity-wrapper:nth-child(5) { animation-delay: 120ms; }" +
+      ".entity-wrapper:nth-child(6) { animation-delay: 150ms; }" +
+      ".entity-wrapper:nth-child(7) { animation-delay: 180ms; }" +
+      ".entity-wrapper:nth-child(8) { animation-delay: 210ms; }" +
+      ".entity-wrapper:nth-child(9) { animation-delay: 240ms; }" +
+      ".entity-wrapper:nth-child(10) { animation-delay: 270ms; }" +
+      ".entity-wrapper:nth-child(n+11) { animation-delay: 300ms; }";
+    document.head.appendChild(staggerStyle);
+  })();
+
+  /* ============================================
+     CURSOR GLOW — soft light follows mouse
+     ============================================ */
+  (function initCursorGlow() {
+    if (reducedMotion.matches) return;
+    var glow = document.createElement("div");
+    glow.id = "ui-beautify-cursor-glow";
+    glow.style.cssText =
+      "position:fixed;width:300px;height:300px;border-radius:50%;" +
+      "pointer-events:none;z-index:0;opacity:0;" +
+      "background:radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%);" +
+      "transition:opacity 0.3s ease;transform:translate(-50%,-50%);";
+    document.body.appendChild(glow);
+
+    var visible = false;
+    document.addEventListener("mousemove", function(e) {
+      glow.style.left = e.clientX + "px";
+      glow.style.top = e.clientY + "px";
+      if (!visible) { glow.style.opacity = "1"; visible = true; }
+    });
+    document.addEventListener("mouseleave", function() {
+      glow.style.opacity = "0"; visible = false;
+    });
+
+    /* Update glow color based on theme */
+    function updateGlowColor(theme) {
+      var colors = {
+        "default": "rgba(76,203,160,0.06)",
+        "sakura": "rgba(236,72,153,0.06)",
+        "ocean": "rgba(59,130,246,0.06)",
+        "dark": "rgba(139,92,246,0.08)",
+        "aurora": "rgba(168,85,247,0.08)",
+        "minimal": "rgba(0,0,0,0.02)"
+      };
+      var c = colors[theme] || colors["default"];
+      glow.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
+    }
+    /* Expose for theme switch */
+    window._uiBeautifyUpdateGlow = updateGlowColor;
+  })();
+
+  /* ============================================
+     ENHANCED PARTICLES — shooting stars, wind, fish
+     ============================================ */
+  (function enhanceParticles() {
+    /* Shooting star for dark theme */
+    var origApply = FX.apply.bind(FX);
+    var shootingStarInterval = null;
+
+    FX.apply = function(theme) {
+      origApply(theme);
+      clearInterval(shootingStarInterval);
+
+      /* Update cursor glow color */
+      if (window._uiBeautifyUpdateGlow) {
+        window._uiBeautifyUpdateGlow(theme);
+      }
+
+      if (theme === "dark" && !reducedMotion.matches) {
+        shootingStarInterval = setInterval(function() {
+          if (!FX.ctx || !FX.canvas) return;
+          var ctx = FX.ctx;
+          var startX = Math.random() * FX.w;
+          var startY = Math.random() * FX.h * 0.3;
+          var len = 60 + Math.random() * 80;
+          var angle = Math.PI / 4 + Math.random() * 0.3;
+          var frames = 0;
+          var maxFrames = 20;
+
+          function drawStar() {
+            if (frames >= maxFrames) return;
+            var progress = frames / maxFrames;
+            var alpha = progress < 0.5 ? progress * 2 : (1 - progress) * 2;
+            var x = startX + Math.cos(angle) * len * progress;
+            var y = startY + Math.sin(angle) * len * progress;
+
+            ctx.save();
+            ctx.globalAlpha = alpha * 0.6;
+            ctx.strokeStyle = "#a78bfa";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - Math.cos(angle) * 20, y - Math.sin(angle) * 20);
+            ctx.stroke();
+            /* bright head */
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = "#c4b5fd";
+            ctx.beginPath();
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            frames++;
+            requestAnimationFrame(drawStar);
+          }
+          drawStar();
+        }, 4000 + Math.random() * 6000);
+      }
+
+      /* Wind gust for sakura */
+      if (theme === "sakura" && !reducedMotion.matches && FX.particles) {
+        setInterval(function() {
+          FX.particles.forEach(function(p) {
+            p.vx += 1.5; /* push right */
+            setTimeout(function() { p.vx -= 1.5; }, 2000);
+          });
+        }, 8000 + Math.random() * 5000);
+      }
+    };
+  })();
 })();
 
 /* Plugin Module Registration */
