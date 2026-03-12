@@ -41,17 +41,12 @@
 /* --- Entity List Enhancement --- */
 .entity-wrapper {
     border-radius: 0.5rem !important;
-    transition: all 150ms ease !important;
+    transition: background-color 150ms ease, border-color 150ms ease !important;
 }
 
 /* --- Modal Enhancement --- */
-.modal-content {
+.modal-wrapper .modal-content {
     border-radius: 1rem !important;
-}
-
-.modal-layer {
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
 }
 
 /* --- Alert Enhancement --- */
@@ -65,19 +60,19 @@
 }
 
 /* --- Dropdown Enhancement --- */
-[data-headlessui-state] {
+.v-popper--theme-dropdown .v-popper__inner {
     border-radius: 0.625rem !important;
 }
 
 /* --- Form Input Enhancement --- */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="url"],
-input[type="search"],
-input[type="number"],
-textarea,
-select {
+.formkit-outer input[type="text"],
+.formkit-outer input[type="email"],
+.formkit-outer input[type="password"],
+.formkit-outer input[type="url"],
+.formkit-outer input[type="search"],
+.formkit-outer input[type="number"],
+.formkit-outer textarea,
+.formkit-outer select {
     border-radius: 0.5rem !important;
     transition: border-color 180ms ease, box-shadow 180ms ease !important;
 }
