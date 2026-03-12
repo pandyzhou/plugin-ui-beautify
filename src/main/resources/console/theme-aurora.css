@@ -219,7 +219,6 @@ body {
 }
 .entity-wrapper.entity-selected {
   background-color: rgba(168, 85, 247, 0.1) !important;
-  border-left: 2px solid #a855f7 !important;
 }
 .entity-field-title {
   color: #e2e8f0 !important;
@@ -700,7 +699,7 @@ input[type="radio"]:checked {
 .empty-title { color: #c084fc !important; }
 .empty-message { color: #7c8599 !important; }
 .switch-inner[aria-checked="true"] { background: linear-gradient(135deg, #a855f7, #ec4899) !important; }
-.entity-wrapper:hover { border-left-color: #a855f7 !important; }
+.entity-wrapper:hover { background-color: rgba(168, 85, 247, 0.04) !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(168, 85, 247, 0.25) !important; }
 .formkit-outer select { background-color: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
 .formkit-outer select:focus { border-color: #a855f7 !important; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25) !important; }

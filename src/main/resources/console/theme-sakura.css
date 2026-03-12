@@ -160,7 +160,6 @@
 }
 .entity-wrapper.entity-selected {
   background-color: rgba(236, 72, 153, 0.06) !important;
-  border-left: 2px solid #ec4899 !important;
 }
 
 /* === 8. Modal === */
@@ -403,7 +402,7 @@ body .border-gray-200 {
 .empty-title { color: #9d174d !important; }
 .empty-message { color: #be185d !important; }
 .switch-inner[aria-checked="true"] { background-color: #ec4899 !important; }
-.entity-wrapper:hover { border-left-color: #ec4899 !important; }
+.entity-wrapper:hover { background-color: rgba(236, 72, 153, 0.04) !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2) !important; }
 .formkit-outer select:focus { border-color: #ec4899 !important; box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2) !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.2), transparent) 1 !important; }

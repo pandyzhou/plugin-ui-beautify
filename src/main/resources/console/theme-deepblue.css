@@ -674,7 +674,7 @@ input[type="radio"]:checked {
 .empty-title { color: #7dd3fc !important; }
 .empty-message { color: #4a5e80 !important; }
 .switch-inner[aria-checked="true"] { background-color: #38bdf8 !important; }
-.entity-wrapper:hover { border-left-color: #38bdf8 !important; }
+.entity-wrapper:hover { background-color: rgba(56, 189, 248, 0.04) !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(56, 189, 248, 0.2) !important; }
 .formkit-outer select { background-color: #1e293b !important; color: #e2e8f0 !important; border-color: #1e3a5f !important; }
 .formkit-outer select:focus { border-color: #38bdf8 !important; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important; }

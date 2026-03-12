@@ -224,17 +224,14 @@ body {
 .entity-wrapper {
   border-radius: 0.5rem !important;
   transition: all 0.2s ease !important;
-  border-left: 2px solid transparent !important;
 }
 .entity-wrapper:hover {
   background-color: rgba(255, 0, 110, 0.06) !important;
-  border-left-color: #ff006e !important;
   box-shadow: 0 0 15px rgba(255, 0, 110, 0.08) !important;
 }
 .entity-wrapper.entity-selected,
 .entity-wrapper.is-selected {
   background-color: rgba(255, 0, 110, 0.08) !important;
-  border-left-color: #b967ff !important;
 }
 .entity-field-title, .entity-field-body-title { color: #e0e0f0 !important; }
 .entity-field-description { color: #8888aa !important; }
