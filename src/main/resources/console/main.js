@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.3.1";
+  var PLUGIN_VERSION = "1.3.2";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -566,18 +566,15 @@
     staggerStyle.id = "ui-beautify-list-anim";
     staggerStyle.textContent =
       "@keyframes _ui_staggerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }" +
-      ".entity-wrapper { animation: _ui_staggerIn 0.25s ease both; }" +
+      ".entity-wrapper:nth-child(-n+8) { animation: _ui_staggerIn 0.2s ease both; }" +
       ".entity-wrapper:nth-child(1) { animation-delay: 0ms; }" +
-      ".entity-wrapper:nth-child(2) { animation-delay: 30ms; }" +
-      ".entity-wrapper:nth-child(3) { animation-delay: 60ms; }" +
-      ".entity-wrapper:nth-child(4) { animation-delay: 90ms; }" +
-      ".entity-wrapper:nth-child(5) { animation-delay: 120ms; }" +
-      ".entity-wrapper:nth-child(6) { animation-delay: 150ms; }" +
-      ".entity-wrapper:nth-child(7) { animation-delay: 180ms; }" +
-      ".entity-wrapper:nth-child(8) { animation-delay: 210ms; }" +
-      ".entity-wrapper:nth-child(9) { animation-delay: 240ms; }" +
-      ".entity-wrapper:nth-child(10) { animation-delay: 270ms; }" +
-      ".entity-wrapper:nth-child(n+11) { animation-delay: 300ms; }";
+      ".entity-wrapper:nth-child(2) { animation-delay: 25ms; }" +
+      ".entity-wrapper:nth-child(3) { animation-delay: 50ms; }" +
+      ".entity-wrapper:nth-child(4) { animation-delay: 75ms; }" +
+      ".entity-wrapper:nth-child(5) { animation-delay: 100ms; }" +
+      ".entity-wrapper:nth-child(6) { animation-delay: 125ms; }" +
+      ".entity-wrapper:nth-child(7) { animation-delay: 150ms; }" +
+      ".entity-wrapper:nth-child(8) { animation-delay: 175ms; }";
     document.head.appendChild(staggerStyle);
   })();
 
@@ -788,8 +785,10 @@
     }
 
     scanAndInject();
+    var macDebounce = null;
     var macObserver = new MutationObserver(function() {
-      setTimeout(scanAndInject, 100);
+      if (macDebounce) clearTimeout(macDebounce);
+      macDebounce = setTimeout(scanAndInject, 300);
     });
     macObserver.observe(document.body, { childList: true, subtree: true });
   })();
@@ -990,16 +989,12 @@
       "@keyframes _ui_rainbowSpin { 0% { --_rb_angle: 0deg; } 100% { --_rb_angle: 360deg; } }" +
       "@property --_rb_angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }" +
       ".card-wrapper { position: relative !important; }" +
-      ".card-wrapper::before {" +
+      ".card-wrapper:hover::before {" +
       "  content: '' !important; position: absolute !important;" +
       "  inset: -2px !important; border-radius: inherit !important; z-index: -1 !important;" +
       "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
       "  animation: _ui_rainbowSpin 6s linear infinite !important;" +
-      "  opacity: 0 !important; filter: blur(12px) !important;" +
-      "  transition: opacity 0.5s ease !important;" +
-      "}" +
-      ".card-wrapper:hover::before {" +
-      "  opacity: 0.15 !important;" +
+      "  opacity: 0.15 !important; filter: blur(12px) !important;" +
       "}";
     document.head.appendChild(rbStyle);
   })();
