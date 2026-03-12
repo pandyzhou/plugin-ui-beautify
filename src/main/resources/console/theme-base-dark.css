@@ -56,9 +56,9 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 /* === 6. Cards === */
 .card-wrapper { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; box-shadow: 0 1px 3px var(--ui-shadow) !important; }
 .card-wrapper:hover { box-shadow: 0 4px 12px var(--ui-shadow-hover) !important; border-color: var(--ui-border-hover) !important; }
-.card-header { border-bottom: 1px solid var(--ui-border) !important; }
+.card-header { border-bottom: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
 .card-header-title, .card-body { color: var(--ui-text) !important; }
-.card-footer { border-top: 1px solid var(--ui-border) !important; }
+.card-footer { border-top: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
 
 /* === 7. Buttons === */
 .btn { color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
@@ -200,6 +200,17 @@ body .bg-white, body [class*="bg-white"] { background-color: var(--ui-surface) !
 body .bg-gray-50, body [class*="bg-gray-50"] { background-color: var(--ui-bg) !important; }
 body .bg-gray-100, body [class*="bg-gray-100"] { background-color: var(--ui-surface) !important; }
 body .bg-gray-200, body [class*="bg-gray-200"] { background-color: var(--ui-surface-hover) !important; }
+
+/* Catch-all: any remaining white backgrounds */
+body [style*="background-color: white"],
+body [style*="background-color: #fff"],
+body [style*="background: white"],
+body [style*="background: #fff"] { background-color: var(--ui-surface) !important; }
+
+/* List header/footer/pagination bars */
+.pagination-wrapper, .pagination { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text-secondary) !important; }
+.list-header, .list-footer, [class*="list-header"], [class*="list-footer"] { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
+.search-bar, [class*="search-bar"], [class*="filter-bar"] { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
 body .hover\:bg-gray-50:hover { background-color: var(--ui-surface-hover) !important; }
 body .hover\:bg-gray-100:hover { background-color: var(--ui-surface-hover) !important; }
 body .text-gray-900, body .text-gray-800, body .text-gray-700 { color: var(--ui-text) !important; }
