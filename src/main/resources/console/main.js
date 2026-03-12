@@ -3,7 +3,7 @@
   "use strict";
 
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.3.0";
+  var PLUGIN_VERSION = "1.3.1";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -111,18 +111,33 @@
     /* Page transition */
     var pageStyleEl = document.getElementById("ui-beautify-page-anim");
     if (pageStyleEl) pageStyleEl.disabled = !enablePageTransition;
-    /* macOS cards */
+    /* macOS cards — remove injected elements if disabled */
     var macLights = document.querySelectorAll(".ui-traffic-lights");
-    macLights.forEach(function(el) { el.style.display = enableMacOSCards ? "" : "none"; });
-    /* 3D cards */
-    var tiltCards = document.querySelectorAll(".card-wrapper > *");
-    if (!enable3DCards) tiltCards.forEach(function(el) { el.style.transform = ""; });
+    macLights.forEach(function(el) {
+      if (!enableMacOSCards) {
+        var header = el.parentElement;
+        if (header) header.style.paddingLeft = "";
+        el.remove();
+      }
+    });
+    /* 3D cards — clear transforms */
+    if (!enable3DCards) {
+      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) {
+        el.style.transform = "";
+      });
+    }
     /* Wallpaper */
     var wallEl = document.getElementById("ui-beautify-wallpaper");
     if (wallEl) wallEl.style.display = enableWallpaper ? "" : "none";
+    /* Aurora background */
+    var auroraEl = document.getElementById("ui-beautify-aurora-bg");
+    if (auroraEl) auroraEl.style.display = enableWallpaper ? "" : "none";
     /* Welcome banner */
     var bannerEl = document.getElementById("ui-welcome-banner");
     if (bannerEl) bannerEl.style.display = enableWelcomeBanner ? "" : "none";
+    /* Sidebar overhaul */
+    var sidebarStyle = document.getElementById("ui-beautify-sidebar-overhaul");
+    if (sidebarStyle) sidebarStyle.disabled = !enableMacOSCards;
   }
 
   /* ========== Particle Effects Engine ========== */
@@ -751,16 +766,15 @@
      ============================================ */
   (function initMacOSCards() {
     function injectTrafficLights(header) {
+      if (!enableMacOSCards) return;
       if (header.querySelector(".ui-traffic-lights")) return;
       var container = document.createElement("div");
       container.className = "ui-traffic-lights";
-      container.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;";
+      container.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;pointer-events:none;";
       var colors = ["#ff5f57", "#febc2e", "#28c840"];
       for (var i = 0; i < 3; i++) {
         var dot = document.createElement("span");
-        dot.style.cssText = "width:11px;height:11px;border-radius:50%;background:" + colors[i] + ";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);transition:transform 0.15s ease;";
-        dot.addEventListener("mouseenter", function() { this.style.transform = "scale(1.2)"; });
-        dot.addEventListener("mouseleave", function() { this.style.transform = "scale(1)"; });
+        dot.style.cssText = "width:11px;height:11px;border-radius:50%;background:" + colors[i] + ";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);";
         container.appendChild(dot);
       }
       header.style.position = "relative";
@@ -769,6 +783,7 @@
     }
 
     function scanAndInject() {
+      if (!enableMacOSCards) return;
       document.querySelectorAll(".card-header").forEach(injectTrafficLights);
     }
 
@@ -941,38 +956,26 @@
      ============================================ */
   (function init3DCards() {
     if (reducedMotion.matches) return;
-    var tiltStyle = document.createElement("style");
-    tiltStyle.textContent =
-      ".card-wrapper { perspective: 800px !important; }" +
-      ".card-wrapper > * { transition: transform 0.15s ease-out !important; transform-style: preserve-3d !important; }";
-    document.head.appendChild(tiltStyle);
 
     document.addEventListener("mousemove", function(e) {
-      var cards = document.querySelectorAll(".card-wrapper");
+      if (!enable3DCards) return;
+      /* Only tilt small dashboard cards, not full-page cards */
+      var cards = document.querySelectorAll(".dashboard .vue-grid-item > div");
       cards.forEach(function(card) {
         var rect = card.getBoundingClientRect();
+        if (rect.width > 600) return; /* Skip large cards */
         if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
         var x = (e.clientX - rect.left) / rect.width - 0.5;
         var y = (e.clientY - rect.top) / rect.height - 0.5;
-        var child = card.firstElementChild;
-        if (child) {
-          child.style.transform = "rotateY(" + (x * 4).toFixed(2) + "deg) rotateX(" + (-y * 4).toFixed(2) + "deg) translateZ(4px)";
-        }
+        card.style.transition = "transform 0.15s ease-out";
+        card.style.transform = "perspective(800px) rotateY(" + (x * 3).toFixed(2) + "deg) rotateX(" + (-y * 3).toFixed(2) + "deg)";
       });
     });
 
-    document.addEventListener("mouseleave", function() {
-      document.querySelectorAll(".card-wrapper > *").forEach(function(el) {
-        el.style.transform = "";
-      });
-    }, true);
-
-    /* Reset on mouseout of individual cards */
     document.addEventListener("mouseout", function(e) {
-      var card = e.target.closest(".card-wrapper");
+      var card = e.target.closest(".dashboard .vue-grid-item > div");
       if (card && !card.contains(e.relatedTarget)) {
-        var child = card.firstElementChild;
-        if (child) child.style.transform = "";
+        card.style.transform = "";
       }
     });
   })();
@@ -986,21 +989,17 @@
     rbStyle.textContent =
       "@keyframes _ui_rainbowSpin { 0% { --_rb_angle: 0deg; } 100% { --_rb_angle: 360deg; } }" +
       "@property --_rb_angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }" +
-      ".card-wrapper:hover { position: relative !important; }" +
-      ".card-wrapper:hover::before {" +
+      ".card-wrapper { position: relative !important; }" +
+      ".card-wrapper::before {" +
       "  content: '' !important; position: absolute !important;" +
       "  inset: -2px !important; border-radius: inherit !important; z-index: -1 !important;" +
       "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
-      "  animation: _ui_rainbowSpin 3s linear infinite !important;" +
-      "  opacity: 0.4 !important; filter: blur(8px) !important;" +
+      "  animation: _ui_rainbowSpin 6s linear infinite !important;" +
+      "  opacity: 0 !important; filter: blur(12px) !important;" +
+      "  transition: opacity 0.5s ease !important;" +
       "}" +
-      ".formkit-outer input:focus { position: relative !important; }" +
-      ".formkit-outer input:focus::after {" +
-      "  content: '' !important; position: absolute !important;" +
-      "  inset: -3px !important; border-radius: inherit !important; z-index: -1 !important;" +
-      "  background: conic-gradient(from var(--_rb_angle), #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b) !important;" +
-      "  animation: _ui_rainbowSpin 3s linear infinite !important;" +
-      "  opacity: 0.3 !important; filter: blur(6px) !important;" +
+      ".card-wrapper:hover::before {" +
+      "  opacity: 0.15 !important;" +
       "}";
     document.head.appendChild(rbStyle);
   })();
