@@ -42,7 +42,7 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
     );
 
     private static final Set<String> VALID_THEMES = Set.of(
-        "default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora"
+        "default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"
     );
 
     private final ReactiveSettingFetcher settingFetcher;

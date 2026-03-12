@@ -229,7 +229,7 @@ select:focus-visible {
 .formkit-outer select:focus,
 .form-select:focus {
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+  box-shadow: 0 0 0 2px var(--ui-primary-soft, rgba(99, 102, 241, 0.2)) !important;
 }
 
 /* --- Menu Item Hover Micro-shift --- */
@@ -321,21 +321,21 @@ button[class*="upgrade"],
 
 /* Switch glow when on */
 .switch-inner[aria-checked="true"] {
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+  box-shadow: 0 0 10px var(--ui-primary-soft, rgba(99, 102, 241, 0.3)) !important;
 }
 
 /* Selected entity glow */
 .entity-wrapper.is-selected,
 .entity-wrapper.entity-selected {
-  background-color: rgba(99, 102, 241, 0.06) !important;
+  background-color: var(--ui-primary-soft, rgba(99, 102, 241, 0.06)) !important;
 }
 
 /* Input focus glow ring */
 .formkit-outer input:focus,
 .formkit-outer textarea:focus {
   box-shadow:
-    0 0 0 2px rgba(99, 102, 241, 0.15),
-    0 0 8px rgba(99, 102, 241, 0.08) !important;
+    0 0 0 2px var(--ui-primary-soft, rgba(99, 102, 241, 0.15)),
+    0 0 8px var(--ui-primary-soft, rgba(99, 102, 241, 0.08)) !important;
 }
 
 /* Link hover glow underline */

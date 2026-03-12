@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "1.7.5";
+  var PLUGIN_VERSION = "1.8.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -687,7 +687,7 @@
 
   /* --- Module: Sidebar Overhaul --- */
   App.register({
-    id: "sidebarOverhaul", toggle: "enableMacOSCards",
+    id: "sidebarOverhaul",
     _styleEl: null,
     init: function() {
       this._styleEl = document.createElement("style");
@@ -780,7 +780,15 @@
         if (!isEditor) document.body.classList.remove("ui-zen-mode");
       }, 500);
 
-      document.addEventListener("keydown", function(e) { if (e.key === "Escape") document.body.classList.remove("ui-zen-mode"); });
+      this._onKeydown = function(e) { if (e.key === "Escape") document.body.classList.remove("ui-zen-mode"); };
+      document.addEventListener("keydown", this._onKeydown);
+    },
+    destroy: function() {
+      if (this._checkTimer) { clearInterval(this._checkTimer); this._checkTimer = null; }
+      if (this._onKeydown) { document.removeEventListener("keydown", this._onKeydown); this._onKeydown = null; }
+      if (this._btn && this._btn.parentNode) this._btn.remove();
+      if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
+      document.body.classList.remove("ui-zen-mode");
     }
   });
 
@@ -1073,7 +1081,9 @@
   App.register({
     id: "settingsRefresh",
     init: function() {
-      /* Show a fixed refresh button when on this plugin's settings page */
+      /* Trigger on initial load in case user lands directly on settings page */
+      var self = this;
+      setTimeout(function() { self.onRouteChange(location.pathname + location.hash); }, 600);
     },
     onRouteChange: function(path) {
       var old = document.getElementById("ui-beautify-settings-refresh");

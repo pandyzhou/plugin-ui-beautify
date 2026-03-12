@@ -20,7 +20,7 @@ public class ThemeHeadInjector implements TemplateHeadProcessor {
         "/plugins/plugin-ui-beautify/assets/static/";
 
     private static final Set<String> VALID_THEMES = Set.of(
-        "default", "ocean", "dark", "sakura", "minimal", "aurora"
+        "default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"
     );
 
     private final ReactiveSettingFetcher settingFetcher;
