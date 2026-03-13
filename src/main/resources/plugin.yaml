@@ -4,8 +4,8 @@ metadata:
   name: plugin-ui-beautify
 spec:
   enabled: true
-  version: "1.8.6"
-  requires: ">=2.22.0"
+  version: "2.0.0"
+  requires: ">=2.23.0"
   author:
     name: 周易
   logo: logo.png

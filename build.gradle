@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'run.halo.ui.beautify'
-version = '1.8.6'
+version = '2.0.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -16,10 +16,20 @@ repositories {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'org.slf4j:slf4j-api:2.0.17'
+    }
+}
+
 dependencies {
-    compileOnly 'run.halo.app:api:2.22.0'
-    compileOnly 'org.springframework.boot:spring-boot-starter-webflux:3.4.3'
-    compileOnly 'org.thymeleaf:thymeleaf:3.1.3.RELEASE'
+    compileOnly files("E:/halo-dev/api/build/libs/api-2.23.0-SNAPSHOT.jar")
+    compileOnly 'org.springframework:spring-web:7.0.3'
+    compileOnly 'org.springframework:spring-webflux:7.0.3'
+    compileOnly 'org.springframework:spring-context:7.0.3'
+    compileOnly 'io.projectreactor:reactor-core:3.7.6'
+    compileOnly 'org.pf4j:pf4j:3.15.0'
+    compileOnly 'tools.jackson.core:jackson-databind:3.0.4'
 }
 
 jar {

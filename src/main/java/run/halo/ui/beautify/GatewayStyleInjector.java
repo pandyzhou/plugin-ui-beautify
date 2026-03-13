@@ -64,14 +64,14 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
     }
 
     private Mono<Boolean> isGatewayEnabled() {
-        return settingFetcher.get("basic")
+        return settingFetcher.getSettingValue("basic")
             .map(setting ->
                 setting.path("enableGateway").asBoolean(true))
             .defaultIfEmpty(true);
     }
 
     private Mono<String> getGatewayTheme() {
-        return settingFetcher.get("basic")
+        return settingFetcher.getSettingValue("basic")
             .map(setting -> {
                 String theme =
                     setting.path("gatewayTheme").asText("default");
