@@ -11,6 +11,7 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org/content/repositories/releases' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
@@ -23,7 +24,7 @@ configurations.all {
 }
 
 dependencies {
-    compileOnly files("E:/halo-dev/api/build/libs/api-2.23.0-SNAPSHOT.jar")
+    compileOnly 'run.halo.app:api:2.23.0-SNAPSHOT'
     compileOnly 'org.springframework:spring-web:7.0.3'
     compileOnly 'org.springframework:spring-webflux:7.0.3'
     compileOnly 'org.springframework:spring-context:7.0.3'
