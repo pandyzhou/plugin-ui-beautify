@@ -74,8 +74,10 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 .entity-wrapper.entity-selected, .entity-wrapper.is-selected { background-color: var(--ui-primary-soft) !important; }
 .entity-field-title, .entity-field-body-title { color: var(--ui-text) !important; }
 .entity-field-description { color: var(--ui-text-secondary) !important; }
-.entity-dropdown-trigger { color: var(--ui-text-muted) !important; }
-.entity-dropdown-trigger:hover { color: var(--ui-text) !important; }
+.entity-dropdown-trigger { color: var(--ui-text-muted) !important; background-color: transparent !important; }
+.entity-dropdown-trigger:hover { color: var(--ui-text) !important; background-color: var(--ui-surface-hover) !important; }
+.entity-wrapper:hover .entity-dropdown-trigger { background-color: var(--ui-surface-hover) !important; }
+.entity-wrapper.entity-selected .entity-dropdown-trigger { background-color: var(--ui-surface-hover) !important; }
 
 /* === 9. Forms === */
 input[type="text"], input[type="email"], input[type="password"],
@@ -146,6 +148,7 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 /* === 12. Toast / Alert === */
 .toast-body { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
 .alert-default { background: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text) !important; }
+.alert-close:hover { background-color: var(--ui-surface-hover) !important; color: var(--ui-text) !important; }
 
 /* === 13. Tags === */
 .tag-default { border-color: var(--ui-border) !important; color: var(--ui-text-secondary) !important; }
@@ -175,6 +178,56 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 
 /* === 18. Editor === */
 .ProseMirror { background: var(--ui-bg) !important; color: var(--ui-text) !important; }
+/* Editor toolbar */
+.editor-header, [class*="editor-header"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+/* Bubble menu (Teleported to body) */
+.bubble-menu, [class*="bubble-menu"],
+.tippy-box[data-theme="bubble-menu"] .tippy-content {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+/* Slash commands menu (Teleported to body) */
+.tippy-box .items, .tippy-content .items,
+[class*="command-list"], [class*="slash-command"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.tippy-box .items .item.is-selected,
+.tippy-content .items .item.is-selected {
+  background-color: var(--ui-surface-hover) !important;
+}
+/* Drag handle menu */
+[data-drag-handle-menu], .drag-menu, [class*="drag-menu"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+/* Search & Replace panel */
+[class*="search-and-replace"], [class*="SearchAndReplace"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+/* Code block language selector */
+[class*="code-block"] select, .code-block-select {
+  background-color: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-border) !important;
+}
+/* Editor toolbox/dropdown items */
+[class*="toolbox-item"], [class*="ToolboxItem"],
+[class*="dropdown-item"] [class*="icon-wrap"] {
+  background-color: var(--ui-surface) !important;
+}
+/* Gallery placeholder */
+body .bg-white\/90, body [class*="bg-white\\/90"] {
+  background-color: var(--ui-surface) !important;
+}
 
 /* === 19. Tooltip === */
 .v-popper--theme-tooltip .v-popper__inner { background: var(--ui-surface) !important; color: var(--ui-text) !important; }
@@ -189,6 +242,20 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 /* === 21. Pagination === */
 .pagination-button { color: var(--ui-text-secondary) !important; }
 .pagination-button:hover { background-color: var(--ui-surface-hover) !important; }
+.pagination__btn {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text-secondary) !important;
+}
+.pagination__btn:hover { background-color: var(--ui-surface-hover) !important; }
+.pagination__btn:disabled { opacity: 0.4 !important; }
+.pagination__select {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.pagination__select option { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
+.pagination__total, .pagination__select-label { color: var(--ui-text-secondary) !important; }
 
 /* === 22. Tabs === */
 .tabbar-wrapper, .tabbar-default, .tabbar-outline { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
@@ -196,6 +263,13 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
 .tabbar-item { color: var(--ui-text-secondary) !important; }
 .tabbar-item:hover { color: var(--ui-text) !important; background-color: var(--ui-surface-hover) !important; }
 .tabbar-default .tabbar-item-active, .tabbar-item--active { color: var(--ui-text) !important; background-color: var(--ui-primary-soft) !important; }
+.tabbar-outline .tabbar-item-active, .tabbar-outline .tabbar-item:hover {
+  background-color: var(--ui-surface-hover) !important;
+  color: var(--ui-text) !important;
+}
+/* Tabbar scrollbar */
+.tabbar-items::-webkit-scrollbar-thumb { background-color: var(--ui-scrollbar) !important; }
+.tabbar-items::-webkit-scrollbar-thumb:hover { background-color: var(--ui-scrollbar-hover) !important; }
 
 /* === 23. Tailwind Overrides === */
 body .bg-white, body [class*="bg-white"] { background-color: var(--ui-surface) !important; }
@@ -208,6 +282,10 @@ body [style*="background-color: white"],
 body [style*="background-color: #fff"],
 body [style*="background: white"],
 body [style*="background: #fff"] { background-color: var(--ui-surface) !important; }
+body .hover\:bg-gray-200:hover { background-color: var(--ui-surface-hover) !important; }
+body .group:hover .group-hover\:bg-gray-200\/60 { background-color: var(--ui-surface-hover) !important; }
+body .active\:\!bg-gray-300:active, body .\!bg-gray-300 { background-color: var(--ui-surface-hover) !important; }
+body .\!bg-gray-100 { background-color: var(--ui-surface) !important; }
 
 /* List header/footer/pagination bars */
 .pagination-wrapper, .pagination { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text-secondary) !important; }
@@ -315,7 +393,7 @@ hr, .divider { border-color: var(--ui-border) !important; }
 }
 
 /* === 32. Catch-all: force dark text/bg on main content area === */
-.main-content, .main-content * { color: var(--ui-text); }
+.main-content { color: var(--ui-text) !important; }
 .main-content input, .main-content textarea, .main-content select,
 .main-content [contenteditable] {
   background-color: var(--ui-surface) !important;

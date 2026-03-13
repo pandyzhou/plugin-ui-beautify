@@ -49,7 +49,7 @@
 .menu-label {
   color: #c0c0e0 !important; font-size: 0.8rem !important; font-weight: 600 !important;
   letter-spacing: 0.05em !important; padding-left: 10px !important;
-  border-left: 3px solid rgba(255, 0, 110, 0.4) !important; text-transform: uppercase !important;
+  border-left: 3px solid rgba(255, 0, 110, 0.4) !important;
 }
 .menu-icon-collapse:hover, .menu-icon-collapse.open { background-color: rgba(255, 0, 110, 0.12) !important; color: #ff006e !important; }
 
