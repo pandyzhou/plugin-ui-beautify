@@ -167,17 +167,17 @@ select:disabled {
 
 /* --- Focus-visible (keyboard accessibility) --- */
 .btn:focus-visible {
-  outline: 2px solid currentColor !important;
+  outline: 2px solid var(--ui-primary, #4ccba0) !important;
   outline-offset: 2px !important;
 }
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid currentColor !important;
+  outline: 2px solid var(--ui-primary, #4ccba0) !important;
   outline-offset: 1px !important;
 }
 .menu-item-title:focus-visible {
-  outline: 2px solid currentColor !important;
+  outline: 2px solid var(--ui-primary, #4ccba0) !important;
   outline-offset: -2px !important;
   border-radius: 0.5rem !important;
 }
