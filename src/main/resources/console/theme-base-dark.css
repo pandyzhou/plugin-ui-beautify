@@ -288,6 +288,7 @@ body .active\:\!bg-gray-300:active, body .\!bg-gray-300 { background-color: var(
 body .\!bg-gray-100 { background-color: var(--ui-surface) !important; }
 /* bg-white opacity variants */
 body .bg-white\/80, body .bg-white\/90 { background-color: var(--ui-surface) !important; }
+body .active\:\!bg-white\/80:active { background-color: var(--ui-surface) !important; }
 /* bg-gray-300/500 */
 body .bg-gray-300 { background-color: var(--ui-surface-hover) !important; }
 body .bg-gray-500 { background-color: var(--ui-border-hover) !important; }
@@ -311,6 +312,9 @@ body .group:hover .group-hover\:bg-gray-100 { background-color: var(--ui-surface
 body .group:hover .group-hover\:bg-gray-200 { background-color: var(--ui-surface-hover) !important; }
 body .group:hover .group-hover\:bg-gray-400 { background-color: var(--ui-surface-hover) !important; }
 body .group:hover .group-hover\:bg-white { background-color: var(--ui-surface) !important; }
+body .group:hover .group-hover\:text-gray-900 { color: var(--ui-text) !important; }
+body .group:hover .group-hover\:text-gray-700 { color: var(--ui-text) !important; }
+body .group:hover .group-hover\:text-gray-400 { color: var(--ui-text-secondary) !important; }
 body .border-gray-100, body .border-gray-200, body .border-gray-300 { border-color: var(--ui-border) !important; }
 body .divide-gray-100 > * + *, body .divide-gray-200 > * + * { border-color: var(--ui-border) !important; }
 body .ring-\[\#eaecf0\] { --tw-ring-color: var(--ui-border) !important; }
