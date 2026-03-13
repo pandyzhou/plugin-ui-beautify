@@ -165,6 +165,10 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 html { scrollbar-color: var(--ui-scrollbar) transparent !important; }
 ::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; }
 ::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-hover) !important; }
+/* OverlayScrollbars */
+.os-scrollbar-handle { background: var(--ui-scrollbar) !important; }
+.os-scrollbar-handle:hover, .os-scrollbar-handle:active { background: var(--ui-scrollbar-hover) !important; }
+.os-scrollbar-track { background: transparent !important; }
 
 /* === 16. Table === */
 tbody tr:nth-child(even) { background-color: var(--ui-surface) !important; }
