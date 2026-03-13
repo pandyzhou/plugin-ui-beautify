@@ -1007,7 +1007,7 @@
         if (bar.querySelector("._ui_tab-indicator")) return;
         bar.classList.add("_ui_tab-bar");
         var ind = document.createElement("div"); ind.className = "_ui_tab-indicator";
-        ind.style.background = "var(--color-primary, #4f46e5)";
+        ind.style.background = "var(--ui-primary, #4f46e5)";
         bar.style.position = "relative"; bar.appendChild(ind);
         function move() {
           var active = bar.querySelector(".active, [aria-selected='true'], .router-link-active");
