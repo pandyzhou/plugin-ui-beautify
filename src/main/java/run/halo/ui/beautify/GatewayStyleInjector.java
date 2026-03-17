@@ -60,7 +60,12 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
         if (GATEWAY_EXACT.contains(path)) {
             return true;
         }
-        return GATEWAY_PREFIX.stream().anyMatch(path::startsWith);
+        for (String prefix : GATEWAY_PREFIX) {
+            if (path.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Mono<Boolean> isGatewayEnabled() {

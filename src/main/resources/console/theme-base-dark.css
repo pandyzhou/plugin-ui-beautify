@@ -435,7 +435,9 @@ hr, .divider { border-color: var(--ui-border) !important; }
   background-color: var(--ui-surface-hover) !important;
 }
 /* Labels, spans, small text */
-.main-content label, .main-content span, .main-content p,
+.main-content label,
+.main-content span:not([class*="status"]):not([class*="badge"]):not([class*="tag"]),
+.main-content p,
 .main-content h1, .main-content h2, .main-content h3, .main-content h4,
 .main-content small, .main-content .text-xs, .main-content .text-sm {
   color: var(--ui-text) !important;
@@ -458,8 +460,9 @@ hr, .divider { border-color: var(--ui-border) !important; }
   border-color: var(--ui-border) !important;
 }
 /* Filter/tag chips */
-.main-content [class*="chip"], .main-content [class*="tag"],
-.main-content [class*="filter"] {
+.main-content [class*="chip"],
+.main-content [class*="tag"]:not(.tag-default):not(.tag-wrapper),
+.main-content .content-filter, .main-content .filter-bar, .main-content [class*="filter-"] {
   background-color: var(--ui-surface) !important;
   color: var(--ui-text-secondary) !important;
   border-color: var(--ui-border) !important;

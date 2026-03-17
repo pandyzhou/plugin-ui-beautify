@@ -641,7 +641,8 @@
           var len = 60+Math.random()*80, angle = Math.PI/4+Math.random()*0.3, frames = 0;
           var rafId;
           (function drawStar() {
-            if (frames >= 20) { var idx = self._activeRafs.indexOf(rafId); if (idx > -1) self._activeRafs.splice(idx, 1); return; }
+            if (rafId) { var idx = self._activeRafs.indexOf(rafId); if (idx > -1) self._activeRafs.splice(idx, 1); }
+            if (frames >= 20) return;
             var t = frames/20, alpha = t < 0.5 ? t*2 : (1-t)*2;
             var x = startX+Math.cos(angle)*len*t, y = startY+Math.sin(angle)*len*t;
             ctx.save(); ctx.globalAlpha = alpha*0.6; ctx.strokeStyle = starColor; ctx.lineWidth = 1.5;
