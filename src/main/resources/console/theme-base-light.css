@@ -27,19 +27,37 @@
   background: var(--ui-surface) !important;
   border-right: 1px solid var(--ui-border) !important;
 }
+.sidebar__logo-container {
+  padding-bottom: 0.75rem !important;
+}
 .sidebar__search {
+  border-radius: 0.75rem !important;
   background-color: var(--ui-surface-hover) !important;
   border: 1px solid var(--ui-border) !important;
   color: var(--ui-text) !important;
+  transition: all 0.2s ease !important;
 }
 .sidebar__search:hover {
   border-color: var(--ui-border-hover) !important;
 }
 .sidebar__profile {
+  position: relative !important;
   border-top: 1px solid var(--ui-border) !important;
+}
+.sidebar__profile::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  pointer-events: none !important;
 }
 
 /* === 2. Menu === */
+.menu-item {
+  border-radius: 0.625rem !important;
+  margin: 2px 0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 .menu-item:hover {
   background-color: var(--ui-surface-hover) !important;
 }
@@ -50,6 +68,16 @@
   color: var(--ui-text) !important;
   background: var(--ui-primary-soft) !important;
   font-weight: 600 !important;
+}
+.menu-item-title.active::before {
+  border-radius: 0 3px 3px 0 !important;
+  width: 3px !important;
+}
+.menu-label {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  padding-left: 10px !important;
 }
 
 /* === 3. Main Content === */
@@ -71,9 +99,11 @@
 
 /* === 5. Cards === */
 .card-wrapper {
+  border-radius: 1rem !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
   box-shadow: 0 1px 3px var(--ui-shadow) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .card-wrapper:hover {
   box-shadow: 0 4px 12px var(--ui-shadow-hover) !important;
@@ -86,6 +116,9 @@
 .btn {
   border-radius: 0.5rem !important;
   transition: all 0.2s ease !important;
+}
+.btn.btn-secondary:active {
+  transform: translateY(0) !important;
 }
 .btn-secondary, .btn-default {
   background: var(--ui-surface) !important;
@@ -114,9 +147,11 @@
 input[type="text"], input[type="email"], input[type="password"],
 input[type="url"], input[type="search"], input[type="number"],
 textarea, .formkit-outer select {
+  border-radius: 0.625rem !important;
   background: var(--ui-surface) !important;
   border-color: var(--ui-border) !important;
   color: var(--ui-text) !important;
+  transition: all 0.2s ease !important;
 }
 .formkit-outer input[type="text"]:focus, .formkit-outer input[type="email"]:focus, .formkit-outer input[type="password"]:focus,
 .formkit-outer input[type="url"]:focus, .formkit-outer input[type="search"]:focus, .formkit-outer input[type="number"]:focus,
@@ -157,12 +192,19 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
   background: rgba(0,0,0,0.3) !important;
 }
 .modal-wrapper .modal-content {
+  border-radius: 1.25rem !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
 }
 
 /* === 11. Toast / Alert === */
+.alert-wrapper {
+  border-radius: 0.75rem !important;
+}
 .toast-body {
+  border-radius: 0.75rem !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
   color: var(--ui-text) !important;
@@ -174,6 +216,9 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 }
 
 /* === 12. Tags === */
+.tag-wrapper {
+  border-radius: 9999px !important;
+}
 .tag-default {
   border-color: var(--ui-border) !important;
   color: var(--ui-text-secondary) !important;
@@ -181,13 +226,18 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 
 /* === 13. Dropdown Menu === */
 .v-popper--theme-dropdown .v-popper__inner {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
 }
 .dropdown-content {
   background: var(--ui-surface) !important;
 }
-.dropdown-item-wrapper { color: var(--ui-text) !important; }
+.dropdown-item-wrapper {
+  border-radius: 0.5rem !important;
+  color: var(--ui-text) !important;
+}
 .dropdown-item-wrapper:hover,
 .dropdown-item-wrapper.active {
   background-color: var(--ui-surface-hover) !important;
@@ -195,7 +245,7 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 
 /* === 14. Scrollbar === */
 html { scrollbar-color: var(--ui-scrollbar) transparent !important; }
-::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; }
+::-webkit-scrollbar-thumb { background: var(--ui-scrollbar) !important; border-radius: 3px !important; }
 ::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-hover) !important; }
 
 /* === 15. Table === */
@@ -216,14 +266,42 @@ code:not(pre code) { background: var(--ui-surface-hover) !important; color: var(
 }
 
 /* === 19. Description List === */
+.description-item-wrapper {
+  transition: background-color 0.15s ease !important;
+}
 .description-item-wrapper:hover { background-color: var(--ui-surface-hover) !important; }
 .description-item__label { color: var(--ui-text-muted) !important; }
 
 /* === 20. Pagination === */
-.pagination-button { color: var(--ui-text-secondary) !important; }
+.pagination-button {
+  border-radius: 0.5rem !important;
+  color: var(--ui-text-secondary) !important;
+}
 .pagination-button:hover { background-color: var(--ui-surface-hover) !important; }
 
 /* === 21. Tabs === */
-.tabbar-item { color: var(--ui-text-secondary) !important; }
+.tabs-wrapper .tabs-items-wrapper {
+  border-radius: 0.625rem !important;
+}
+.tabbar-item {
+  color: var(--ui-text-secondary) !important;
+  transition: color 0.18s ease !important;
+}
 .tabbar-item:hover { color: var(--ui-text) !important; }
 .tabbar-default .tabbar-item-active { color: var(--ui-text) !important; }
+
+/* === 22. Entity Detail === */
+.entity-dropdown-trigger {
+  transition: color 0.15s ease !important;
+}
+
+/* === 23. Dynamic Background === */
+.main-content {
+  background-size: 400% 400% !important;
+  animation: _ui_gradientShift 20s ease infinite !important;
+}
+
+/* === 24. Primary Button Structure === */
+.btn.btn-primary {
+  background-size: 200% 100% !important;
+}
