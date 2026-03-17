@@ -56,6 +56,10 @@
     radial-gradient(ellipse at 80% 15%, rgba(59, 130, 246, 0.06), transparent 50%),
     radial-gradient(ellipse at 10% 85%, rgba(37, 99, 235, 0.04), transparent 50%),
     linear-gradient(160deg, #eef4ff 0%, #f5f8fc 25%, #f0f5ff 60%, #e8f0fe 100%) !important;
+  background-size: 400% 400% !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .main-content { animation: _ui_gradientShift 20s ease infinite !important; }
 }
 
 /* === 4. Page Header === */

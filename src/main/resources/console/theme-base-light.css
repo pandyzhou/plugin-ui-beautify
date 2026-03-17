@@ -300,9 +300,3 @@ code:not(pre code) { background: var(--ui-surface-hover) !important; color: var(
   transition: color 0.15s ease !important;
 }
 
-/* === 23. Dynamic Background === */
-.main-content {
-  background-size: 400% 400% !important;
-  animation: _ui_gradientShift 20s ease infinite !important;
-}
-
