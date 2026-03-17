@@ -81,6 +81,19 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
             .defaultIfEmpty("default");
     }
 
+    /**
+     * Injects UI styling and script assets into gateway-related HTML responses when gateway UI is enabled.
+     *
+     * <p>If the request path is a gateway page and the gateway UI setting is enabled, this filter decorates
+     * the HTTP response to insert stylesheet and script tags (including a theme-specific CSS and a theme
+     * marker script) before the first </head> in HTML content. Non-HTML responses and requests for
+     * non-gateway pages are passed through unchanged. The response body is buffered (up to 512 KB) while
+     * performing the injection and the Content-Length header is adjusted to reflect any changes.
+     *
+     * @param exchange the current server web exchange
+     * @param chain the web filter chain to delegate to
+     * @return a Mono that completes when request processing (including any response modification) finishes
+     */
     @Override
     @NonNull
     public Mono<Void> filter(@NonNull ServerWebExchange exchange,
@@ -127,7 +140,7 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
                                 Flux<? extends DataBuffer> fluxBody =
                                     Flux.from(body);
                                 return super.writeWith(
-                                    DataBufferUtils.join(fluxBody)
+                                    DataBufferUtils.join(fluxBody, 512 * 1024)
                                         .map(dataBuffer -> {
                                             byte[] content;
                                             try {
