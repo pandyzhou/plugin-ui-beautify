@@ -25,6 +25,8 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
 
     private static final String PLUGIN_NAME = "plugin-ui-beautify";
 
+    private static final int MAX_RESPONSE_BODY_SIZE = 512 * 1024;
+
     private static final String CSS_BASE =
         "/plugins/" + PLUGIN_NAME + "/assets/static/";
 
@@ -140,7 +142,7 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
                                 Flux<? extends DataBuffer> fluxBody =
                                     Flux.from(body);
                                 return super.writeWith(
-                                    DataBufferUtils.join(fluxBody, 512 * 1024)
+                                    DataBufferUtils.join(fluxBody, MAX_RESPONSE_BODY_SIZE)
                                         .map(dataBuffer -> {
                                             byte[] content;
                                             try {
@@ -175,7 +177,10 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
                                                 );
                                             return bufferFactory
                                                 .wrap(newContent);
-                                        }).flux()
+                                        })
+                                        .onErrorResume(e ->
+                                            Flux.from(body).next())
+                                        .flux()
                                 );
                             }
                             return super.writeWith(body);

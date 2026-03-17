@@ -160,7 +160,7 @@ textarea, .formkit-outer select {
 }
 
 /* --- Scrollbar --- */
-* {
+html, body {
   scrollbar-color: rgba(107, 114, 128, 0.2) transparent;
 }
 ::-webkit-scrollbar-thumb {
@@ -270,7 +270,6 @@ body .border-\[\#eaecf0\] {
 /* === NEW: Extended Components === */
 .empty-title { color: #374151 !important; }
 .empty-message { color: #6b7280 !important; }
-.entity-wrapper:hover { background-color: rgba(156, 163, 175, 0.06) !important; }
 .formkit-outer select:focus { border-color: #6b7280 !important; box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.15) !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(107, 114, 128, 0.15), transparent) 1 !important; }
 

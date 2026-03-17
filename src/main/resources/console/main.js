@@ -641,7 +641,8 @@
           var len = 60+Math.random()*80, angle = Math.PI/4+Math.random()*0.3, frames = 0;
           var rafId;
           (function drawStar() {
-            if (frames >= 20) { var idx = self._activeRafs.indexOf(rafId); if (idx > -1) self._activeRafs.splice(idx, 1); return; }
+            if (rafId) { var idx = self._activeRafs.indexOf(rafId); if (idx > -1) self._activeRafs.splice(idx, 1); }
+            if (frames >= 20) return;
             var t = frames/20, alpha = t < 0.5 ? t*2 : (1-t)*2;
             var x = startX+Math.cos(angle)*len*t, y = startY+Math.sin(angle)*len*t;
             ctx.save(); ctx.globalAlpha = alpha*0.6; ctx.strokeStyle = starColor; ctx.lineWidth = 1.5;
@@ -930,6 +931,7 @@
     destroy: function() {
       if (this._onMove) document.removeEventListener("mousemove", this._onMove);
       if (this._onOut) document.removeEventListener("mouseout", this._onOut);
+      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
       this._currentCard = null;
     }
   });
@@ -970,7 +972,7 @@
         var userEl = document.querySelector(".sidebar__profile .profile-name") ||
                      document.querySelector("[class*='profile'] [class*='name']") ||
                      document.querySelector(".sidebar__profile span");
-        if (userEl) userName = "，" + userEl.textContent.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        if (userEl) userName = "，" + userEl.textContent.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
         var b = document.createElement("div"); b.id = "ui-welcome-banner";
         b.style.cssText = "background:" + gradient + ";border-radius:16px;padding:28px 32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;"
           + "box-shadow:0 8px 32px rgba(0,0,0,0.12);animation:_ui_pageIn .3s ease forwards;";

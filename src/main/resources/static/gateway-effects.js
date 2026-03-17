@@ -218,11 +218,6 @@
   }
 
   var rafId = null;
-  /**
-   * Advance the particle simulation by clearing the canvas, updating and drawing every particle, and scheduling the next animation frame.
-   *
-   * This function clears the full-screen canvas, calls the active theme's `update` and `draw` routines for each particle, and assigns the returned animation frame id to `rafId`.
-   */
   function loop() {
     ctx.clearRect(0, 0, w, h);
     for (var i = 0; i < particles.length; i++) {

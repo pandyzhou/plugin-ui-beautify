@@ -105,10 +105,6 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
   background: rgba(255, 255, 255, 0.88) !important;
 }
-.card-wrapper:hover {
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04) !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
-}
 .card-header {
   border-bottom: 1px solid rgba(59, 130, 246, 0.06) !important;
 }
@@ -120,14 +116,6 @@
 .btn {
   border-radius: 0.625rem !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.btn.btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35) !important;
-  border: none !important;
-}
-.btn.btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
 }
 
 .btn.btn-default {
@@ -246,7 +234,7 @@ textarea,
 }
 
 /* === 13. Scrollbar === */
-* {
+html, body {
   scrollbar-color: rgba(59, 130, 246, 0.2) transparent;
 }
 ::-webkit-scrollbar-thumb {
@@ -400,7 +388,6 @@ body .border-gray-200 {
 .empty-title { color: #1e40af !important; }
 .empty-message { color: #2563eb !important; }
 .switch-inner[aria-checked="true"] { background-color: #3b82f6 !important; }
-.entity-wrapper:hover { background-color: rgba(59, 130, 246, 0.04) !important; }
 .tag-wrapper:hover { box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important; }
 .formkit-outer select:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important; }
 .page-header { border-image: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent) 1 !important; }
