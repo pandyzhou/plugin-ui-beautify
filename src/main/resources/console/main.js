@@ -931,6 +931,7 @@
     destroy: function() {
       if (this._onMove) document.removeEventListener("mousemove", this._onMove);
       if (this._onOut) document.removeEventListener("mouseout", this._onOut);
+      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
       this._currentCard = null;
     }
   });

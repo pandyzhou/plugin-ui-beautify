@@ -177,7 +177,10 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
                                                 );
                                             return bufferFactory
                                                 .wrap(newContent);
-                                        }).flux()
+                                        })
+                                        .onErrorResume(e ->
+                                            Flux.from(body).next())
+                                        .flux()
                                 );
                             }
                             return super.writeWith(body);
