@@ -78,9 +78,9 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
                 String theme =
                     setting.path("gatewayTheme").asText("default");
                 return VALID_THEMES.contains(theme)
-                    ? theme : "default";
+                    ? theme : "minimal";
             })
-            .defaultIfEmpty("default");
+            .defaultIfEmpty("minimal");
     }
 
     /**

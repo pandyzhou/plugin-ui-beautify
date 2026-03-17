@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.0.8";
+  var PLUGIN_VERSION = "2.1.0";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -57,11 +57,11 @@
             self.toggles.enableWallpaper = readToggle("enableWallpaper");
             self.toggles.enableWelcomeBanner = readToggle("enableWelcomeBanner");
             self._applyToggleStates();
-            return data.basic.consoleTheme || "default";
+            return data.basic.consoleTheme || "minimal";
           }
-          return "default";
+          return "minimal";
         })
-        .catch(function() { return "default"; });
+        .catch(function() { return "minimal"; });
     },
 
     isEnabled: function(toggleName) {
@@ -71,7 +71,7 @@
     /* --- Theme --- */
     resolveTheme: function(theme) {
       if (theme !== "auto") return theme;
-      return darkMql.matches ? "dark" : "default";
+      return darkMql.matches ? "dark" : "minimal";
     },
 
     loadThemeCSS: function(theme) {
@@ -299,7 +299,7 @@
 
     THEMES: {
       sakura: {
-        count: 22,
+        count: 22, wind: true,
         color: function() {
           var c = ["rgba(236,72,153,0.18)","rgba(244,114,182,0.15)","rgba(251,191,210,0.2)","rgba(253,164,200,0.16)"];
           return c[Math.floor(Math.random() * c.length)];
@@ -322,7 +322,7 @@
         }
       },
       dark: {
-        count: 35,
+        count: 35, shootingStars: true, shootingStarColor: "#a78bfa", shootingStarGlow: "#c4b5fd",
         color: function() { return "rgba(139,92,246," + (0.15 + Math.random() * 0.35).toFixed(2) + ")"; },
         size: function() { return 1 + Math.random() * 2.5; },
         speed: function() { return 0; },
@@ -389,7 +389,7 @@
         }
       },
       neon: {
-        count: 30,
+        count: 30, shootingStars: true, shootingStarColor: "#ff006e", shootingStarGlow: "#00ffff",
         color: function() {
           var c = ["rgba(255,0,110,","rgba(0,255,255,","rgba(185,103,255,","rgba(5,255,161,"];
           return c[Math.floor(Math.random()*c.length)] + (0.15+Math.random()*0.25).toFixed(2) + ")";
@@ -595,7 +595,12 @@
     },
     onThemeChange: function(theme) {
       if (!this._el) return;
-      var c = this._COLORS[theme] || this._COLORS["default"];
+      var c = this._COLORS[theme];
+      if (!c) {
+        var style = getComputedStyle(document.documentElement);
+        var primary = style.getPropertyValue("--ui-primary").trim();
+        c = primary ? primary.replace(")", ",0.12)").replace("rgb(", "rgba(") : this._COLORS["default"];
+      }
       this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
     },
     onToggle: function(on) {
@@ -632,9 +637,10 @@
       this._activeRafs.forEach(function(id) { cancelAnimationFrame(id); });
       this._activeRafs = [];
 
-      if (theme === "dark" || theme === "neon") {
-        var starColor = theme === "neon" ? "#ff006e" : "#a78bfa";
-        var starGlow = theme === "neon" ? "#00ffff" : "#c4b5fd";
+      var cfg = FX.THEMES[theme];
+      if (cfg && cfg.shootingStars) {
+        var starColor = cfg.shootingStarColor || "#a78bfa";
+        var starGlow = cfg.shootingStarGlow || "#c4b5fd";
         this._shootInterval = setInterval(function() {
           if (!FX.ctx || !FX.canvas) return;
           var ctx = FX.ctx, startX = Math.random()*FX.w, startY = Math.random()*FX.h*0.3;
@@ -655,7 +661,7 @@
         }, theme === "neon" ? 3000 : 5000);
       }
 
-      if (theme === "sakura" && FX.particles) {
+      if (cfg && cfg.wind && FX.particles) {
         this._windInterval = setInterval(function() {
           FX.particles.forEach(function(p) { p.vx += 1.5; setTimeout(function() { p.vx -= 1.5; }, 2000); });
         }, 10000);
@@ -704,7 +710,13 @@
     },
     onThemeChange: function(theme) {
       if (!this._inner) return;
-      this._inner.style.background = this._GRADIENTS[theme] || this._GRADIENTS["default"];
+      var grad = this._GRADIENTS[theme];
+      if (!grad) {
+        var style = getComputedStyle(document.documentElement);
+        var primary = style.getPropertyValue("--ui-primary").trim() || "99,102,241";
+        grad = "radial-gradient(ellipse at 40% 40%,rgba(" + primary + ",0.06) 0%,transparent 60%)";
+      }
+      this._inner.style.background = grad;
       this._inner.style.opacity = theme === "minimal" ? "0" : "0.3";
     },
     onToggle: function(on) {
@@ -1020,7 +1032,14 @@
       }
       this._startDraw();
     },
-    onThemeChange: function(theme) { this._color = this._COLORS[theme] || this._COLORS["default"]; },
+    onThemeChange: function(theme) {
+      this._color = this._COLORS[theme];
+      if (!this._color) {
+        var style = getComputedStyle(document.documentElement);
+        var primary = style.getPropertyValue("--ui-primary").trim();
+        this._color = primary || this._COLORS["default"];
+      }
+    },
     _startDraw: function() {
       var self = this, c = this._canvas, ctx = this._ctx, ps = this._particles, col = this._color;
       if (this._rafId) cancelAnimationFrame(this._rafId);
