@@ -193,8 +193,8 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 }
 .modal-wrapper .modal-content {
   border-radius: 1.25rem !important;
-  backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
 }
@@ -226,8 +226,8 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 
 /* === 13. Dropdown Menu === */
 .v-popper--theme-dropdown .v-popper__inner {
-  backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
 }
