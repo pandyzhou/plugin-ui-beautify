@@ -86,6 +86,7 @@
 .main-content {
   color: var(--ui-text) !important;
 }
+/* !important needed to override Halo's default footer opacity */
 .main-content__footer {
   opacity: 0.5 !important;
   transition: opacity 0.2s ease !important;
