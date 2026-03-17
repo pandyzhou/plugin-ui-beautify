@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.0.7";
+  var PLUGIN_VERSION = "2.0.8";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -142,17 +142,26 @@
       });
     },
 
-    /* --- Router (single poller replaces all setIntervals) --- */
+    /* --- Router (event-driven with fallback poller) --- */
     _startRouter: function() {
       var self = this;
       this._lastPath = location.pathname + location.hash;
-      this._routeTimer = setInterval(function() {
+      this._routeCheckHandler = function() {
         var cur = location.pathname + location.hash;
         if (cur !== self._lastPath) {
           self._lastPath = cur;
           self._notifyRouteChange(cur);
         }
-      }, 120);
+      };
+      window.addEventListener("popstate", this._routeCheckHandler);
+      window.addEventListener("hashchange", this._routeCheckHandler);
+      // Intercept pushState/replaceState for Vue Router
+      this._origPushState = history.pushState;
+      this._origReplaceState = history.replaceState;
+      history.pushState = function() { self._origPushState.apply(this, arguments); self._routeCheckHandler(); };
+      history.replaceState = function() { self._origReplaceState.apply(this, arguments); self._routeCheckHandler(); };
+      // Fallback poller at 500ms
+      this._routeTimer = setInterval(this._routeCheckHandler, 500);
     },
 
     /* --- Unified MutationObserver --- */
@@ -252,11 +261,33 @@
       });
       document.body.appendChild(toast);
 
+      /**
+       * Dismisses a toast element by playing its exit animation and removing it from the DOM.
+       * @param {HTMLElement} el - The toast element to dismiss; ignored if not present in the document.
+       */
       function dismissToast(el) {
         if (!el || !el.parentNode) return;
         el.style.animation = "uiToastOut .3s ease forwards";
         setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
       }
+    },
+
+    /* --- Destroy All --- */
+    destroyAll: function() {
+      if (this._routeTimer) { clearInterval(this._routeTimer); this._routeTimer = null; }
+      if (this._routeCheckHandler) {
+        window.removeEventListener("popstate", this._routeCheckHandler);
+        window.removeEventListener("hashchange", this._routeCheckHandler);
+        history.pushState = this._origPushState;
+        history.replaceState = this._origReplaceState;
+        this._routeCheckHandler = null;
+        this._origPushState = null;
+        this._origReplaceState = null;
+      }
+      if (this._mutationObs) { this._mutationObs.disconnect(); this._mutationObs = null; }
+      this._modules.forEach(function(mod) {
+        if (mod.destroy) { try { mod.destroy(); } catch(e) { console.warn('[ui-beautify] Module ' + mod.id + ' destroy error:', e); } }
+      });
     }
   };
 
@@ -480,21 +511,12 @@
     var urlStr = typeof url === "string" ? url : (url && url.url) ? url.url : "";
     var method = (options && options.method) ? options.method : (url && url.method) ? url.method : "GET";
     if (method.toUpperCase() === "PUT" && urlStr.indexOf(CONFIG_URL) !== -1) {
-      return originalFetch.apply(this, arguments).then(function(r) { if (r.ok || r.status === 204) onPluginSettingSaved(); return r; });
+      return originalFetch.apply(this, arguments).then(function(r) {
+        if (r.ok || r.status === 204) onPluginSettingSaved();
+        return r;
+      }).catch(function(e) { throw e; });
     }
     return originalFetch.apply(this, arguments);
-  };
-
-  var origXHROpen = XMLHttpRequest.prototype.open;
-  var origXHRSend = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function(m, u) { this._uiM = m; this._uiU = u; return origXHROpen.apply(this, arguments); };
-  XMLHttpRequest.prototype.send = function() {
-    var xhr = this;
-    if (xhr._uiM && xhr._uiU && xhr._uiM.toUpperCase() === "PUT" &&
-        xhr._uiU.indexOf(CONFIG_URL) !== -1) {
-      xhr.addEventListener("load", function() { if (xhr.status >= 200 && xhr.status < 300) onPluginSettingSaved(); });
-    }
-    return origXHRSend.apply(this, arguments);
   };
 
   /* --- Module: Page Transition --- */
@@ -588,18 +610,27 @@
         document.removeEventListener("mousemove", this._onMove);
         document.removeEventListener("mouseleave", this._onLeave);
       }
+    },
+    destroy: function() {
+      if (this._onMove) document.removeEventListener("mousemove", this._onMove);
+      if (this._onLeave) document.removeEventListener("mouseleave", this._onLeave);
+      if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+      if (this._el && this._el.parentNode) this._el.remove();
+      this._el = null;
     }
   });
 
   /* --- Module: Enhanced Particles (shooting stars + wind) --- */
   App.register({
     id: "enhancedParticles", skipIfReducedMotion: true,
-    _shootInterval: null, _windInterval: null,
+    _shootInterval: null, _windInterval: null, _activeRafs: [],
     init: function() {},
     onThemeChange: function(theme) {
       var self = this;
       clearInterval(this._shootInterval); clearInterval(this._windInterval);
       this._shootInterval = null; this._windInterval = null;
+      this._activeRafs.forEach(function(id) { cancelAnimationFrame(id); });
+      this._activeRafs = [];
 
       if (theme === "dark" || theme === "neon") {
         var starColor = theme === "neon" ? "#ff006e" : "#a78bfa";
@@ -608,15 +639,17 @@
           if (!FX.ctx || !FX.canvas) return;
           var ctx = FX.ctx, startX = Math.random()*FX.w, startY = Math.random()*FX.h*0.3;
           var len = 60+Math.random()*80, angle = Math.PI/4+Math.random()*0.3, frames = 0;
+          var rafId;
           (function drawStar() {
-            if (frames >= 20) return;
+            if (frames >= 20) { var idx = self._activeRafs.indexOf(rafId); if (idx > -1) self._activeRafs.splice(idx, 1); return; }
             var t = frames/20, alpha = t < 0.5 ? t*2 : (1-t)*2;
             var x = startX+Math.cos(angle)*len*t, y = startY+Math.sin(angle)*len*t;
             ctx.save(); ctx.globalAlpha = alpha*0.6; ctx.strokeStyle = starColor; ctx.lineWidth = 1.5;
             ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-Math.cos(angle)*20, y-Math.sin(angle)*20); ctx.stroke();
             ctx.globalAlpha = alpha; ctx.fillStyle = starGlow;
             ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2); ctx.fill(); ctx.restore();
-            frames++; requestAnimationFrame(drawStar);
+            frames++; rafId = requestAnimationFrame(drawStar);
+            self._activeRafs.push(rafId);
           })();
         }, theme === "neon" ? 3000 : 5000);
       }
@@ -626,6 +659,12 @@
           FX.particles.forEach(function(p) { p.vx += 1.5; setTimeout(function() { p.vx -= 1.5; }, 2000); });
         }, 10000);
       }
+    },
+    destroy: function() {
+      clearInterval(this._shootInterval); clearInterval(this._windInterval);
+      this._shootInterval = null; this._windInterval = null;
+      this._activeRafs.forEach(function(id) { cancelAnimationFrame(id); });
+      this._activeRafs = [];
     }
   });
 
@@ -684,6 +723,11 @@
         this._el.style.display = "none";
         if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
       }
+    },
+    destroy: function() {
+      if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+      if (this._el && this._el.parentNode) this._el.remove();
+      this._el = null; this._inner = null;
     }
   });
 
@@ -764,8 +808,8 @@
   /* --- Module: Dashboard Visual Overhaul + Sparklines --- */
   App.register({
     id: "dashboardOverhaul",
-    _styleEl: null, _retryTimer: null,
-    init: function() {
+    _styleEl: null,
+    init: function(app) {
       this._styleEl = document.createElement("style");
       this._styleEl.id = "ui-beautify-dashboard";
       this._styleEl.textContent =
@@ -774,7 +818,8 @@
         ".dashboard .rounded-full[class*='bg-gray-100'],.dashboard .rounded-full[class*='bg-gray']{width:48px!important;height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important}" +
         ".dashboard .rounded-full[class*='bg-gray-100'] svg,.dashboard .rounded-full[class*='bg-gray'] svg{width:24px!important;height:24px!important}";
       document.head.appendChild(this._styleEl);
-      this._tryInject();
+      var self = this;
+      app.onMutation(function() { self._injectSparklines(); });
     },
     _injectSparklines: function() {
       var cards = document.querySelectorAll(".dashboard .vue-grid-item > div"), idx = 0;
@@ -789,13 +834,6 @@
         card.appendChild(svg); idx++;
       });
     },
-    _tryInject: function() {
-      var self = this;
-      this._retryTimer = setInterval(function() {
-        if (document.querySelector(".dashboard .vue-grid-item")) { self._injectSparklines(); clearInterval(self._retryTimer); }
-      }, 500);
-      setTimeout(function() { clearInterval(self._retryTimer); }, 15000);
-    },
     onRouteChange: function(path) {
       if (path.indexOf("/console") > -1) { var self = this; setTimeout(function() { self._injectSparklines(); }, 800); }
     }
@@ -804,7 +842,7 @@
   /* --- Module: Zen Mode Editor --- */
   App.register({
     id: "zenMode",
-    _styleEl: null, _btn: null, _checkTimer: null,
+    _styleEl: null, _btn: null,
     init: function() {
       this._styleEl = document.createElement("style");
       this._styleEl.id = "ui-beautify-zen";
@@ -831,18 +869,24 @@
       this._btn.addEventListener("click", function() { document.body.classList.toggle("ui-zen-mode"); });
       document.body.appendChild(this._btn);
 
-      var btn = this._btn;
-      this._checkTimer = setInterval(function() {
-        var isEditor = !!document.querySelector(".ProseMirror") || location.pathname.indexOf("/editor") > -1;
-        btn.style.display = isEditor ? "block" : "none";
-        if (!isEditor) document.body.classList.remove("ui-zen-mode");
-      }, 500);
-
       this._onKeydown = function(e) { if (e.key === "Escape") document.body.classList.remove("ui-zen-mode"); };
       document.addEventListener("keydown", this._onKeydown);
+
+      // Initial check
+      this._updateVisibility();
+    },
+    _updateVisibility: function() {
+      if (!this._btn) return;
+      var isEditor = !!document.querySelector(".ProseMirror") || location.pathname.indexOf("/editor") > -1;
+      this._btn.style.display = isEditor ? "block" : "none";
+      if (!isEditor) document.body.classList.remove("ui-zen-mode");
+    },
+    onRouteChange: function() {
+      var self = this;
+      // Small delay to let Vue render the editor
+      setTimeout(function() { self._updateVisibility(); }, 300);
     },
     destroy: function() {
-      if (this._checkTimer) { clearInterval(this._checkTimer); this._checkTimer = null; }
       if (this._onKeydown) { document.removeEventListener("keydown", this._onKeydown); this._onKeydown = null; }
       if (this._btn && this._btn.parentNode) this._btn.remove();
       if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
@@ -853,26 +897,40 @@
   /* --- Module: 3D Card Tilt --- */
   App.register({
     id: "card3D", toggle: "enable3DCards", skipIfReducedMotion: true,
+    _currentCard: null,
     init: function() {
+      var self = this;
       this._onMove = function(e) {
         if (!App.isEnabled("enable3DCards")) return;
-        document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(card) {
-          var r = card.getBoundingClientRect();
-          if (r.width > 600 || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
-          var x = (e.clientX-r.left)/r.width-0.5, y = (e.clientY-r.top)/r.height-0.5;
-          card.style.transition = "transform .15s ease-out";
-          card.style.transform = "perspective(800px) rotateY("+(x*3).toFixed(2)+"deg) rotateX("+(-y*3).toFixed(2)+"deg)";
-        });
+        var card = e.target.closest(".dashboard .vue-grid-item > div");
+        if (!card) {
+          if (self._currentCard) { self._currentCard.style.transform = ""; self._currentCard = null; }
+          return;
+        }
+        var r = card.getBoundingClientRect();
+        if (r.width > 600) return;
+        self._currentCard = card;
+        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transition = "transform .15s ease-out";
+        card.style.transform = "perspective(800px) rotateY(" + (x * 3).toFixed(2) + "deg) rotateX(" + (-y * 3).toFixed(2) + "deg)";
       };
       this._onOut = function(e) {
         var card = e.target.closest(".dashboard .vue-grid-item > div");
-        if (card && !card.contains(e.relatedTarget)) card.style.transform = "";
+        if (card && !card.contains(e.relatedTarget)) { card.style.transform = ""; self._currentCard = null; }
       };
       document.addEventListener("mousemove", this._onMove);
       document.addEventListener("mouseout", this._onOut);
     },
     onToggle: function(on) {
-      if (!on) document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
+      if (!on) {
+        document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
+        this._currentCard = null;
+      }
+    },
+    destroy: function() {
+      if (this._onMove) document.removeEventListener("mousemove", this._onMove);
+      if (this._onOut) document.removeEventListener("mouseout", this._onOut);
+      this._currentCard = null;
     }
   });
 
@@ -912,7 +970,7 @@
         var userEl = document.querySelector(".sidebar__profile .profile-name") ||
                      document.querySelector("[class*='profile'] [class*='name']") ||
                      document.querySelector(".sidebar__profile span");
-        if (userEl) userName = "，" + userEl.textContent.trim();
+        if (userEl) userName = "，" + userEl.textContent.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
         var b = document.createElement("div"); b.id = "ui-welcome-banner";
         b.style.cssText = "background:" + gradient + ";border-radius:16px;padding:28px 32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;"
           + "box-shadow:0 8px 32px rgba(0,0,0,0.12);animation:_ui_pageIn .3s ease forwards;";
@@ -964,6 +1022,7 @@
     _startDraw: function() {
       var self = this, c = this._canvas, ctx = this._ctx, ps = this._particles, col = this._color;
       if (this._rafId) cancelAnimationFrame(this._rafId);
+      var DIST_THRESHOLD = 130, DIST_SQ = DIST_THRESHOLD * DIST_THRESHOLD;
       (function draw() {
         col = self._color;
         ctx.clearRect(0, 0, c.width, c.height);
@@ -975,10 +1034,10 @@
           ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fillStyle = "rgba(" + col + ",0.5)"; ctx.fill();
           for (var j = i + 1; j < ps.length; j++) {
-            var q = ps[j], dx = p.x - q.x, dy = p.y - q.y, dist = Math.sqrt(dx*dx + dy*dy);
-            if (dist < 130) {
+            var q = ps[j], dx = p.x - q.x, dy = p.y - q.y, distSq = dx*dx + dy*dy;
+            if (distSq < DIST_SQ) {
               ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
-              ctx.strokeStyle = "rgba(" + col + "," + (0.12 * (1 - dist / 130)).toFixed(3) + ")";
+              ctx.strokeStyle = "rgba(" + col + "," + (0.12 * (1 - Math.sqrt(distSq) / DIST_THRESHOLD)).toFixed(3) + ")";
               ctx.lineWidth = 0.5; ctx.stroke();
             }
           }
@@ -990,20 +1049,27 @@
       if (!this._canvas) return;
       if (on) { this._canvas.style.display = ""; this._startDraw(); }
       else { this._canvas.style.display = "none"; if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; } }
+    },
+    destroy: function() {
+      if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = null; }
+      if (this._onResize) { window.removeEventListener("resize", this._onResize); this._onResize = null; }
+      if (this._canvas && this._canvas.parentNode) this._canvas.remove();
+      this._canvas = null; this._ctx = null; this._particles = [];
     }
   });
 
   /* --- Module: Button Ripple Effect --- */
   App.register({
     id: "buttonRipple", skipIfReducedMotion: true,
+    _styleEl: null, _handler: null,
     init: function() {
-      var s = document.createElement("style");
-      s.textContent =
+      this._styleEl = document.createElement("style");
+      this._styleEl.textContent =
         "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
         "._ui_ripple-host{position:relative!important;overflow:hidden!important}" +
         "._ui_ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
-      document.head.appendChild(s);
-      document.addEventListener("click", function(e) {
+      document.head.appendChild(this._styleEl);
+      this._handler = function(e) {
         if (!App.isEnabled("enableEffects")) return;
         var btn = e.target.closest("button, .btn, [role='button'], a.action-btn");
         if (!btn) return;
@@ -1013,20 +1079,38 @@
         rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;";
         btn.appendChild(rip);
         setTimeout(function() { rip.remove(); }, 550);
-      });
+      };
+      document.addEventListener("click", this._handler);
+    },
+    destroy: function() {
+      if (this._handler) document.removeEventListener("click", this._handler);
+      if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
+      this._handler = null;
+      this._styleEl = null;
     }
   });
 
   /* --- Module: Tab Sliding Indicator --- */
   App.register({
     id: "tabSlider", skipIfReducedMotion: true,
+    _observers: [],
     init: function(app) {
       var s = document.createElement("style");
       s.textContent =
         "._ui_tab-bar{position:relative}" +
         "._ui_tab-indicator{position:absolute;bottom:0;height:2px;border-radius:1px;transition:left .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:1}";
       document.head.appendChild(s);
+      var self = this;
 
+      /**
+       * Attach and manage a sliding tab indicator inside a tab bar element.
+       *
+       * Creates and inserts a visual indicator that matches the width and position of the currently
+       * active tab, updates its position on clicks and when tab selection or classes change, and
+       * registers a MutationObserver for ongoing updates (observer is added to `self._observers`).
+       *
+       * @param {HTMLElement} bar - The tab bar container element whose child tab items include an active state (e.g., `.active`, `[aria-selected="true"]`, or `.router-link-active`).
+       */
       function setupTabBar(bar) {
         if (bar.querySelector("._ui_tab-indicator")) return;
         bar.classList.add("_ui_tab-bar");
@@ -1041,25 +1125,32 @@
         }
         move();
         bar.addEventListener("click", function() { setTimeout(move, 50); });
-        new MutationObserver(move).observe(bar, { attributes: true, subtree: true, attributeFilter: ["class", "aria-selected"] });
+        var obs = new MutationObserver(move);
+        obs.observe(bar, { attributes: true, subtree: true, attributeFilter: ["class", "aria-selected"] });
+        self._observers.push(obs);
       }
 
-      function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs").forEach(setupTabBar); }
+      /**
+ * Initializes sliding-tab indicators on existing tab containers.
+ *
+ * Scans the document for elements matching "[role='tablist']", ".tab-bar", or ".tabs" and attaches the sliding-indicator behavior to each matching element.
+ */
+function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs").forEach(setupTabBar); }
       scan();
       app.onMutation(scan);
+    },
+    destroy: function() {
+      this._observers.forEach(function(obs) { obs.disconnect(); });
+      this._observers = [];
     }
   });
 
   /* --- Module: Number Count-Up Animation --- */
   App.register({
     id: "countUp", skipIfReducedMotion: true,
-    _retryTimer: null,
-    init: function() {
+    init: function(app) {
       var self = this;
-      this._retryTimer = setInterval(function() {
-        if (document.querySelector(".dashboard")) { self._scan(); clearInterval(self._retryTimer); }
-      }, 600);
-      setTimeout(function() { clearInterval(self._retryTimer); }, 15000);
+      app.onMutation(function() { self._scan(); });
     },
     _animateEl: function(el) {
       if (el.dataset.uiCounted) return;
@@ -1117,9 +1208,22 @@
       document.body.appendChild(container);
 
       var ss = document.createElement("style");
-      ss.textContent = "@keyframes _ui_seasonFall{0%{transform:translateY(0) rotate(0deg);opacity:0.7}100%{transform:translateY(" + (window.innerHeight + 60) + "px) rotate(360deg);opacity:0}}";
+      ss.textContent = "@keyframes _ui_seasonFall{0%{transform:translateY(0) rotate(0deg);opacity:0.7}100%{transform:translateY(calc(100vh + 60px)) rotate(360deg);opacity:0}}";
       document.head.appendChild(ss);
 
+      /**
+       * Creates and appends a single falling symbol element to the seasonal container.
+       *
+       * If the container already contains 12 or more child elements, the function does nothing.
+       * The element's text is chosen at random from the `pool`. Its horizontal position is a
+       * random percentage, and its animation timing and font size are randomized:
+       * - duration between 6 and 12 seconds
+       * - font size between 14px and 28px
+       * - start delay between 0 and 2 seconds
+       *
+       * The element is styled for absolute positioning, semi-transparent opacity, and pointer-events disabled,
+       * then appended to `container`. The element is removed from the DOM shortly after its animation completes.
+       */
       function spawn() {
         if (container.children.length >= 12) return;
         var el = document.createElement("span");
@@ -1193,4 +1297,4 @@ try {
       extensionPoints: {},
     });
   })(HaloUiShared);
-} catch(e) {}
+} catch(e) { console.warn("[ui-beautify] Plugin registration failed:", e); }

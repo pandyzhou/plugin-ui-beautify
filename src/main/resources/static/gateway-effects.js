@@ -217,13 +217,35 @@
     particles.push(cfg.create());
   }
 
+  var rafId = null;
+  /**
+   * Advance the particle simulation by clearing the canvas, updating and drawing every particle, and scheduling the next animation frame.
+   *
+   * This function clears the full-screen canvas, calls the active theme's `update` and `draw` routines for each particle, and assigns the returned animation frame id to `rafId`.
+   */
   function loop() {
     ctx.clearRect(0, 0, w, h);
     for (var i = 0; i < particles.length; i++) {
       cfg.update(particles[i]);
       cfg.draw(particles[i]);
     }
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
+
+  // Pause when tab is hidden, resume when visible
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    } else {
+      if (!rafId) rafId = requestAnimationFrame(loop);
+    }
+  });
+
+  // Full cleanup on page unload
+  window.addEventListener("pagehide", function() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    window.removeEventListener("resize", resize);
+    if (canvas.parentNode) canvas.remove();
+  });
 })();
