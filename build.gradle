@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'run.halo.ui.beautify'
-version = '2.0.2'
+version = '2.0.7'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21

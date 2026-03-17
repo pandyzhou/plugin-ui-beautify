@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.0.2";
+  var PLUGIN_VERSION = "2.0.7";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -694,8 +694,31 @@
       var self = this;
       this._scan = function() {
         if (!App.isEnabled("enableMacOSCards")) return;
-        /* Only inject inside dashboard grid cards, not other pages */
-        document.querySelectorAll(".vue-grid-item .card-header").forEach(function(header) {
+        /* Match both legacy .card-header and new WidgetCard header structure */
+        var headers = document.querySelectorAll(".vue-grid-item .card-header");
+        /* WidgetCard: first child div with border-b inside .vue-grid-item */
+        document.querySelectorAll(".vue-grid-item").forEach(function(gridItem) {
+          var card = gridItem.querySelector(":scope > div > div.rounded-lg, :scope > div > div[class*='rounded']");
+          if (!card) card = gridItem.querySelector(":scope > div");
+          if (!card) return;
+          /* Find the header: first child div that has border-b style or contains title text */
+          var firstChild = card.firstElementChild;
+          if (firstChild && firstChild.tagName === "DIV" &&
+              (firstChild.className.indexOf("border-b") > -1 || firstChild.classList.contains("card-header"))) {
+            if (!firstChild.querySelector(".ui-traffic-lights")) {
+              var c = document.createElement("div"); c.className = "ui-traffic-lights";
+              c.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;pointer-events:none;";
+              ["#ff5f57","#febc2e","#28c840"].forEach(function(col) {
+                var d = document.createElement("span");
+                d.style.cssText = "width:11px;height:11px;border-radius:50%;background:"+col+";display:block;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.12);";
+                c.appendChild(d);
+              });
+              firstChild.style.position = "relative"; firstChild.style.paddingLeft = "72px"; firstChild.prepend(c);
+            }
+          }
+        });
+        /* Also handle legacy .card-header */
+        headers.forEach(function(header) {
           if (header.querySelector(".ui-traffic-lights")) return;
           var c = document.createElement("div"); c.className = "ui-traffic-lights";
           c.style.cssText = "position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:7px;z-index:1;pointer-events:none;";
@@ -786,6 +809,7 @@
       this._styleEl = document.createElement("style");
       this._styleEl.id = "ui-beautify-zen";
       this._styleEl.textContent =
+        "#ui-zen-btn{position:fixed!important;bottom:24px!important;right:24px!important;left:auto!important;z-index:99999!important}" +
         "body.ui-zen-mode .sidebar{transform:translateX(-100%)!important;transition:transform .5s cubic-bezier(.4,0,.2,1)!important}" +
         "body.ui-zen-mode .main-content{margin-left:0!important;width:100%!important;transition:margin-left .5s ease!important}" +
         "body.ui-zen-mode .page-header{opacity:0!important;height:0!important;overflow:hidden!important;transition:opacity .3s ease,height .3s ease!important}" +
@@ -801,7 +825,7 @@
 
       this._btn = document.createElement("button");
       this._btn.id = "ui-zen-btn";
-      this._btn.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 20px;border-radius:24px;border:none;cursor:pointer;"
+      this._btn.style.cssText = "position:fixed;bottom:24px;right:24px;left:auto;z-index:99999;padding:10px 20px;border-radius:24px;border:none;cursor:pointer;"
         + "font-size:14px;font-weight:600;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);"
         + "box-shadow:0 4px 16px rgba(102,126,234,0.4);transition:all .3s ease;display:none;";
       this._btn.addEventListener("click", function() { document.body.classList.toggle("ui-zen-mode"); });

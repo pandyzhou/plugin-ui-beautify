@@ -135,13 +135,13 @@ textarea, .formkit-outer select {
   border-radius: 0.375rem !important;
   transition: border-color 0.12s ease !important;
 }
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="url"]:focus,
-input[type="search"]:focus,
-input[type="number"]:focus,
-textarea:focus, .formkit-outer select:focus {
+.formkit-outer input[type="text"]:focus,
+.formkit-outer input[type="email"]:focus,
+.formkit-outer input[type="password"]:focus,
+.formkit-outer input[type="url"]:focus,
+.formkit-outer input[type="search"]:focus,
+.formkit-outer input[type="number"]:focus,
+.formkit-outer textarea:focus, .formkit-outer select:focus {
   border-color: #6b7280 !important;
   box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1) !important;
 }

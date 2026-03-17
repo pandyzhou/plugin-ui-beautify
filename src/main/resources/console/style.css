@@ -95,6 +95,17 @@ tbody tr {
   transform: scale(1.05) !important;
 }
 
+/* --- Editor title input focus fix --- */
+.editor-main-extra input[type="text"]:focus,
+.editor-main-extra input[type="text"]:focus-visible,
+.editor-main-extra input:not([type]):focus,
+.editor-main-extra input:not([type]):focus-visible {
+  border-color: inherit !important;
+  outline: none !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+}
+
 /* --- Editor (ProseMirror / Tiptap) --- */
 .ProseMirror {
   border-radius: 0.5rem !important;
@@ -170,9 +181,9 @@ select:disabled {
   outline: 2px solid var(--ui-primary, #4ccba0) !important;
   outline-offset: 2px !important;
 }
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
+.formkit-outer input:focus-visible,
+.formkit-outer textarea:focus-visible,
+.formkit-outer select:focus-visible {
   outline: 2px solid var(--ui-primary, #4ccba0) !important;
   outline-offset: 1px !important;
 }
