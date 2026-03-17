@@ -27,7 +27,7 @@
   height: 80px !important;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cpath d='M20 70 Q30 45 50 60 Q60 35 45 20' fill='none' stroke='%23ec4899' stroke-width='1.2' opacity='0.12'/%3E%3Ccircle cx='42' cy='28' r='4' fill='%23ec4899' opacity='0.1'/%3E%3Ccircle cx='48' cy='18' r='3' fill='%23f472b6' opacity='0.08'/%3E%3Ccircle cx='35' cy='35' r='3.5' fill='%23ec4899' opacity='0.09'/%3E%3Ccircle cx='140' cy='55' r='3' fill='%23ec4899' opacity='0.07'/%3E%3Ccircle cx='160' cy='40' r='2' fill='%23f472b6' opacity='0.08'/%3E%3C/svg%3E") no-repeat center bottom !important;
   background-size: contain !important;
-  opacity: 0.7 !important;
+  opacity: 0.7;
 }
 
 /* === 2. Menu === */

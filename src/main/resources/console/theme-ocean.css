@@ -27,7 +27,7 @@
   height: 60px !important;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'%3E%3Cpath d='M0 30 Q25 18 50 30 Q75 42 100 30 Q125 18 150 30 Q175 42 200 30' fill='none' stroke='%233b82f6' stroke-width='1.5' opacity='0.1'/%3E%3Cpath d='M0 40 Q25 30 50 40 Q75 50 100 40 Q125 30 150 40 Q175 50 200 40' fill='none' stroke='%2360a5fa' stroke-width='1' opacity='0.08'/%3E%3C/svg%3E") no-repeat center bottom !important;
   background-size: cover !important;
-  opacity: 0.7 !important;
+  opacity: 0.7;
 }
 
 /* === 2. Menu === */

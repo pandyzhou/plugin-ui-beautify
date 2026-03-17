@@ -41,15 +41,16 @@
   border-color: var(--ui-border-hover) !important;
 }
 .sidebar__profile {
+  /* position: relative needed for ::before decorative pseudo-element */
   position: relative !important;
   border-top: 1px solid var(--ui-border) !important;
 }
 .sidebar__profile::before {
-  content: "" !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  pointer-events: none !important;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
 }
 
 /* === 2. Menu === */
@@ -73,6 +74,7 @@
   border-radius: 0 3px 3px 0 !important;
   width: 3px !important;
 }
+/* !important needed to override Halo's default menu-label styles */
 .menu-label {
   font-size: 0.8rem !important;
   font-weight: 600 !important;
