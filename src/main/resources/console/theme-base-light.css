@@ -146,12 +146,17 @@
 /* === 8. Forms === */
 input[type="text"], input[type="email"], input[type="password"],
 input[type="url"], input[type="search"], input[type="number"],
-textarea, .formkit-outer select {
+textarea {
   border-radius: 0.625rem !important;
   background: var(--ui-surface) !important;
   border-color: var(--ui-border) !important;
   color: var(--ui-text) !important;
   transition: all 0.2s ease !important;
+}
+.formkit-outer select {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
 }
 .formkit-outer input[type="text"]:focus, .formkit-outer input[type="email"]:focus, .formkit-outer input[type="password"]:focus,
 .formkit-outer input[type="url"]:focus, .formkit-outer input[type="search"]:focus, .formkit-outer input[type="number"]:focus,
@@ -301,7 +306,3 @@ code:not(pre code) { background: var(--ui-surface-hover) !important; color: var(
   animation: _ui_gradientShift 20s ease infinite !important;
 }
 
-/* === 24. Primary Button Structure === */
-.btn.btn-primary {
-  background-size: 200% 100% !important;
-}
