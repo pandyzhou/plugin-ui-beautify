@@ -971,7 +971,7 @@
         var userEl = document.querySelector(".sidebar__profile .profile-name") ||
                      document.querySelector("[class*='profile'] [class*='name']") ||
                      document.querySelector(".sidebar__profile span");
-        if (userEl) userName = "，" + userEl.textContent.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        if (userEl) userName = "，" + userEl.textContent.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
         var b = document.createElement("div"); b.id = "ui-welcome-banner";
         b.style.cssText = "background:" + gradient + ";border-radius:16px;padding:28px 32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;"
           + "box-shadow:0 8px 32px rgba(0,0,0,0.12);animation:_ui_pageIn .3s ease forwards;";
