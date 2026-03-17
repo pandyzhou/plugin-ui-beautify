@@ -24,7 +24,7 @@ configurations.all {
 }
 
 dependencies {
-    compileOnly 'run.halo.app:api:2.23.0-SNAPSHOT'
+    compileOnly 'run.halo.app:api:2.23.0'
     compileOnly 'org.springframework:spring-web:7.0.3'
     compileOnly 'org.springframework:spring-webflux:7.0.3'
     compileOnly 'org.springframework:spring-context:7.0.3'
