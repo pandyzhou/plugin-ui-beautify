@@ -35,7 +35,7 @@
   background-color: var(--ui-surface-hover) !important;
   border: 1px solid var(--ui-border) !important;
   color: var(--ui-text) !important;
-  transition: all 0.2s ease !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .sidebar__search:hover {
   border-color: var(--ui-border-hover) !important;
@@ -57,7 +57,7 @@
 .menu-item {
   border-radius: 0.625rem !important;
   margin: 2px 0 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .menu-item:hover {
   background-color: var(--ui-surface-hover) !important;
@@ -105,7 +105,7 @@
   background: var(--ui-surface) !important;
   border: 1px solid var(--ui-border) !important;
   box-shadow: 0 1px 3px var(--ui-shadow) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .card-wrapper:hover {
   box-shadow: 0 4px 12px var(--ui-shadow-hover) !important;
@@ -117,7 +117,7 @@
 /* === 6. Buttons === */
 .btn {
   border-radius: 0.5rem !important;
-  transition: all 0.2s ease !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease !important;
 }
 .btn.btn-secondary:active {
   transform: translateY(0) !important;
@@ -135,7 +135,7 @@
 /* === 7. Entity List === */
 .entity-wrapper {
   border-radius: 0.625rem !important;
-  transition: all 0.2s ease !important;
+  transition: background-color 0.2s ease !important;
 }
 .entity-wrapper:hover {
   background-color: var(--ui-surface-hover) !important;
@@ -153,7 +153,7 @@ textarea {
   background: var(--ui-surface) !important;
   border-color: var(--ui-border) !important;
   color: var(--ui-text) !important;
-  transition: all 0.2s ease !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .formkit-outer select {
   background: var(--ui-surface) !important;
