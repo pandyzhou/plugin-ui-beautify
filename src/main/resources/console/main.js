@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.0.10";
+  var PLUGIN_VERSION = "2.0.12";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -1366,6 +1366,82 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       for (var i = 0; i < 6; i++) spawn();
       var spawnId = setInterval(spawn, 3000);
       setTimeout(function() { clearInterval(spawnId); if (container.parentNode) container.remove(); if (ss.parentNode) ss.remove(); }, 120000);
+    }
+  });
+
+  /* --- Module: Route Flags + App Store Shadow Theme --- */
+  App.register({
+    id: "routeFlagsAndAppStoreTheme",
+    init: function(app) {
+      var self = this;
+      app.onMutation(function() { self._apply(); });
+      setTimeout(function() { self._apply(); }, 300);
+      setTimeout(function() { self._apply(); }, 1200);
+    },
+    onRouteChange: function() {
+      var self = this;
+      self._apply();
+      setTimeout(function() { self._apply(); }, 300);
+      setTimeout(function() { self._apply(); }, 1200);
+    },
+    onThemeChange: function() {
+      this._apply();
+    },
+    _setRouteFlags: function() {
+      var path = location.pathname;
+      document.body.classList.toggle("ui-route-app-store", path.indexOf("/console/app-store") === 0);
+      document.body.classList.toggle(
+        "ui-route-app-store-plugin",
+        path.indexOf("/console/plugins/app-store-integration") === 0
+      );
+    },
+    _apply: function() {
+      this._setRouteFlags();
+      this._themeHaloAppCards();
+    },
+    _themeHaloAppCards: function() {
+      var cards = document.querySelectorAll("halo-app-card");
+      if (!cards.length) return;
+
+      var shadowCss = [
+        ":host { display:block; color: var(--ui-text); }",
+        ":host > div {",
+        "  background: linear-gradient(180deg, var(--ui-surface-hover), var(--ui-surface)) !important;",
+        "  border: 1px solid var(--ui-border) !important;",
+        "  border-radius: 18px !important;",
+        "  box-shadow: 0 10px 30px var(--ui-shadow), inset 0 1px 0 rgba(255,255,255,0.04) !important;",
+        "  overflow: hidden !important;",
+        "  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;",
+        "}",
+        ":host > div:hover {",
+        "  transform: translateY(-2px);",
+        "  border-color: var(--ui-border-hover) !important;",
+        "  box-shadow: 0 14px 34px var(--ui-shadow-hover), 0 0 0 1px var(--ui-border-hover) !important;",
+        "}",
+        ":host img { background: var(--ui-surface-hover) !important; }",
+        ":host p { color: var(--ui-text-secondary) !important; }",
+        ":host span { color: var(--ui-text) !important; }",
+        ":host span.inline-flex, :host span[class*=\"rounded-full\"] {",
+        "  background: var(--ui-primary-soft) !important;",
+        "  color: var(--ui-text) !important;",
+        "  border: 1px solid var(--ui-border) !important;",
+        "}",
+        ":host [class*=\"!text-xs\"],",
+        ":host [class*=\"uno-85n0vz\"],",
+        ":host [class*=\"uno-d6nu2d\"],",
+        ":host [class*=\"uno-okyht5\"] { color: var(--ui-text-secondary) !important; }"
+      ].join("\n");
+
+      cards.forEach(function(card) {
+        if (!card.shadowRoot) return;
+        var styleEl = card.shadowRoot.getElementById("ui-beautify-app-store-shadow-style");
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = "ui-beautify-app-store-shadow-style";
+          card.shadowRoot.appendChild(styleEl);
+        }
+        styleEl.textContent = shadowCss;
+      });
     }
   });
 

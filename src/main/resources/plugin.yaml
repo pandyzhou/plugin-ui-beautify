@@ -4,7 +4,7 @@ metadata:
   name: plugin-ui-beautify
 spec:
   enabled: true
-  version: "2.0.11"
+  version: "2.0.12"
   requires: ">=2.23.0"
   author:
     name: 周易

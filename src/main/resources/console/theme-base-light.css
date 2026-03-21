@@ -115,6 +115,55 @@
 .card-header { border-bottom: 1px solid var(--ui-border) !important; }
 .card-footer { border-top: 1px solid var(--ui-border) !important; }
 
+/* === 5.1 App Store Pages === */
+body.ui-route-app-store .card-header > div {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+body.ui-route-app-store .card-body aside > ul > li > div {
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, var(--ui-bg), var(--ui-surface)) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: 0 1px 2px var(--ui-shadow) !important;
+}
+body.ui-route-app-store .card-body aside h2 {
+  color: var(--ui-text) !important;
+}
+body.ui-route-app-store .card-body aside label,
+body.ui-route-app-store .card-body [class*="text-gray-700"],
+body.ui-route-app-store .card-body [class*="font-semibold"] {
+  color: var(--ui-text-secondary) !important;
+}
+body.ui-route-app-store .card-body aside fieldset span {
+  background: var(--ui-surface-hover) !important;
+  color: var(--ui-text-secondary) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: none !important;
+}
+body.ui-route-app-store .card-body aside fieldset span[class*="i-0w24j4"] {
+  background: var(--ui-primary-soft) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-border-hover) !important;
+}
+body.ui-route-app-store .card-body aside input[type="checkbox"],
+body.ui-route-app-store .card-body aside input[type="radio"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+body.ui-route-app-store .card-header .v-popper--has-tooltip,
+body.ui-route-app-store .card-header [class*="i-e7mvzi"] {
+  background: var(--ui-surface-hover) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 12px !important;
+  color: var(--ui-text-secondary) !important;
+}
+body.ui-route-app-store .card-header .v-popper--has-tooltip svg,
+body.ui-route-app-store .card-header [class*="i-e7mvzi"] svg {
+  color: inherit !important;
+}
+
 /* === 6. Buttons === */
 .btn {
   border-radius: 0.5rem !important;
