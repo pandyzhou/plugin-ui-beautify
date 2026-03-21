@@ -1645,12 +1645,41 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
         panel.classList.add("ui-app-store-filter-panel");
       });
 
-      // 标签 chip 当前没有 data-* 标记，先以 aside fieldset 内的独立文本 span 作为稳定语义近似。
-      document.querySelectorAll(".card-body aside fieldset span").forEach(function(el) {
-        el.classList.add("ui-app-store-chip");
-        if (!ColorUtils.isLightBackground(window.getComputedStyle(el).backgroundColor)) {
-          el.classList.add("ui-app-store-chip-active");
-        }
+      // 标签 chip 当前没有 aria/data 选中标记时，回退到控件自身输出的额外状态 class 进行判断。
+      document.querySelectorAll(".card-body aside fieldset").forEach(function(fieldset) {
+        var chips = Array.from(fieldset.querySelectorAll("span"));
+        if (!chips.length) return;
+
+        var sharedClasses = chips.reduce(function(shared, chip, index) {
+          var originalClasses = Array.from(chip.classList).filter(function(className) {
+            return className.indexOf("ui-") !== 0;
+          });
+          if (index === 0) {
+            return originalClasses;
+          }
+          return shared.filter(function(className) {
+            return originalClasses.indexOf(className) !== -1;
+          });
+        }, []);
+
+        chips.forEach(function(el) {
+          el.classList.add("ui-app-store-chip");
+
+          var originalClasses = Array.from(el.classList).filter(function(className) {
+            return className.indexOf("ui-") !== 0;
+          });
+          var hasSelectionMarker =
+            el.getAttribute("aria-selected") === "true" ||
+            el.dataset.selected === "true" ||
+            el.classList.contains("selected") ||
+            originalClasses.some(function(className) {
+              return sharedClasses.indexOf(className) === -1;
+            });
+
+          if (hasSelectionMarker) {
+            el.classList.add("ui-app-store-chip-active");
+          }
+        });
       });
 
       document
