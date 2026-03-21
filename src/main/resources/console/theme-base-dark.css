@@ -314,6 +314,14 @@ body .\!bg-gray-300\/60 { background-color: var(--ui-surface-hover) !important; 
 .pagination-wrapper, .pagination { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text-secondary) !important; }
 .list-header, .list-footer, [class*="list-header"], [class*="list-footer"] { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
 .search-bar, [class*="search-bar"], [class*="filter-bar"] { background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important; }
+/* Plugin pages often use sticky white toolbars/search bars */
+.main-content [class*="sticky"][class*="top-0"][class*="bg-white"],
+.main-content [class*="sticky"][class*="top-0"][class*="backdrop-blur"],
+.main-content [class*="backdrop-blur"][class*="bg-white"],
+.main-content [class*="bg-white/"][class*="backdrop-blur"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
 body .hover\:bg-gray-50:hover { background-color: var(--ui-surface-hover) !important; }
 body .hover\:bg-gray-100:hover { background-color: var(--ui-surface-hover) !important; }
 body .text-gray-900, body .text-gray-800, body .text-gray-700 { color: var(--ui-text) !important; }
