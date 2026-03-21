@@ -142,7 +142,7 @@ var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal",
 var DARK_THEMES = ["dark", "deepblue", "aurora", "neon", "mytheme"];
 ```
 
-`VALID_THEMES` 用于校验主题名是否合法。如果用户配置了不在列表中的主题名，系统会回退到 `"default"`。
+`VALID_THEMES` 用于校验主题名是否合法。如果用户配置了不在列表中的主题名，系统会回退到 `"minimal"`。
 
 ### 步骤 4：添加粒子效果（可选）
 
