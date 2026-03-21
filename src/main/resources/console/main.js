@@ -47,15 +47,17 @@
       ":host img { background: var(--ui-surface-hover) !important; }",
       ":host p { color: var(--ui-text-secondary) !important; }",
       ":host span { color: var(--ui-text) !important; }",
-      ":host span.inline-flex, :host span[class*=\"rounded-full\"] {",
+      ":host > div > div:first-child span.inline-flex {",
       "  background: var(--ui-primary-soft) !important;",
       "  color: var(--ui-text) !important;",
       "  border: 1px solid var(--ui-border) !important;",
       "}",
-      ":host [class*=\"!text-xs\"],",
-      ":host [class*=\"uno-85n0vz\"],",
-      ":host [class*=\"uno-d6nu2d\"],",
-      ":host [class*=\"uno-okyht5\"] { color: var(--ui-text-secondary) !important; }"
+      ":host > div > div:last-child > div:first-child > div:first-child > div:first-child > span:last-child,",
+      ":host > div > div:last-child > div:first-child > div:first-child > div:last-child,",
+      ":host > div > div:last-child > div:first-child > p,",
+      ":host > div > div:last-child > div:last-child > div:first-child > span:last-child {",
+      "  color: var(--ui-text-secondary) !important;",
+      "}"
     ].join("\n")
   };
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
