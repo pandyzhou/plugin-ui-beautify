@@ -13,6 +13,7 @@
   var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"];
   var DARK_THEMES = ["dark", "deepblue", "aurora", "neon"];
   var DEFAULT_THEME = "minimal";
+  var DEFAULT_DARK_THEME = "dark";
   var BASE_LINK_ID = "ui-beautify-base-css";
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -117,12 +118,12 @@
     /* --- Theme --- */
     resolveTheme: function(theme) {
       if (theme !== "auto") return theme;
-      return darkMql.matches ? "dark" : DEFAULT_THEME;
+      return darkMql.matches ? DEFAULT_DARK_THEME : DEFAULT_THEME;
     },
 
     loadThemeCSS: function(theme) {
       theme = this.resolveTheme(theme);
-      if (VALID_THEMES.indexOf(theme) === -1) theme = DEFAULT_THEME;
+      if (!VALID_THEMES.includes(theme)) theme = DEFAULT_THEME;
 
       var existing = document.getElementById(LINK_ID);
       if (existing && existing.dataset.theme === theme) {
