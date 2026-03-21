@@ -685,7 +685,9 @@ var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal",
 var DARK_THEMES = ["dark", "deepblue", "aurora", "neon", "forest"];
 ```
 
-同时在光标光晕模块的 `_COLORS` 中添加：
+光标光晕、极光背景和动态壁纸默认会从 CSS 变量 `--ui-primary` 自动回退生成颜色，因此**不需要**额外修改 `_COLORS` 映射也能正常工作。
+
+如果你希望为新主题提供更精细的专属颜色（而不是使用 `--ui-primary` 的自动回退），可以**可选地**在光标光晕模块的 `_COLORS` 中添加：
 
 ```javascript
 _COLORS: {
