@@ -647,7 +647,7 @@
       if (!c) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        c = cssColorToRgba(primary, 0.12, this._COLORS["default"]);
+        c = cssColorToRgba(primary, 0.12, this._COLORS["minimal"] || this._COLORS["default"]);
       }
       this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
     },
