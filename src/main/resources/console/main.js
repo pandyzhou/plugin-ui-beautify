@@ -1004,27 +1004,29 @@
         return;
       }
       var self = this;
-      var candidates = document.querySelectorAll(
-        ".main-content div, .main-content section, .main-content header, .main-content aside"
+      var containers = document.querySelectorAll(
+        ".main-content .card-header, .main-content .card:not(.card-wrapper), .main-content .card-wrapper"
       );
-      candidates.forEach(function(el) {
-        if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
-        var tag = el.tagName;
-        if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG" || tag === "IMG") return;
-        var rect = el.getBoundingClientRect();
-        if (rect.width < 220 || rect.height < 24 || rect.height > 140) return;
-        if (rect.top < 0 || rect.top > Math.max(320, window.innerHeight * 0.35)) return;
-        var style = window.getComputedStyle(el);
-        if (style.display === "inline" || style.visibility === "hidden") return;
-        if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
-        el.dataset.uiDarkCompatPatched = "1";
-        el.dataset.uiDarkCompatBg = el.style.backgroundColor || "";
-        el.dataset.uiDarkCompatBorder = el.style.borderColor || "";
-        el.dataset.uiDarkCompatColor = el.style.color || "";
-        el.style.backgroundColor = "var(--ui-surface)";
-        el.style.borderColor = "var(--ui-border)";
-        el.style.color = "var(--ui-text)";
-        self._patched.push(el);
+      containers.forEach(function(container) {
+        var nodes = [container].concat(Array.prototype.slice.call(container.querySelectorAll("div, section, header, aside, span, label")));
+        nodes.forEach(function(el) {
+          if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
+          var tag = el.tagName;
+          if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG" || tag === "IMG") return;
+          var rect = el.getBoundingClientRect();
+          if (rect.width < 24 || rect.height < 12 || rect.height > 180) return;
+          var style = window.getComputedStyle(el);
+          if (style.display === "inline" || style.visibility === "hidden") return;
+          if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
+          el.dataset.uiDarkCompatPatched = "1";
+          el.dataset.uiDarkCompatBg = el.style.backgroundColor || "";
+          el.dataset.uiDarkCompatBorder = el.style.borderColor || "";
+          el.dataset.uiDarkCompatColor = el.style.color || "";
+          el.style.backgroundColor = "var(--ui-surface)";
+          el.style.borderColor = "var(--ui-border)";
+          el.style.color = "var(--ui-text)";
+          self._patched.push(el);
+        });
       });
     },
     _schedule: function() {
