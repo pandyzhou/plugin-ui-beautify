@@ -991,15 +991,25 @@
     id: "pluginDarkCompat",
     _patched: [],
     _rafId: null,
+    _theme: null,
+    _timers: [],
+    _targetPaths: ["/links", "/photos", "/equipments", "/moments", "/openlist", "/timeline", "/timelines", "/friends", "/friend"],
+    _isTargetRoute: function() {
+      var route = location.pathname + location.hash;
+      return this._targetPaths.some(function(path) { return route.indexOf(path) !== -1; });
+    },
     _scan: function() {
-      if (!App.currentTheme || DARK_THEMES.indexOf(App.currentTheme) === -1) {
+      if (!this._theme || DARK_THEMES.indexOf(this._theme) === -1 || !this._isTargetRoute()) {
         this._clear();
         return;
       }
       var self = this;
       var candidates = document.querySelectorAll(
-        ".main-content .card-header, .main-content .card:not(.card-wrapper), .main-content .card-wrapper, " +
-        ".main-content [class*='sticky'], .main-content [class*='bg-white'], .main-content [class*='bg-gray-50'], .main-content [class*='bg-gray-100']"
+        ".main-content .card-header > div, " +
+        ".main-content .card-header [class*='bg-white'], .main-content .card-header [class*='bg-gray-50'], .main-content .card-header [class*='bg-gray-100'], " +
+        ".main-content .card:not(.card-wrapper) [class*='bg-white'], .main-content .card:not(.card-wrapper) [class*='bg-gray-50'], .main-content .card:not(.card-wrapper) [class*='bg-gray-100'], " +
+        ".main-content .card:not(.card-wrapper) [class*='border-b-gray-100'], .main-content .card:not(.card-wrapper) [class*='border-gray-100'], " +
+        ".main-content .group[class*='bg-white'], .main-content .flex[class*='bg-white']"
       );
       candidates.forEach(function(el) {
         if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
@@ -1023,10 +1033,14 @@
     _schedule: function() {
       var self = this;
       if (this._rafId) cancelAnimationFrame(this._rafId);
+      this._timers.forEach(clearTimeout);
+      this._timers = [];
       this._rafId = requestAnimationFrame(function() {
         self._rafId = null;
         self._scan();
       });
+      this._timers.push(setTimeout(function() { self._scan(); }, 200));
+      this._timers.push(setTimeout(function() { self._scan(); }, 800));
     },
     _clear: function() {
       this._patched.forEach(function(el) {
@@ -1042,15 +1056,21 @@
       this._patched = [];
     },
     init: function(app) {
+      this._theme = App.resolveTheme(App.currentTheme || DEFAULT_THEME);
       this._mutationHandler = this._schedule.bind(this);
       this._schedule();
       app.onMutation(this._mutationHandler);
     },
-    onThemeChange: function() { this._schedule(); },
+    onThemeChange: function(theme) {
+      this._theme = theme;
+      this._schedule();
+    },
     onRouteChange: function() { this._schedule(); },
     destroy: function() {
       if (this._rafId) cancelAnimationFrame(this._rafId);
       this._rafId = null;
+      this._timers.forEach(clearTimeout);
+      this._timers = [];
       this._clear();
     }
   });
