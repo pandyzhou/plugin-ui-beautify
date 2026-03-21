@@ -33,3 +33,13 @@
 .ui-plugin-page-toolbar [class*="text-gray-400"] {
   color: var(--ui-text-secondary) !important;
 }
+
+body.ui-route-plugins-app-store-integration .description-item__label {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-plugins-app-store-integration .description-item__content {
+  color: var(--ui-text) !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+}
