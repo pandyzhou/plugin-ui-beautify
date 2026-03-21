@@ -18,6 +18,7 @@ style.css（全局结构，主题无关）
   |     +-- theme-minimal.css（极简）
   |     +-- patch-plugin-pages-light.css（插件页补丁层）
   |     +-- patch-app-store-light.css（应用市场补丁层）
+  |     +-- patch-dashboard-light.css（仪表盘补丁层）
   |
   +-- theme-base-dark.css（暗色公共样式 + CSS 变量）
         +-- theme-dark.css（暗夜）
