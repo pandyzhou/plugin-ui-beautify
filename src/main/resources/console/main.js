@@ -12,6 +12,7 @@
   var CONFIG_URL = "/apis/api.console.halo.run/v1alpha1/plugins/" + PLUGIN_NAME + "/json-config";
   var VALID_THEMES = ["default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"];
   var DARK_THEMES = ["dark", "deepblue", "aurora", "neon"];
+  var DEFAULT_THEME = "minimal";
   var BASE_LINK_ID = "ui-beautify-base-css";
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -103,11 +104,11 @@
             self.toggles.enableWallpaper = readToggle("enableWallpaper");
             self.toggles.enableWelcomeBanner = readToggle("enableWelcomeBanner");
             self._applyToggleStates();
-            return data.basic.consoleTheme || "minimal";
+            return data.basic.consoleTheme || DEFAULT_THEME;
           }
-          return "minimal";
+          return DEFAULT_THEME;
         })
-        .catch(function() { return "minimal"; });
+        .catch(function() { return DEFAULT_THEME; });
     },
 
     isEnabled: function(toggleName) {
@@ -117,12 +118,12 @@
     /* --- Theme --- */
     resolveTheme: function(theme) {
       if (theme !== "auto") return theme;
-      return darkMql.matches ? "dark" : "minimal";
+      return darkMql.matches ? "dark" : DEFAULT_THEME;
     },
 
     loadThemeCSS: function(theme) {
       theme = this.resolveTheme(theme);
-      if (VALID_THEMES.indexOf(theme) === -1) theme = "minimal";
+      if (VALID_THEMES.indexOf(theme) === -1) theme = DEFAULT_THEME;
 
       var existing = document.getElementById(LINK_ID);
       if (existing && existing.dataset.theme === theme) {
