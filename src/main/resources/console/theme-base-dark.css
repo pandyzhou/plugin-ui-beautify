@@ -57,6 +57,7 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 .card-wrapper { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; box-shadow: 0 1px 3px var(--ui-shadow) !important; }
 .card-wrapper:hover { box-shadow: 0 4px 12px var(--ui-shadow-hover) !important; border-color: var(--ui-border-hover) !important; }
 .card-header { border-bottom: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
+.card-header > div { background-color: inherit !important; border-color: inherit !important; }
 .card-header-title, .card-body { color: var(--ui-text) !important; }
 .card-footer { border-top: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
 /* Force ALL direct children of card-wrapper to inherit dark bg */
