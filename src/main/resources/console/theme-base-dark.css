@@ -57,69 +57,9 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 .card-wrapper { background: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; box-shadow: 0 1px 3px var(--ui-shadow) !important; }
 .card-wrapper:hover { box-shadow: 0 4px 12px var(--ui-shadow-hover) !important; border-color: var(--ui-border-hover) !important; }
 .card-header { border-bottom: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
-/* Plugin pages often render header slot wrappers as compiled Uno classes like .uno-ga61as.
-   Give the wrapper its own dark background instead of relying on inherit so later plugin bundle
-   styles cannot leave a white toolbar/search strip in dark themes. */
-.card-header > div,
-.card-header > [class^="uno-"],
-.card-header > [class*=" uno-"] {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
-}
+.card-header > div { background-color: inherit !important; border-color: inherit !important; }
 .card-header-title, .card-body { color: var(--ui-text) !important; }
 .card-footer { border-top: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
-/* Force ALL direct children of card-wrapper to inherit dark bg */
-.card-wrapper > div { background-color: var(--ui-surface) !important; color: var(--ui-text) !important; }
-
-/* === 6.1 App Store Pages === */
-body.ui-route-app-store .card-header > div {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
-}
-body.ui-route-app-store .card-body aside > ul > li > div {
-  padding: 14px 16px !important;
-  border-radius: 16px !important;
-  background: linear-gradient(180deg, rgba(15,23,42,0.45), rgba(30,41,59,0.82)) !important;
-  border: 1px solid var(--ui-border) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03) !important;
-}
-body.ui-route-app-store .card-body aside h2 {
-  color: var(--ui-text) !important;
-}
-body.ui-route-app-store .card-body aside label,
-body.ui-route-app-store .card-body [class*="text-gray-700"],
-body.ui-route-app-store .card-body [class*="font-semibold"] {
-  color: var(--ui-text-secondary) !important;
-}
-body.ui-route-app-store .card-body aside fieldset span {
-  background: rgba(51,65,85,0.76) !important;
-  color: var(--ui-text-secondary) !important;
-  border: 1px solid var(--ui-border) !important;
-  box-shadow: none !important;
-}
-body.ui-route-app-store .card-body aside fieldset span[class*="i-0w24j4"] {
-  background: linear-gradient(135deg, rgba(56,189,248,0.22), rgba(14,165,233,0.16)) !important;
-  color: var(--ui-text) !important;
-  border-color: rgba(56,189,248,0.24) !important;
-}
-body.ui-route-app-store .card-body aside input[type="checkbox"],
-body.ui-route-app-store .card-body aside input[type="radio"] {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-}
-body.ui-route-app-store .card-header .v-popper--has-tooltip,
-body.ui-route-app-store .card-header [class*="i-e7mvzi"] {
-  background: rgba(51,65,85,0.68) !important;
-  border: 1px solid var(--ui-border) !important;
-  border-radius: 12px !important;
-  color: var(--ui-text-secondary) !important;
-}
-body.ui-route-app-store .card-header .v-popper--has-tooltip svg,
-body.ui-route-app-store .card-header [class*="i-e7mvzi"] svg {
-  color: inherit !important;
-}
 
 /* === 7. Buttons === */
 .btn { color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
@@ -480,13 +420,6 @@ hr, .divider { border-color: var(--ui-border) !important; }
 }
 .stepper, [class*="stepper"], [class*="step-item"] {
   color: var(--ui-text-secondary) !important;
-}
-
-/* === 28. App Store Plugin Cards === */
-.app-store-card, [class*="plugin-card"], [class*="store-item"] {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
 }
 
 /* === 29. Global Search (Ctrl+K) === */

@@ -1,0 +1,73 @@
+/* ============================================
+   Page Patch: App Store — Light themes
+   Scoped enhancements for /console/app-store routes.
+   ============================================ */
+
+body.ui-route-app-store .ui-app-store-toolbar {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar [class*="text-gray-700"],
+body.ui-route-app-store .ui-app-store-toolbar [class*="font-semibold"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-filter-panel {
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, var(--ui-bg), var(--ui-surface)) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: 0 1px 2px var(--ui-shadow) !important;
+}
+
+body.ui-route-app-store .card-body aside h2 {
+  color: var(--ui-text) !important;
+}
+
+body.ui-route-app-store .card-body aside label,
+body.ui-route-app-store .card-body aside p,
+body.ui-route-app-store .card-body aside small,
+body.ui-route-app-store .card-body aside [class*="text-gray-700"],
+body.ui-route-app-store .card-body aside [class*="font-semibold"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-chip {
+  background: var(--ui-surface-hover) !important;
+  color: var(--ui-text-secondary) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: none !important;
+}
+
+body.ui-route-app-store .ui-app-store-chip.ui-app-store-chip-active {
+  background: var(--ui-primary-soft) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-border-hover) !important;
+}
+
+body.ui-route-app-store .card-body aside input[type="checkbox"],
+body.ui-route-app-store .card-body aside input[type="radio"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar-icon {
+  background: var(--ui-surface-hover) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 12px !important;
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar-icon svg {
+  color: inherit !important;
+}
+
+body.ui-route-app-store .ui-app-store-preview {
+  background: var(--ui-surface-hover) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px var(--ui-shadow) !important;
+}

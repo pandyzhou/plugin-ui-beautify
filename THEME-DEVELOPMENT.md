@@ -16,15 +16,19 @@ style.css（全局结构，主题无关）
   |     +-- theme-ocean.css（海洋）
   |     +-- theme-sakura.css（樱花）
   |     +-- theme-minimal.css（极简）
+  |     +-- patch-plugin-pages-light.css（插件页补丁层）
+  |     +-- patch-app-store-light.css（应用市场补丁层）
   |
   +-- theme-base-dark.css（暗色公共样式 + CSS 变量）
         +-- theme-dark.css（暗夜）
         +-- theme-deepblue.css（深邃蓝）
         +-- theme-aurora.css（极光）
         +-- theme-neon.css（霓虹）
+        +-- patch-plugin-pages-dark.css（插件页补丁层）
+        +-- patch-app-store-dark.css（应用市场补丁层）
 ```
 
-加载顺序：`style.css` 始终加载 -> 根据主题类型加载对应 base -> 加载 `theme-{name}.css` 覆盖。
+加载顺序：`style.css` 始终加载 -> 根据主题类型加载对应 base -> 加载 `theme-{name}.css` 覆盖 -> 加载页面级 patch CSS。
 
 ### CSS 变量驱动的颜色系统
 
@@ -35,7 +39,7 @@ style.css（全局结构，主题无关）
 ```text
 main.js
   |
-  +-- App（核心）: 配置加载、主题切换、路由监听、模块管理
+  +-- App（核心）: 配置加载、主题切换、路由监听、模块管理、patch CSS 加载
   +-- FX（粒子引擎）: Canvas 粒子系统，每个主题定义独立的粒子配置
   +-- 功能模块: 通过 App.register() 注册，支持生命周期回调
        +-- pageTransition（页面过渡动画）
@@ -44,6 +48,9 @@ main.js
        +-- macOSCards（macOS 窗口风格）
        +-- wallpaper（动态壁纸）
        +-- welcomeBanner（欢迎横幅）
+       +-- routeFlags（路由语义类）
+       +-- semanticPagePatches（页面语义补丁标记）
+       +-- shadowThemeBridge（shadow DOM 主题桥接）
 ```
 
 ### 网关页面独立系统

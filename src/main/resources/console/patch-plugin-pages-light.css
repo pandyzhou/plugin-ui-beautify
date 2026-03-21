@@ -1,0 +1,35 @@
+/* ============================================
+   Page Patch: Plugin Pages — Light themes
+   Route-scoped fixes for third-party / plugin-managed list pages.
+   ============================================ */
+
+.ui-plugin-page-toolbar {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+.ui-plugin-page-toolbar [class*="bg-white"],
+.ui-plugin-page-toolbar [class*="bg-gray-50"],
+.ui-plugin-page-toolbar [class*="bg-gray-100"] {
+  background: transparent !important;
+}
+
+.ui-plugin-page-toolbar [class*="border-gray-100"],
+.ui-plugin-page-toolbar [class*="border-b-gray-100"],
+.ui-plugin-page-toolbar [class*="divide-gray-100"] > * + * {
+  border-color: var(--ui-border) !important;
+}
+
+.ui-plugin-page-toolbar [class*="text-gray-900"],
+.ui-plugin-page-toolbar [class*="text-gray-800"],
+.ui-plugin-page-toolbar [class*="text-gray-700"],
+.ui-plugin-page-toolbar [class*="font-semibold"] {
+  color: var(--ui-text) !important;
+}
+
+.ui-plugin-page-toolbar [class*="text-gray-600"],
+.ui-plugin-page-toolbar [class*="text-gray-500"],
+.ui-plugin-page-toolbar [class*="text-gray-400"] {
+  color: var(--ui-text-secondary) !important;
+}
