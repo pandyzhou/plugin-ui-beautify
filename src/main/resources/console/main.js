@@ -1515,10 +1515,8 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       self._schedule();
     },
     onRouteChange: function() {
+      // 路由切换后先触发一次，后续异步节点交给全局 MutationObserver 继续补扫。
       this._schedule();
-      var self = this;
-      setTimeout(function() { self._schedule(); }, 320);
-      setTimeout(function() { self._schedule(); }, 1200);
     },
     onThemeChange: function() {
       this._schedule();
@@ -1668,10 +1666,8 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       self._schedule();
     },
     onRouteChange: function() {
+      // 路由切换后先触发一次，后续异步节点交给全局 MutationObserver 继续补扫。
       this._schedule();
-      var self = this;
-      setTimeout(function() { self._schedule(); }, 320);
-      setTimeout(function() { self._schedule(); }, 1200);
     },
     onThemeChange: function() {
       this._schedule();
