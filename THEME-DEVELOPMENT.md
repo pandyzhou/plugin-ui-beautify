@@ -650,11 +650,12 @@ forest: {
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
     var alpha = (p.alpha * p.baseAlpha).toFixed(2);
-    ctx.fillStyle = p.color.replace(/[\d.]+\)$/, alpha + ")");
+    var colorBase = p.color.slice(0, p.color.lastIndexOf(",") + 1);
+    ctx.fillStyle = colorBase + alpha + ")";
     ctx.fill();
     /* 萤火虫光晕 */
     var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-    g.addColorStop(0, p.color.replace(/[\d.]+\)$/, (alpha * 0.3).toFixed(2) + ")"));
+    g.addColorStop(0, colorBase + (alpha * 0.3).toFixed(2) + ")");
     g.addColorStop(1, "transparent");
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
