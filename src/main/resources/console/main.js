@@ -1019,12 +1019,11 @@
           if (style.display === "inline" || style.visibility === "hidden") return;
           if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
           el.dataset.uiDarkCompatPatched = "1";
-          el.dataset.uiDarkCompatBg = el.style.backgroundColor || "";
-          el.dataset.uiDarkCompatBorder = el.style.borderColor || "";
-          el.dataset.uiDarkCompatColor = el.style.color || "";
-          el.style.backgroundColor = "var(--ui-surface)";
-          el.style.borderColor = "var(--ui-border)";
-          el.style.color = "var(--ui-text)";
+          el.dataset.uiDarkCompatStyle = el.getAttribute("style") || "";
+          el.style.setProperty("background", "var(--ui-surface)", "important");
+          el.style.setProperty("background-color", "var(--ui-surface)", "important");
+          el.style.setProperty("border-color", "var(--ui-border)", "important");
+          el.style.setProperty("color", "var(--ui-text)", "important");
           self._patched.push(el);
         });
       });
@@ -1041,17 +1040,17 @@
       this._timers.push(setTimeout(function() { self._scan(); }, 200));
       this._timers.push(setTimeout(function() { self._scan(); }, 800));
       this._timers.push(setTimeout(function() { self._scan(); }, 1800));
+      this._timers.push(setTimeout(function() { self._scan(); }, 3200));
+      this._timers.push(setTimeout(function() { self._scan(); }, 5200));
     },
     _clear: function() {
       this._patched.forEach(function(el) {
         if (!el || !el.dataset || el.dataset.uiDarkCompatPatched !== "1") return;
-        el.style.backgroundColor = el.dataset.uiDarkCompatBg || "";
-        el.style.borderColor = el.dataset.uiDarkCompatBorder || "";
-        el.style.color = el.dataset.uiDarkCompatColor || "";
+        var styleText = el.dataset.uiDarkCompatStyle || "";
+        if (styleText) el.setAttribute("style", styleText);
+        else el.removeAttribute("style");
         delete el.dataset.uiDarkCompatPatched;
-        delete el.dataset.uiDarkCompatBg;
-        delete el.dataset.uiDarkCompatBorder;
-        delete el.dataset.uiDarkCompatColor;
+        delete el.dataset.uiDarkCompatStyle;
       });
       this._patched = [];
     },
