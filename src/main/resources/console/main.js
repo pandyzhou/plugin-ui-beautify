@@ -27,21 +27,21 @@
     toRgba: function(color, alpha, fallback) {
       if (!color || !color.trim()) return fallback;
       color = color.trim();
-      if (color.startsWith("rgb")) {
-        var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+        const match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
         return match
           ? ("rgba(" + match[1] + "," + match[2] + "," + match[3] + "," + alpha + ")")
           : fallback;
       }
       if (color.startsWith("#")) {
-        var hex = color.slice(1);
+        let hex = color.slice(1);
         if (hex.length === 3) {
           hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
         }
         if (hex.length === 6) {
-          var r = parseInt(hex.slice(0, 2), 16);
-          var g = parseInt(hex.slice(2, 4), 16);
-          var b = parseInt(hex.slice(4, 6), 16);
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
           return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
         }
       }
@@ -52,11 +52,11 @@
       if (!color || !color.trim()) return fallback;
       color = color.trim();
       if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
-        var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        const match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
         return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
       }
       if (color.startsWith("#")) {
-        var hex = color.slice(1);
+        let hex = color.slice(1);
         if (hex.length === 3) {
           hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
         }
