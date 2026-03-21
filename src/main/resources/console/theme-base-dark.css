@@ -60,8 +60,6 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 .card-header > div { background-color: inherit !important; border-color: inherit !important; }
 .card-header-title, .card-body { color: var(--ui-text) !important; }
 .card-footer { border-top: 1px solid var(--ui-border) !important; background-color: var(--ui-surface) !important; }
-/* Force ALL direct children of card-wrapper to inherit dark bg */
-.card-wrapper > div { background-color: var(--ui-surface) !important; color: var(--ui-text) !important; }
 
 /* === 7. Buttons === */
 .btn { color: var(--ui-text) !important; border-color: var(--ui-border) !important; }
@@ -422,13 +420,6 @@ hr, .divider { border-color: var(--ui-border) !important; }
 }
 .stepper, [class*="stepper"], [class*="step-item"] {
   color: var(--ui-text-secondary) !important;
-}
-
-/* === 28. App Store Plugin Cards === */
-.app-store-card, [class*="plugin-card"], [class*="store-item"] {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
 }
 
 /* === 29. Global Search (Ctrl+K) === */

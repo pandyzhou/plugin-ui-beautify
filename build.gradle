@@ -1,9 +1,11 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
 }
 
 group = 'run.halo.ui.beautify'
-version = '2.0.10'
+version = '2.1.1'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -31,6 +33,15 @@ dependencies {
     compileOnly 'io.projectreactor:reactor-core:3.7.6'
     compileOnly 'org.pf4j:pf4j:3.15.0'
     compileOnly 'tools.jackson.core:jackson-databind:3.0.4'
+}
+
+tasks.named('processResources') {
+    inputs.property('pluginVersion', version)
+    filteringCharset = 'UTF-8'
+
+    filesMatching(['plugin.yaml', 'console/main.js']) {
+        filter(ReplaceTokens, tokens: [pluginVersion: version.toString()])
+    }
 }
 
 jar {

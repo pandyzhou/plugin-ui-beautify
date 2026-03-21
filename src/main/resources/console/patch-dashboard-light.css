@@ -1,0 +1,35 @@
+/* ============================================
+   Page Patch: Dashboard — Light themes
+   Improves widget quick-action contrast and hierarchy.
+   ============================================ */
+
+body.ui-route-dashboard .ui-dashboard-quick-action {
+  background: linear-gradient(180deg, #f8fbff, #ffffff) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: 0 8px 18px rgba(15,23,42,0.06) !important;
+}
+
+body.ui-route-dashboard .ui-dashboard-quick-action:hover {
+  background: linear-gradient(180deg, #f1f5f9, #ffffff) !important;
+  border-color: var(--ui-border-hover) !important;
+  box-shadow: 0 12px 22px rgba(15,23,42,0.08) !important;
+}
+
+body.ui-route-dashboard .ui-dashboard-quick-action-icon {
+  background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(56,189,248,0.1)) !important;
+  color: var(--ui-primary) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.08), 0 8px 16px rgba(15,23,42,0.06) !important;
+}
+
+body.ui-route-dashboard .ui-dashboard-quick-action-icon svg,
+body.ui-route-dashboard .ui-dashboard-quick-action-icon * {
+  color: inherit !important;
+}
+
+body.ui-route-dashboard .ui-dashboard-quick-action-arrow {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-dashboard .ui-dashboard-quick-action:hover .ui-dashboard-quick-action-arrow {
+  color: var(--ui-text) !important;
+}

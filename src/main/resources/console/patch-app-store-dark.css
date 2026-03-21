@@ -1,0 +1,73 @@
+/* ============================================
+   Page Patch: App Store — Dark themes
+   Scoped enhancements for /console/app-store routes.
+   ============================================ */
+
+body.ui-route-app-store .ui-app-store-toolbar {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar [class*="text-gray-700"],
+body.ui-route-app-store .ui-app-store-toolbar [class*="font-semibold"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-filter-panel {
+  padding: 14px 16px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(15,23,42,0.48), rgba(30,41,59,0.84)) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03) !important;
+}
+
+body.ui-route-app-store .card-body aside h2 {
+  color: var(--ui-text) !important;
+}
+
+body.ui-route-app-store .card-body aside label,
+body.ui-route-app-store .card-body aside p,
+body.ui-route-app-store .card-body aside small,
+body.ui-route-app-store .card-body aside [class*="text-gray-700"],
+body.ui-route-app-store .card-body aside [class*="font-semibold"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-chip {
+  background: rgba(51,65,85,0.78) !important;
+  color: var(--ui-text-secondary) !important;
+  border: 1px solid var(--ui-border) !important;
+  box-shadow: none !important;
+}
+
+body.ui-route-app-store .ui-app-store-chip.ui-app-store-chip-active {
+  background: linear-gradient(135deg, rgba(56,189,248,0.22), rgba(14,165,233,0.16)) !important;
+  color: var(--ui-text) !important;
+  border-color: rgba(56,189,248,0.24) !important;
+}
+
+body.ui-route-app-store .card-body aside input[type="checkbox"],
+body.ui-route-app-store .card-body aside input[type="radio"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar-icon {
+  background: rgba(51,65,85,0.7) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 12px !important;
+  color: var(--ui-text-secondary) !important;
+}
+
+body.ui-route-app-store .ui-app-store-toolbar-icon svg {
+  color: inherit !important;
+}
+
+body.ui-route-app-store .ui-app-store-preview {
+  background: rgba(51,65,85,0.56) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 24px rgba(2,6,23,0.18) !important;
+}

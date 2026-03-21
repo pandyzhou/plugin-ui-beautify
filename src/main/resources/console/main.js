@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.0.10";
+  var PLUGIN_VERSION = "@pluginVersion@";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -15,12 +15,64 @@
   var DEFAULT_THEME = "minimal";
   var DEFAULT_DARK_THEME = "dark";
   var BASE_LINK_ID = "ui-beautify-base-css";
+  var PATCH_ASSETS = {
+    light: [
+      { id: "ui-beautify-patch-plugin-pages-css", name: "patch-plugin-pages-light" },
+      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-light" },
+      { id: "ui-beautify-patch-dashboard-css", name: "patch-dashboard-light" }
+    ],
+    dark: [
+      { id: "ui-beautify-patch-plugin-pages-css", name: "patch-plugin-pages-dark" },
+      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-dark" },
+      { id: "ui-beautify-patch-dashboard-css", name: "patch-dashboard-dark" }
+    ]
+  };
+  var SHADOW_THEME_STYLE_ID = "ui-beautify-app-store-shadow-style";
+  var SHADOW_THEME_CSS = {
+    haloAppCard: [
+      ":host { display:block; color: var(--ui-text); }",
+      ":host > div {",
+      "  background: linear-gradient(180deg, var(--ui-surface-hover), var(--ui-surface)) !important;",
+      "  border: 1px solid var(--ui-border) !important;",
+      "  border-radius: 18px !important;",
+      "  box-shadow: 0 10px 30px var(--ui-shadow), inset 0 1px 0 rgba(255,255,255,0.04) !important;",
+      "  overflow: hidden !important;",
+      "  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;",
+      "}",
+      ":host > div:hover {",
+      "  transform: translateY(-2px);",
+      "  border-color: var(--ui-border-hover) !important;",
+      "  box-shadow: 0 14px 34px var(--ui-shadow-hover), 0 0 0 1px var(--ui-border-hover) !important;",
+      "}",
+      ":host img { background: var(--ui-surface-hover) !important; }",
+      ":host p { color: var(--ui-text-secondary) !important; }",
+      ":host span { color: var(--ui-text) !important; }",
+      ":host > div > div:first-child span.inline-flex {",
+      "  background: var(--ui-primary-soft) !important;",
+      "  color: var(--ui-text) !important;",
+      "  border: 1px solid var(--ui-border) !important;",
+      "}",
+      ":host > div > div:last-child > div:first-child > div:first-child > div:first-child > span:last-child,",
+      ":host > div > div:last-child > div:first-child > div:first-child > div:last-child,",
+      ":host > div > div:last-child > div:first-child > p,",
+      ":host > div > div:last-child > div:last-child > div:first-child > span:last-child {",
+      "  color: var(--ui-text-secondary) !important;",
+      "}"
+    ].join("\n")
+  };
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function getSidebarWidth() {
     var sb = document.querySelector(".sidebar");
     return sb ? sb.getBoundingClientRect().width : 260;
+  }
+
+  function sanitizeRouteToken(token) {
+    return (token || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   var ColorUtils = {
@@ -134,55 +186,133 @@
       return darkMql.matches ? DEFAULT_DARK_THEME : DEFAULT_THEME;
     },
 
+    _replaceStylesheet: function(id, href, dataKey, dataValue, anchorEl) {
+      var existing = document.getElementById(id);
+      if (existing && existing.dataset[dataKey] === dataValue) {
+        return existing;
+      }
+
+      var loadingId = id + "-loading";
+      var inFlight = document.getElementById(loadingId);
+      if (inFlight) {
+        if (inFlight.dataset[dataKey] === dataValue) {
+          return inFlight;
+        }
+        if (typeof inFlight._uiBeautifyCleanup === "function") {
+          inFlight._uiBeautifyCleanup();
+        } else if (inFlight.parentNode) {
+          inFlight.remove();
+        }
+      }
+
+      var link = document.createElement("link");
+      var oldLink = existing;
+      var settled = false;
+      var timeoutId = null;
+      link.id = loadingId;
+      link.rel = "stylesheet";
+      link.dataset[dataKey] = dataValue;
+      link.href = href;
+
+      function cleanup() {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        link.onload = null;
+        link.onerror = null;
+        link._uiBeautifyCleanup = null;
+      }
+
+      function finalize() {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        link.id = id;
+        if (oldLink && oldLink.parentNode) {
+          oldLink.remove();
+        }
+      }
+
+      function discard() {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        if (link.parentNode) {
+          link.remove();
+        }
+      }
+
+      link._uiBeautifyCleanup = discard;
+      link.onload = finalize;
+      link.onerror = discard;
+      timeoutId = setTimeout(discard, 2000);
+
+      if (anchorEl && anchorEl.parentNode) {
+        if (anchorEl.nextSibling) {
+          anchorEl.parentNode.insertBefore(link, anchorEl.nextSibling);
+        } else {
+          anchorEl.parentNode.appendChild(link);
+        }
+      } else {
+        document.head.appendChild(link);
+      }
+
+      return link;
+    },
+
+    _syncPatchStyles: function(isDark, anchorEl) {
+      var self = this;
+      var patchSet = isDark ? PATCH_ASSETS.dark : PATCH_ASSETS.light;
+      var insertionAnchor = anchorEl;
+
+      patchSet.forEach(function(asset) {
+        insertionAnchor = self._replaceStylesheet(
+          asset.id,
+          BASE_URL + asset.name + ".css?v=" + PLUGIN_VERSION,
+          "asset",
+          asset.name,
+          insertionAnchor
+        );
+      });
+    },
+
     loadThemeCSS: function(theme) {
       theme = this.resolveTheme(theme);
       if (!VALID_THEMES.includes(theme)) theme = DEFAULT_THEME;
 
-      var existing = document.getElementById(LINK_ID);
-      if (existing && existing.dataset.theme === theme) {
-        FX.apply(theme);
-        this._notifyThemeChange(theme);
-        return;
-      }
+      var existingTheme = document.getElementById(LINK_ID);
+      var isDark = DARK_THEMES.includes(theme);
+      var baseName = isDark ? "theme-base-dark" : "theme-base-light";
 
       /* Smooth transition */
       var root = document.documentElement;
       root.style.transition = "background-color 0.35s ease, color 0.35s ease";
       setTimeout(function() { root.style.transition = ""; }, 500);
 
-      /* Load base CSS (light or dark) */
-      var isDark = DARK_THEMES.includes(theme);
-      var baseName = isDark ? "theme-base-dark" : "theme-base-light";
-      var existingBase = document.getElementById(BASE_LINK_ID);
-      if (!existingBase || existingBase.dataset.base !== baseName) {
-        if (existingBase) existingBase.remove();
-        var baseLink = document.createElement("link");
-        baseLink.id = BASE_LINK_ID;
-        baseLink.rel = "stylesheet";
-        baseLink.dataset.base = baseName;
-        baseLink.href = BASE_URL + baseName + ".css?v=" + PLUGIN_VERSION;
-        document.head.appendChild(baseLink);
-      }
+      var baseLink = this._replaceStylesheet(
+        BASE_LINK_ID,
+        BASE_URL + baseName + ".css?v=" + PLUGIN_VERSION,
+        "base",
+        baseName,
+        document.head.lastElementChild
+      );
 
-      /* Load theme-specific CSS — insert after base, remove old after new loads */
-      var link = document.createElement("link");
-      link.id = LINK_ID + "-loading";
-      link.rel = "stylesheet";
-      link.dataset.theme = theme;
-      link.href = BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION;
-      var oldLink = existing;
-      link.onload = function() {
-        link.id = LINK_ID;
-        if (oldLink && oldLink.parentNode) oldLink.remove();
-      };
-      /* Fallback: if onload doesn't fire within 2s, force swap */
-      setTimeout(function() {
-        link.id = LINK_ID;
-        if (oldLink && oldLink.parentNode) oldLink.remove();
-      }, 2000);
-      var baseEl = document.getElementById(BASE_LINK_ID);
-      if (baseEl && baseEl.nextSibling) { baseEl.parentNode.insertBefore(link, baseEl.nextSibling); }
-      else { document.head.appendChild(link); }
+      var themeLink = this._replaceStylesheet(
+        LINK_ID,
+        BASE_URL + "theme-" + theme + ".css?v=" + PLUGIN_VERSION,
+        "theme",
+        theme,
+        baseLink
+      );
+
+      this._syncPatchStyles(isDark, themeLink);
+
+      if (existingTheme && existingTheme.dataset.theme === theme) {
+        FX.apply(theme);
+        this._notifyThemeChange(theme);
+        return;
+      }
 
       FX.apply(theme);
       this._notifyThemeChange(theme);
@@ -1366,6 +1496,269 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       for (var i = 0; i < 6; i++) spawn();
       var spawnId = setInterval(spawn, 3000);
       setTimeout(function() { clearInterval(spawnId); if (container.parentNode) container.remove(); if (ss.parentNode) ss.remove(); }, 120000);
+    }
+  });
+
+  /* --- Module: Route Flags --- */
+  App.register({
+    id: "routeFlags",
+    _appliedClasses: [],
+    init: function() {
+      this._apply();
+    },
+    onRouteChange: function() {
+      this._apply();
+    },
+    _apply: function() {
+      if (!document.body) return;
+
+      this._appliedClasses.forEach(function(className) {
+        document.body.classList.remove(className);
+      });
+
+      var parts = location.pathname.split("/").filter(Boolean);
+      var classes = [];
+      if (parts[0] === "console") {
+        classes.push("ui-route-console");
+        var routeTokens = parts.slice(1).map(sanitizeRouteToken).filter(Boolean);
+        if (routeTokens[0]) {
+          classes.push("ui-route-" + routeTokens[0]);
+        }
+        if (routeTokens[0] && routeTokens[1]) {
+          classes.push("ui-route-" + routeTokens[0] + "-" + routeTokens[1]);
+        }
+        if (routeTokens[0] && routeTokens[1] && routeTokens[2]) {
+          classes.push(
+            "ui-route-" + routeTokens[0] + "-" + routeTokens[1] + "-" + routeTokens[2]
+          );
+        }
+      }
+
+      classes.forEach(function(className) {
+        document.body.classList.add(className);
+      });
+      this._appliedClasses = classes;
+    }
+  });
+
+  /* --- Module: Semantic Page Patches --- */
+  App.register({
+    id: "semanticPagePatches",
+    _timer: null,
+    init: function(app) {
+      var self = this;
+      app.onMutation(function() { self._schedule(); });
+      self._schedule();
+    },
+    onRouteChange: function() {
+      // 路由切换后先触发一次，后续异步节点交给全局 MutationObserver 继续补扫。
+      this._schedule();
+    },
+    onThemeChange: function() {
+      this._schedule();
+    },
+    _schedule: function() {
+      var self = this;
+      if (self._timer) clearTimeout(self._timer);
+      self._timer = setTimeout(function() {
+        self._timer = null;
+        self._apply();
+      }, 80);
+    },
+    _cleanup: function() {
+      [
+        "ui-plugin-page-toolbar",
+        "ui-app-store-toolbar",
+        "ui-app-store-filter-panel",
+        "ui-app-store-chip",
+        "ui-app-store-chip-active",
+        "ui-app-store-toolbar-icon",
+        "ui-app-store-preview",
+        "ui-dashboard-quick-action",
+        "ui-dashboard-quick-action-icon",
+        "ui-dashboard-quick-action-arrow"
+      ].forEach(function(className) {
+        document.querySelectorAll("." + className).forEach(function(el) {
+          el.classList.remove(className);
+        });
+      });
+    },
+    _apply: function() {
+      if (!document.body) return;
+      this._cleanup();
+      this._patchPluginPageToolbars();
+      this._patchAppStorePage();
+      this._patchDashboardQuickActions();
+    },
+    _looksLikeHeaderActionArea: function(el) {
+      // 优先依赖交互结构判断工具栏，而不是依赖编译后的工具类名。
+      return !!el.querySelector(
+        "input, button, select, textarea, [role='button'], [role='searchbox'], [aria-haspopup='menu']"
+      );
+    },
+    _patchPluginPageToolbars: function() {
+      var body = document.body;
+      var targetRoutes = [
+        "ui-route-links",
+        "ui-route-photos",
+        "ui-route-moments",
+        "ui-route-equipments",
+        "ui-route-timeline",
+        "ui-route-friends",
+        "ui-route-friend",
+        "ui-route-plugins"
+      ];
+
+      var enabled = targetRoutes.some(function(routeClass) {
+        return body.classList.contains(routeClass);
+      });
+      if (!enabled) return;
+
+      var self = this;
+      document.querySelectorAll(".card-header > div").forEach(function(el) {
+        var style = window.getComputedStyle(el);
+        if (
+          ColorUtils.isLightBackground(style.backgroundColor) ||
+          self._looksLikeHeaderActionArea(el)
+        ) {
+          el.classList.add("ui-plugin-page-toolbar");
+        }
+      });
+    },
+    _patchAppStorePage: function() {
+      if (!document.body.classList.contains("ui-route-app-store")) return;
+
+      // 应用市场页面的 card header slot 结构稳定，直接按 card-header 语义范围打标记。
+      document.querySelectorAll(".card-header > div").forEach(function(el) {
+        el.classList.add("ui-app-store-toolbar");
+      });
+
+      // 过滤面板都包裹在 aside 内的 fieldset 外层容器中，取其最近的面板包装节点。
+      var filterPanels = new Set();
+      document.querySelectorAll(".card-body aside fieldset").forEach(function(fieldset) {
+        var panel = fieldset.closest("li");
+        if (panel && panel.firstElementChild instanceof HTMLElement) {
+          filterPanels.add(panel.firstElementChild);
+        }
+      });
+      filterPanels.forEach(function(panel) {
+        panel.classList.add("ui-app-store-filter-panel");
+      });
+
+      // 标签 chip 当前没有 aria/data 选中标记时，回退到控件自身输出的额外状态 class 进行判断。
+      document.querySelectorAll(".card-body aside fieldset").forEach(function(fieldset) {
+        var chips = Array.from(fieldset.querySelectorAll("span"));
+        if (!chips.length) return;
+
+        var sharedClasses = chips.reduce(function(shared, chip, index) {
+          var originalClasses = Array.from(chip.classList).filter(function(className) {
+            return className.indexOf("ui-") !== 0;
+          });
+          if (index === 0) {
+            return originalClasses;
+          }
+          return shared.filter(function(className) {
+            return originalClasses.indexOf(className) !== -1;
+          });
+        }, []);
+
+        chips.forEach(function(el) {
+          el.classList.add("ui-app-store-chip");
+
+          var originalClasses = Array.from(el.classList).filter(function(className) {
+            return className.indexOf("ui-") !== 0;
+          });
+          var hasSelectionMarker =
+            el.getAttribute("aria-selected") === "true" ||
+            el.dataset.selected === "true" ||
+            el.classList.contains("selected") ||
+            originalClasses.some(function(className) {
+              return sharedClasses.indexOf(className) === -1;
+            });
+
+          if (hasSelectionMarker) {
+            el.classList.add("ui-app-store-chip-active");
+          }
+        });
+      });
+
+      document
+        .querySelectorAll(".card-header button, .card-header [role='button'], .card-header .v-popper--has-tooltip")
+        .forEach(function(el) {
+          if (el.querySelector("svg") && (el.textContent || "").trim().length <= 2) {
+            el.classList.add("ui-app-store-toolbar-icon");
+          }
+        });
+
+      document.querySelectorAll(".card-body aside a[href]").forEach(function(el) {
+        var hasPreviewMedia =
+          !!el.querySelector("img") ||
+          window.getComputedStyle(el).backgroundImage !== "none";
+        if (!el.textContent.trim() && hasPreviewMedia) {
+          el.classList.add("ui-app-store-preview");
+        }
+      });
+    },
+    _patchDashboardQuickActions: function() {
+      if (!document.body.classList.contains("ui-route-dashboard")) return;
+
+      // 快捷访问卡片没有专门的数据属性，这里使用“标题 + 主图标 + 右上角 aria-hidden 箭头”组合来识别。
+      document.querySelectorAll(".dashboard [aria-hidden='true']").forEach(function(arrow) {
+        var card = arrow.parentElement;
+        if (!(card instanceof HTMLElement)) return;
+
+        var title = card.querySelector("h3");
+        var icon = Array.from(card.querySelectorAll("span")).find(function(span) {
+          return span !== arrow && !!span.querySelector("svg");
+        });
+
+        if (!title || !icon || card.querySelectorAll("svg").length < 2) return;
+
+        card.classList.add("ui-dashboard-quick-action");
+        icon.classList.add("ui-dashboard-quick-action-icon");
+        arrow.classList.add("ui-dashboard-quick-action-arrow");
+      });
+    }
+  });
+
+  /* --- Module: Shadow Theme Bridge --- */
+  App.register({
+    id: "shadowThemeBridge",
+    _timer: null,
+    init: function(app) {
+      var self = this;
+      app.onMutation(function() { self._schedule(); });
+      self._schedule();
+    },
+    onRouteChange: function() {
+      // 路由切换后先触发一次，后续异步节点交给全局 MutationObserver 继续补扫。
+      this._schedule();
+    },
+    onThemeChange: function() {
+      this._schedule();
+    },
+    _schedule: function() {
+      var self = this;
+      if (self._timer) clearTimeout(self._timer);
+      self._timer = setTimeout(function() {
+        self._timer = null;
+        self._apply();
+      }, 80);
+    },
+    _apply: function() {
+      var cards = document.querySelectorAll("halo-app-card");
+      if (!cards.length) return;
+
+      cards.forEach(function(card) {
+        if (!card.shadowRoot) return;
+        var styleEl = card.shadowRoot.getElementById(SHADOW_THEME_STYLE_ID);
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = SHADOW_THEME_STYLE_ID;
+          card.shadowRoot.appendChild(styleEl);
+        }
+        styleEl.textContent = SHADOW_THEME_CSS.haloAppCard;
+      });
     }
   });
 
