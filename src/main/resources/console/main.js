@@ -1554,6 +1554,12 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       this._patchAppStorePage();
       this._patchDashboardQuickActions();
     },
+    _looksLikeHeaderActionArea: function(el) {
+      // 优先依赖交互结构判断工具栏，而不是依赖编译后的工具类名。
+      return !!el.querySelector(
+        "input, button, select, textarea, [role='button'], [role='searchbox'], [aria-haspopup='menu']"
+      );
+    },
     _patchPluginPageToolbars: function() {
       var body = document.body;
       var targetRoutes = [
@@ -1572,12 +1578,12 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       });
       if (!enabled) return;
 
+      var self = this;
       document.querySelectorAll(".card-header > div").forEach(function(el) {
         var style = window.getComputedStyle(el);
         if (
           ColorUtils.isLightBackground(style.backgroundColor) ||
-          el.className.indexOf("uno-") > -1 ||
-          el.className.indexOf("i-") > -1
+          self._looksLikeHeaderActionArea(el)
         ) {
           el.classList.add("ui-plugin-page-toolbar");
         }
@@ -1586,30 +1592,44 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
     _patchAppStorePage: function() {
       if (!document.body.classList.contains("ui-route-app-store")) return;
 
+      // 应用市场页面的 card header slot 结构稳定，直接按 card-header 语义范围打标记。
       document.querySelectorAll(".card-header > div").forEach(function(el) {
         el.classList.add("ui-app-store-toolbar");
       });
 
-      document.querySelectorAll(".card-body aside > ul > li > div").forEach(function(el) {
-        el.classList.add("ui-app-store-filter-panel");
+      // 过滤面板都包裹在 aside 内的 fieldset 外层容器中，取其最近的面板包装节点。
+      var filterPanels = new Set();
+      document.querySelectorAll(".card-body aside fieldset").forEach(function(fieldset) {
+        var panel = fieldset.closest("li");
+        if (panel && panel.firstElementChild instanceof HTMLElement) {
+          filterPanels.add(panel.firstElementChild);
+        }
+      });
+      filterPanels.forEach(function(panel) {
+        panel.classList.add("ui-app-store-filter-panel");
       });
 
+      // 标签 chip 当前没有 data-* 标记，先以 aside fieldset 内的独立文本 span 作为稳定语义近似。
       document.querySelectorAll(".card-body aside fieldset span").forEach(function(el) {
         el.classList.add("ui-app-store-chip");
-        if (el.classList.length > 1) {
+        if (!ColorUtils.isLightBackground(window.getComputedStyle(el).backgroundColor)) {
           el.classList.add("ui-app-store-chip-active");
         }
       });
 
       document
-        .querySelectorAll(".card-header .v-popper--has-tooltip, .card-header [class*='i-e7mvzi']")
+        .querySelectorAll(".card-header button, .card-header [role='button'], .card-header .v-popper--has-tooltip")
         .forEach(function(el) {
-          el.classList.add("ui-app-store-toolbar-icon");
+          if (el.querySelector("svg") && (el.textContent || "").trim().length <= 2) {
+            el.classList.add("ui-app-store-toolbar-icon");
+          }
         });
 
-      document.querySelectorAll(".card-body aside a").forEach(function(el) {
-        var rect = el.getBoundingClientRect();
-        if (rect.width >= 120 && rect.height >= 40) {
+      document.querySelectorAll(".card-body aside a[href]").forEach(function(el) {
+        var hasPreviewMedia =
+          !!el.querySelector("img") ||
+          window.getComputedStyle(el).backgroundImage !== "none";
+        if (!el.textContent.trim() && hasPreviewMedia) {
           el.classList.add("ui-app-store-preview");
         }
       });
@@ -1617,18 +1637,21 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
     _patchDashboardQuickActions: function() {
       if (!document.body.classList.contains("ui-route-dashboard")) return;
 
-      document.querySelectorAll(".dashboard .group.relative.cursor-pointer.rounded-lg").forEach(function(card) {
-        var title = card.querySelector("h3");
-        var icon = card.querySelector("span.inline-flex.rounded-lg");
-        var arrow = card.querySelector("span[aria-hidden='true']");
+      // 快捷访问卡片没有专门的数据属性，这里使用“标题 + 主图标 + 右上角 aria-hidden 箭头”组合来识别。
+      document.querySelectorAll(".dashboard [aria-hidden='true']").forEach(function(arrow) {
+        var card = arrow.parentElement;
+        if (!(card instanceof HTMLElement)) return;
 
-        if (!title || !icon) return;
+        var title = card.querySelector("h3");
+        var icon = Array.from(card.querySelectorAll("span")).find(function(span) {
+          return span !== arrow && !!span.querySelector("svg");
+        });
+
+        if (!title || !icon || card.querySelectorAll("svg").length < 2) return;
 
         card.classList.add("ui-dashboard-quick-action");
         icon.classList.add("ui-dashboard-quick-action-icon");
-        if (arrow) {
-          arrow.classList.add("ui-dashboard-quick-action-arrow");
-        }
+        arrow.classList.add("ui-dashboard-quick-action-arrow");
       });
     }
   });
