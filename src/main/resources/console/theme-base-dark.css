@@ -229,7 +229,12 @@ code:not(pre code) { background: var(--ui-surface) !important; color: var(--ui-t
   background-color: var(--ui-surface) !important;
 }
 /* Gallery placeholder */
-body .bg-white\/90, body [class*="bg-white\\/90"] {
+body .bg-white\/60, body [class*="bg-white\\/60"],
+body .bg-white\/70, body [class*="bg-white\\/70"],
+body .bg-white\/75, body [class*="bg-white\\/75"],
+body .bg-white\/80, body [class*="bg-white\\/80"],
+body .bg-white\/90, body [class*="bg-white\\/90"],
+body .bg-white\/95, body [class*="bg-white\\/95"] {
   background-color: var(--ui-surface) !important;
 }
 
@@ -284,8 +289,14 @@ body .bg-gray-200, body [class*="bg-gray-200"] { background-color: var(--ui-surf
 /* Catch-all: any remaining white backgrounds */
 body [style*="background-color: white"],
 body [style*="background-color: #fff"],
+body [style*="background-color:#fff"],
+body [style*="background-color: rgb(255, 255, 255)"],
+body [style*="background-color:rgb(255,255,255)"],
 body [style*="background: white"],
-body [style*="background: #fff"] { background-color: var(--ui-surface) !important; }
+body [style*="background: #fff"],
+body [style*="background:#fff"],
+body [style*="background: rgb(255, 255, 255)"],
+body [style*="background:rgb(255,255,255)"] { background-color: var(--ui-surface) !important; }
 body .hover\:bg-gray-200:hover { background-color: var(--ui-surface-hover) !important; }
 body .group:hover .group-hover\:bg-gray-200\/60 { background-color: var(--ui-surface-hover) !important; }
 body .active\:\!bg-gray-300:active, body .\!bg-gray-300 { background-color: var(--ui-surface-hover) !important; }
