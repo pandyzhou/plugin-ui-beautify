@@ -43,3 +43,12 @@ body.ui-route-plugins-app-store-integration .description-item__content {
   font-weight: 600 !important;
   font-variant-numeric: tabular-nums;
 }
+
+body.ui-route-photos .card-wrapper .card-body p.v-popper--has-tooltip {
+  color: var(--ui-text) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.01em !important;
+  padding: 0.5rem 0.75rem 0.75rem !important;
+}
