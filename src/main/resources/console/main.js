@@ -22,9 +22,8 @@
   }
 
   function cssColorToRgba(color, alpha, fallback) {
-    if (!color) return fallback;
+    if (!color || !color.trim()) return fallback;
     color = color.trim();
-    if (!color) return fallback;
     if (color.startsWith("rgba(")) {
       var rgbaMatch = color.match(/rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/);
       return rgbaMatch
@@ -50,9 +49,8 @@
   }
 
   function cssColorToRgbTriplet(color, fallback) {
-    if (!color) return fallback;
+    if (!color || !color.trim()) return fallback;
     color = color.trim();
-    if (!color) return fallback;
     if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
       var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
       return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
