@@ -76,7 +76,7 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
         return settingFetcher.getSettingValue("basic")
             .map(setting -> {
                 String theme =
-                    setting.path("gatewayTheme").asText("default");
+                    setting.path("gatewayTheme").asText("minimal");
                 return VALID_THEMES.contains(theme)
                     ? theme : "minimal";
             })
