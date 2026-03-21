@@ -65,6 +65,20 @@
         }
       }
       return fallback;
+    },
+
+    isLightBackground: function(color) {
+      if (!color || !color.trim()) return false;
+      color = color.trim();
+      if (color === "transparent" || color === "rgba(0, 0, 0, 0)" || color === "rgba(0,0,0,0)") {
+        return false;
+      }
+      var rgb = this.toRgbTriplet(color, "");
+      if (!rgb) return false;
+      var parts = rgb.split(",");
+      if (parts.length !== 3) return false;
+      var r = parseInt(parts[0], 10), g = parseInt(parts[1], 10), b = parseInt(parts[2], 10);
+      return !isNaN(r) && !isNaN(g) && !isNaN(b) && (r + g + b >= 690);
     }
   };
 
@@ -971,6 +985,76 @@
   });
 
   /* --- Module: Page Slide Transition --- */
+
+  /* --- Module: Third-party Plugin Dark Compatibility --- */
+  App.register({
+    id: "pluginDarkCompat",
+    _patched: [],
+    _rafId: null,
+    _scan: function() {
+      if (!App.currentTheme || DARK_THEMES.indexOf(App.currentTheme) === -1) {
+        this._clear();
+        return;
+      }
+      var self = this;
+      var candidates = document.querySelectorAll(
+        ".main-content .card-header, .main-content .card:not(.card-wrapper), .main-content .card-wrapper, " +
+        ".main-content [class*='sticky'], .main-content [class*='bg-white'], .main-content [class*='bg-gray-50'], .main-content [class*='bg-gray-100']"
+      );
+      candidates.forEach(function(el) {
+        if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
+        var tag = el.tagName;
+        if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG" || tag === "IMG") return;
+        var style = window.getComputedStyle(el);
+        if (style.display === "inline") return;
+        if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
+        el.dataset.uiDarkCompatPatched = "1";
+        el.dataset.uiDarkCompatBg = el.style.backgroundColor || "";
+        el.dataset.uiDarkCompatBorder = el.style.borderColor || "";
+        el.dataset.uiDarkCompatColor = el.style.color || "";
+        el.style.backgroundColor = "var(--ui-surface)";
+        el.style.borderColor = "var(--ui-border)";
+        if (tag === "DIV" || tag === "SECTION" || tag === "HEADER" || tag === "ASIDE") {
+          el.style.color = "var(--ui-text)";
+        }
+        self._patched.push(el);
+      });
+    },
+    _schedule: function() {
+      var self = this;
+      if (this._rafId) cancelAnimationFrame(this._rafId);
+      this._rafId = requestAnimationFrame(function() {
+        self._rafId = null;
+        self._scan();
+      });
+    },
+    _clear: function() {
+      this._patched.forEach(function(el) {
+        if (!el || !el.dataset || el.dataset.uiDarkCompatPatched !== "1") return;
+        el.style.backgroundColor = el.dataset.uiDarkCompatBg || "";
+        el.style.borderColor = el.dataset.uiDarkCompatBorder || "";
+        el.style.color = el.dataset.uiDarkCompatColor || "";
+        delete el.dataset.uiDarkCompatPatched;
+        delete el.dataset.uiDarkCompatBg;
+        delete el.dataset.uiDarkCompatBorder;
+        delete el.dataset.uiDarkCompatColor;
+      });
+      this._patched = [];
+    },
+    init: function(app) {
+      this._mutationHandler = this._schedule.bind(this);
+      this._schedule();
+      app.onMutation(this._mutationHandler);
+    },
+    onThemeChange: function() { this._schedule(); },
+    onRouteChange: function() { this._schedule(); },
+    destroy: function() {
+      if (this._rafId) cancelAnimationFrame(this._rafId);
+      this._rafId = null;
+      this._clear();
+    }
+  });
+
   /* --- Module: Welcome Banner --- */
   App.register({
     id: "welcomeBanner", toggle: "enableWelcomeBanner",
