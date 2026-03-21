@@ -27,6 +27,37 @@
       { id: "ui-beautify-patch-dashboard-css", name: "patch-dashboard-dark" }
     ]
   };
+  var SHADOW_THEME_STYLE_ID = "ui-beautify-app-store-shadow-style";
+  var SHADOW_THEME_CSS = {
+    haloAppCard: [
+      ":host { display:block; color: var(--ui-text); }",
+      ":host > div {",
+      "  background: linear-gradient(180deg, var(--ui-surface-hover), var(--ui-surface)) !important;",
+      "  border: 1px solid var(--ui-border) !important;",
+      "  border-radius: 18px !important;",
+      "  box-shadow: 0 10px 30px var(--ui-shadow), inset 0 1px 0 rgba(255,255,255,0.04) !important;",
+      "  overflow: hidden !important;",
+      "  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;",
+      "}",
+      ":host > div:hover {",
+      "  transform: translateY(-2px);",
+      "  border-color: var(--ui-border-hover) !important;",
+      "  box-shadow: 0 14px 34px var(--ui-shadow-hover), 0 0 0 1px var(--ui-border-hover) !important;",
+      "}",
+      ":host img { background: var(--ui-surface-hover) !important; }",
+      ":host p { color: var(--ui-text-secondary) !important; }",
+      ":host span { color: var(--ui-text) !important; }",
+      ":host span.inline-flex, :host span[class*=\"rounded-full\"] {",
+      "  background: var(--ui-primary-soft) !important;",
+      "  color: var(--ui-text) !important;",
+      "  border: 1px solid var(--ui-border) !important;",
+      "}",
+      ":host [class*=\"!text-xs\"],",
+      ":host [class*=\"uno-85n0vz\"],",
+      ":host [class*=\"uno-d6nu2d\"],",
+      ":host [class*=\"uno-okyht5\"] { color: var(--ui-text-secondary) !important; }"
+    ].join("\n")
+  };
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -1632,44 +1663,15 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       var cards = document.querySelectorAll("halo-app-card");
       if (!cards.length) return;
 
-      var shadowCss = [
-        ":host { display:block; color: var(--ui-text); }",
-        ":host > div {",
-        "  background: linear-gradient(180deg, var(--ui-surface-hover), var(--ui-surface)) !important;",
-        "  border: 1px solid var(--ui-border) !important;",
-        "  border-radius: 18px !important;",
-        "  box-shadow: 0 10px 30px var(--ui-shadow), inset 0 1px 0 rgba(255,255,255,0.04) !important;",
-        "  overflow: hidden !important;",
-        "  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;",
-        "}",
-        ":host > div:hover {",
-        "  transform: translateY(-2px);",
-        "  border-color: var(--ui-border-hover) !important;",
-        "  box-shadow: 0 14px 34px var(--ui-shadow-hover), 0 0 0 1px var(--ui-border-hover) !important;",
-        "}",
-        ":host img { background: var(--ui-surface-hover) !important; }",
-        ":host p { color: var(--ui-text-secondary) !important; }",
-        ":host span { color: var(--ui-text) !important; }",
-        ":host span.inline-flex, :host span[class*=\"rounded-full\"] {",
-        "  background: var(--ui-primary-soft) !important;",
-        "  color: var(--ui-text) !important;",
-        "  border: 1px solid var(--ui-border) !important;",
-        "}",
-        ":host [class*=\"!text-xs\"],",
-        ":host [class*=\"uno-85n0vz\"],",
-        ":host [class*=\"uno-d6nu2d\"],",
-        ":host [class*=\"uno-okyht5\"] { color: var(--ui-text-secondary) !important; }"
-      ].join("\n");
-
       cards.forEach(function(card) {
         if (!card.shadowRoot) return;
-        var styleEl = card.shadowRoot.getElementById("ui-beautify-app-store-shadow-style");
+        var styleEl = card.shadowRoot.getElementById(SHADOW_THEME_STYLE_ID);
         if (!styleEl) {
           styleEl = document.createElement("style");
-          styleEl.id = "ui-beautify-app-store-shadow-style";
+          styleEl.id = SHADOW_THEME_STYLE_ID;
           card.shadowRoot.appendChild(styleEl);
         }
-        styleEl.textContent = shadowCss;
+        styleEl.textContent = SHADOW_THEME_CSS.haloAppCard;
       });
     }
   });
