@@ -1086,7 +1086,7 @@
       if (!this._color) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        this._color = cssColorToRgbTriplet(primary, this._COLORS["default"]);
+        this._color = cssColorToRgbTriplet(primary, this._COLORS["minimal"] || this._COLORS["default"]);
       }
     },
     _startDraw: function() {
