@@ -37,6 +37,7 @@ dependencies {
 
 tasks.named('processResources') {
     inputs.property('pluginVersion', version)
+    filteringCharset = 'UTF-8'
 
     filesMatching(['plugin.yaml', 'console/main.js']) {
         filter(ReplaceTokens, tokens: [pluginVersion: version.toString()])
