@@ -8,7 +8,7 @@
 
 ### 分层架构
 
-```
+```text
 style.css（全局结构，主题无关）
   |
   +-- theme-base-light.css（浅色公共样式 + CSS 变量）
@@ -32,7 +32,7 @@ style.css（全局结构，主题无关）
 
 ### 模块化 JS 架构
 
-```
+```text
 main.js
   |
   +-- App（核心）: 配置加载、主题切换、路由监听、模块管理
@@ -462,7 +462,7 @@ App.register({
 
 ### 文件结构
 
-```
+```text
 src/main/resources/static/
   +-- gateway-beautify.css    # 公共样式（所有网关主题共享）
   +-- gateway-default.css     # 薄荷主题
