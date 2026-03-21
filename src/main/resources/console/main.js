@@ -21,6 +21,51 @@
     return sb ? sb.getBoundingClientRect().width : 260;
   }
 
+  function cssColorToRgba(color, alpha, fallback) {
+    if (!color) return fallback;
+    color = color.trim();
+    if (!color) return fallback;
+    if (color.indexOf("rgba(") === 0) {
+      return color.replace(/rgba\(([^)]+),[^,]+\)$/, "rgba($1," + alpha + ")");
+    }
+    if (color.indexOf("rgb(") === 0) {
+      return color.replace("rgb(", "rgba(").replace(")", "," + alpha + ")");
+    }
+    if (color.charAt(0) === "#") {
+      var hex = color.slice(1);
+      if (hex.length === 3) {
+        hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+      }
+      if (hex.length === 6) {
+        var r = parseInt(hex.slice(0, 2), 16);
+        var g = parseInt(hex.slice(2, 4), 16);
+        var b = parseInt(hex.slice(4, 6), 16);
+        return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+      }
+    }
+    return fallback;
+  }
+
+  function cssColorToRgbTriplet(color, fallback) {
+    if (!color) return fallback;
+    color = color.trim();
+    if (!color) return fallback;
+    if (color.indexOf("rgb(") === 0 || color.indexOf("rgba(") === 0) {
+      var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
+    }
+    if (color.charAt(0) === "#") {
+      var hex = color.slice(1);
+      if (hex.length === 3) {
+        hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+      }
+      if (hex.length === 6) {
+        return parseInt(hex.slice(0, 2), 16) + "," + parseInt(hex.slice(2, 4), 16) + "," + parseInt(hex.slice(4, 6), 16);
+      }
+    }
+    return fallback;
+  }
+
   /* ========== APP CORE — Config, Router, Module Registry ========== */
 
   var App = {
@@ -76,7 +121,7 @@
 
     loadThemeCSS: function(theme) {
       theme = this.resolveTheme(theme);
-      if (VALID_THEMES.indexOf(theme) === -1) theme = "default";
+      if (VALID_THEMES.indexOf(theme) === -1) theme = "minimal";
 
       var existing = document.getElementById(LINK_ID);
       if (existing && existing.dataset.theme === theme) {
@@ -599,7 +644,7 @@
       if (!c) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        c = primary ? primary.replace(")", ",0.12)").replace("rgb(", "rgba(") : this._COLORS["default"];
+        c = cssColorToRgba(primary, 0.12, this._COLORS["default"]);
       }
       this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
     },
@@ -713,8 +758,9 @@
       var grad = this._GRADIENTS[theme];
       if (!grad) {
         var style = getComputedStyle(document.documentElement);
-        var primary = style.getPropertyValue("--ui-primary").trim() || "99,102,241";
-        grad = "radial-gradient(ellipse at 40% 40%,rgba(" + primary + ",0.06) 0%,transparent 60%)";
+        var primary = style.getPropertyValue("--ui-primary").trim();
+        var rgb = cssColorToRgbTriplet(primary, "99,102,241");
+        grad = "radial-gradient(ellipse at 40% 40%,rgba(" + rgb + ",0.06) 0%,transparent 60%)";
       }
       this._inner.style.background = grad;
       this._inner.style.opacity = theme === "minimal" ? "0" : "0.3";
@@ -1037,7 +1083,7 @@
       if (!this._color) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        this._color = primary || this._COLORS["default"];
+        this._color = cssColorToRgbTriplet(primary, this._COLORS["default"]);
       }
     },
     _startDraw: function() {
