@@ -47,6 +47,8 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
         "default", "ocean", "deepblue", "dark", "sakura", "minimal", "aurora", "neon"
     );
 
+    private static final String DEFAULT_THEME = "minimal";
+
     private final ReactiveSettingFetcher settingFetcher;
 
     public GatewayStyleInjector(ReactiveSettingFetcher settingFetcher) {
@@ -76,11 +78,11 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
         return settingFetcher.getSettingValue("basic")
             .map(setting -> {
                 String theme =
-                    setting.path("gatewayTheme").asText("default");
+                    setting.path("gatewayTheme").asText(DEFAULT_THEME);
                 return VALID_THEMES.contains(theme)
-                    ? theme : "default";
+                    ? theme : DEFAULT_THEME;
             })
-            .defaultIfEmpty("default");
+            .defaultIfEmpty(DEFAULT_THEME);
     }
 
     /**
