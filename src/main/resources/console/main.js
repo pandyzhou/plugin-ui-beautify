@@ -100,7 +100,6 @@
             self.toggles.enablePageTransition = readToggle("enablePageTransition");
             self.toggles.enableListAnimation = readToggle("enableListAnimation");
             self.toggles.enableMacOSCards = readToggle("enableMacOSCards");
-            self.toggles.enable3DCards = readToggle("enable3DCards");
             self.toggles.enableWallpaper = readToggle("enableWallpaper");
             self.toggles.enableWelcomeBanner = readToggle("enableWelcomeBanner");
             self._applyToggleStates();
@@ -952,47 +951,6 @@
       if (this._btn && this._btn.parentNode) this._btn.remove();
       if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
       document.body.classList.remove("ui-zen-mode");
-    }
-  });
-
-  /* --- Module: 3D Card Tilt --- */
-  App.register({
-    id: "card3D", toggle: "enable3DCards", skipIfReducedMotion: true,
-    _currentCard: null,
-    init: function() {
-      var self = this;
-      this._onMove = function(e) {
-        if (!App.isEnabled("enable3DCards")) return;
-        var card = e.target.closest(".dashboard .vue-grid-item > div");
-        if (!card) {
-          if (self._currentCard) { self._currentCard.style.transform = ""; self._currentCard = null; }
-          return;
-        }
-        var r = card.getBoundingClientRect();
-        if (r.width > 600) return;
-        self._currentCard = card;
-        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transition = "transform .15s ease-out";
-        card.style.transform = "perspective(800px) rotateY(" + (x * 3).toFixed(2) + "deg) rotateX(" + (-y * 3).toFixed(2) + "deg)";
-      };
-      this._onOut = function(e) {
-        var card = e.target.closest(".dashboard .vue-grid-item > div");
-        if (card && !card.contains(e.relatedTarget)) { card.style.transform = ""; self._currentCard = null; }
-      };
-      document.addEventListener("mousemove", this._onMove);
-      document.addEventListener("mouseout", this._onOut);
-    },
-    onToggle: function(on) {
-      if (!on) {
-        document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
-        this._currentCard = null;
-      }
-    },
-    destroy: function() {
-      if (this._onMove) document.removeEventListener("mousemove", this._onMove);
-      if (this._onOut) document.removeEventListener("mouseout", this._onOut);
-      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
-      this._currentCard = null;
     }
   });
 

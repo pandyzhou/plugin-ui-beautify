@@ -93,11 +93,6 @@ spec:
           value: true
           help: "卡片标题栏显示 macOS 风格的红黄绿圆点装饰"
         - $formkit: checkbox
-          label: "启用 3D 卡片倾斜"
-          name: enable3DCards
-          value: true
-          help: "仪表盘卡片鼠标悬停时产生 3D 透视倾斜效果"
-        - $formkit: checkbox
           label: "启用动态壁纸"
           name: enableWallpaper
           value: true
