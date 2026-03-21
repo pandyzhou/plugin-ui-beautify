@@ -18,11 +18,13 @@
   var PATCH_ASSETS = {
     light: [
       { id: "ui-beautify-patch-plugin-pages-css", name: "patch-plugin-pages-light" },
-      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-light" }
+      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-light" },
+      { id: "ui-beautify-patch-dashboard-css", name: "patch-dashboard-light" }
     ],
     dark: [
       { id: "ui-beautify-patch-plugin-pages-css", name: "patch-plugin-pages-dark" },
-      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-dark" }
+      { id: "ui-beautify-patch-app-store-css", name: "patch-app-store-dark" },
+      { id: "ui-beautify-patch-dashboard-css", name: "patch-dashboard-dark" }
     ]
   };
   var darkMql = window.matchMedia("(prefers-color-scheme: dark)");
@@ -1504,7 +1506,10 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
         ".ui-app-store-chip",
         ".ui-app-store-chip-active",
         ".ui-app-store-toolbar-icon",
-        ".ui-app-store-preview"
+        ".ui-app-store-preview",
+        ".ui-dashboard-quick-action",
+        ".ui-dashboard-quick-action-icon",
+        ".ui-dashboard-quick-action-arrow"
       ].forEach(function(selector) {
         document.querySelectorAll(selector).forEach(function(el) {
           el.classList.remove(selector.slice(1));
@@ -1516,6 +1521,7 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       this._cleanup();
       this._patchPluginPageToolbars();
       this._patchAppStorePage();
+      this._patchDashboardQuickActions();
     },
     _patchPluginPageToolbars: function() {
       var body = document.body;
@@ -1574,6 +1580,23 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
         var rect = el.getBoundingClientRect();
         if (rect.width >= 120 && rect.height >= 40) {
           el.classList.add("ui-app-store-preview");
+        }
+      });
+    },
+    _patchDashboardQuickActions: function() {
+      if (!document.body.classList.contains("ui-route-dashboard")) return;
+
+      document.querySelectorAll(".dashboard .group.relative.cursor-pointer.rounded-lg").forEach(function(card) {
+        var title = card.querySelector("h3");
+        var icon = card.querySelector("span.inline-flex.rounded-lg");
+        var arrow = card.querySelector("span[aria-hidden='true']");
+
+        if (!title || !icon) return;
+
+        card.classList.add("ui-dashboard-quick-action");
+        icon.classList.add("ui-dashboard-quick-action-icon");
+        if (arrow) {
+          arrow.classList.add("ui-dashboard-quick-action-arrow");
         }
       });
     }

@@ -26,6 +26,7 @@ style.css（全局结构，主题无关）
         +-- theme-neon.css（霓虹）
         +-- patch-plugin-pages-dark.css（插件页补丁层）
         +-- patch-app-store-dark.css（应用市场补丁层）
+        +-- patch-dashboard-dark.css（仪表盘补丁层）
 ```
 
 加载顺序：`style.css` 始终加载 -> 根据主题类型加载对应 base -> 加载 `theme-{name}.css` 覆盖 -> 加载页面级 patch CSS。
@@ -797,3 +798,4 @@ forest: {
 - [ ] `src/main/java/run/halo/ui/beautify/GatewayStyleInjector.java` — `VALID_THEMES` 集合
 - [ ] `src/main/resources/static/gateway-{name}.css` — 网关主题样式文件（如果支持网关）
 - [ ] `src/main/resources/static/gateway-effects.js` — `THEMES.{name}` 粒子配置（如果支持网关）
+
