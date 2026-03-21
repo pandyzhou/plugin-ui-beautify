@@ -4,7 +4,7 @@
 
   /* ========== CONSTANTS ========== */
   var PLUGIN_NAME = "plugin-ui-beautify";
-  var PLUGIN_VERSION = "2.1.0";
+  var PLUGIN_VERSION = "2.0.10";
   var LINK_ID = "ui-beautify-theme-css";
   var CANVAS_ID = "ui-beautify-fx-canvas";
   var CUSTOM_STYLE_ID = "ui-beautify-custom-css";
@@ -65,6 +65,20 @@
         }
       }
       return fallback;
+    },
+
+    isLightBackground: function(color) {
+      if (!color || !color.trim()) return false;
+      color = color.trim();
+      if (color === "transparent" || color === "rgba(0, 0, 0, 0)" || color === "rgba(0,0,0,0)") {
+        return false;
+      }
+      var rgb = this.toRgbTriplet(color, "");
+      if (!rgb) return false;
+      var parts = rgb.split(",");
+      if (parts.length !== 3) return false;
+      var r = parseInt(parts[0], 10), g = parseInt(parts[1], 10), b = parseInt(parts[2], 10);
+      return !isNaN(r) && !isNaN(g) && !isNaN(b) && (r + g + b >= 690);
     }
   };
 
@@ -100,7 +114,6 @@
             self.toggles.enablePageTransition = readToggle("enablePageTransition");
             self.toggles.enableListAnimation = readToggle("enableListAnimation");
             self.toggles.enableMacOSCards = readToggle("enableMacOSCards");
-            self.toggles.enable3DCards = readToggle("enable3DCards");
             self.toggles.enableWallpaper = readToggle("enableWallpaper");
             self.toggles.enableWelcomeBanner = readToggle("enableWelcomeBanner");
             self._applyToggleStates();
@@ -955,47 +968,6 @@
     }
   });
 
-  /* --- Module: 3D Card Tilt --- */
-  App.register({
-    id: "card3D", toggle: "enable3DCards", skipIfReducedMotion: true,
-    _currentCard: null,
-    init: function() {
-      var self = this;
-      this._onMove = function(e) {
-        if (!App.isEnabled("enable3DCards")) return;
-        var card = e.target.closest(".dashboard .vue-grid-item > div");
-        if (!card) {
-          if (self._currentCard) { self._currentCard.style.transform = ""; self._currentCard = null; }
-          return;
-        }
-        var r = card.getBoundingClientRect();
-        if (r.width > 600) return;
-        self._currentCard = card;
-        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transition = "transform .15s ease-out";
-        card.style.transform = "perspective(800px) rotateY(" + (x * 3).toFixed(2) + "deg) rotateX(" + (-y * 3).toFixed(2) + "deg)";
-      };
-      this._onOut = function(e) {
-        var card = e.target.closest(".dashboard .vue-grid-item > div");
-        if (card && !card.contains(e.relatedTarget)) { card.style.transform = ""; self._currentCard = null; }
-      };
-      document.addEventListener("mousemove", this._onMove);
-      document.addEventListener("mouseout", this._onOut);
-    },
-    onToggle: function(on) {
-      if (!on) {
-        document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
-        this._currentCard = null;
-      }
-    },
-    destroy: function() {
-      if (this._onMove) document.removeEventListener("mousemove", this._onMove);
-      if (this._onOut) document.removeEventListener("mouseout", this._onOut);
-      document.querySelectorAll(".dashboard .vue-grid-item > div").forEach(function(el) { el.style.transform = ""; });
-      this._currentCard = null;
-    }
-  });
-
   /* --- Module: Rainbow Glow Borders --- */
   App.register({
     id: "rainbowBorders", skipIfReducedMotion: true,
@@ -1013,6 +985,95 @@
   });
 
   /* --- Module: Page Slide Transition --- */
+
+  /* --- Module: Third-party Plugin Dark Compatibility --- */
+  App.register({
+    id: "pluginDarkCompat",
+    _patched: [],
+    _rafId: null,
+    _theme: null,
+    _timers: [],
+    _targetPaths: ["/links", "/photos", "/equipments", "/moments", "/openlist", "/timeline", "/timelines", "/friends", "/friend"],
+    _isTargetRoute: function() {
+      var route = location.pathname + location.hash;
+      return this._targetPaths.some(function(path) { return route.indexOf(path) !== -1; });
+    },
+    _scan: function() {
+      if (!this._theme || DARK_THEMES.indexOf(this._theme) === -1 || !this._isTargetRoute()) {
+        this._clear();
+        return;
+      }
+      var self = this;
+      var containers = document.querySelectorAll(
+        ".main-content .card-header, .main-content .card:not(.card-wrapper), .main-content .card-wrapper"
+      );
+      containers.forEach(function(container) {
+        var nodes = [container].concat(Array.prototype.slice.call(container.querySelectorAll("div, section, header, aside, span, label")));
+        nodes.forEach(function(el) {
+          if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
+          var tag = el.tagName;
+          if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG" || tag === "IMG") return;
+          var rect = el.getBoundingClientRect();
+          if (rect.width < 24 || rect.height < 12 || rect.height > 180) return;
+          var style = window.getComputedStyle(el);
+          if (style.display === "inline" || style.visibility === "hidden") return;
+          if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
+          el.dataset.uiDarkCompatPatched = "1";
+          el.dataset.uiDarkCompatStyle = el.getAttribute("style") || "";
+          el.style.setProperty("background", "var(--ui-surface)", "important");
+          el.style.setProperty("background-color", "var(--ui-surface)", "important");
+          el.style.setProperty("border-color", "var(--ui-border)", "important");
+          el.style.setProperty("color", "var(--ui-text)", "important");
+          self._patched.push(el);
+        });
+      });
+    },
+    _schedule: function() {
+      var self = this;
+      if (this._rafId) cancelAnimationFrame(this._rafId);
+      this._timers.forEach(clearTimeout);
+      this._timers = [];
+      this._rafId = requestAnimationFrame(function() {
+        self._rafId = null;
+        self._scan();
+      });
+      this._timers.push(setTimeout(function() { self._scan(); }, 200));
+      this._timers.push(setTimeout(function() { self._scan(); }, 800));
+      this._timers.push(setTimeout(function() { self._scan(); }, 1800));
+      this._timers.push(setTimeout(function() { self._scan(); }, 3200));
+      this._timers.push(setTimeout(function() { self._scan(); }, 5200));
+    },
+    _clear: function() {
+      this._patched.forEach(function(el) {
+        if (!el || !el.dataset || el.dataset.uiDarkCompatPatched !== "1") return;
+        var styleText = el.dataset.uiDarkCompatStyle || "";
+        if (styleText) el.setAttribute("style", styleText);
+        else el.removeAttribute("style");
+        delete el.dataset.uiDarkCompatPatched;
+        delete el.dataset.uiDarkCompatStyle;
+      });
+      this._patched = [];
+    },
+    init: function(app) {
+      this._theme = App.resolveTheme(App.currentTheme || DEFAULT_THEME);
+      this._mutationHandler = this._schedule.bind(this);
+      this._schedule();
+      app.onMutation(this._mutationHandler);
+    },
+    onThemeChange: function(theme) {
+      this._theme = theme;
+      this._schedule();
+    },
+    onRouteChange: function() { this._schedule(); },
+    destroy: function() {
+      if (this._rafId) cancelAnimationFrame(this._rafId);
+      this._rafId = null;
+      this._timers.forEach(clearTimeout);
+      this._timers = [];
+      this._clear();
+    }
+  });
+
   /* --- Module: Welcome Banner --- */
   App.register({
     id: "welcomeBanner", toggle: "enableWelcomeBanner",

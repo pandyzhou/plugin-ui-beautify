@@ -42,7 +42,6 @@ main.js
        +-- listAnimation（列表入场动画）
        +-- cursorGlow（光标光晕）
        +-- macOSCards（macOS 窗口风格）
-       +-- 3DCards（3D 卡片倾斜）
        +-- wallpaper（动态壁纸）
        +-- welcomeBanner（欢迎横幅）
 ```

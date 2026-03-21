@@ -109,7 +109,6 @@ tbody tr {
 /* --- Editor (ProseMirror / Tiptap) --- */
 .ProseMirror {
   border-radius: 0.5rem !important;
-  padding: 1rem !important;
   outline: none !important;
   min-height: 300px !important;
   line-height: 1.75 !important;
