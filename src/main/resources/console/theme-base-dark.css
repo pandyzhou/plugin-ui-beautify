@@ -477,9 +477,3 @@ hr, .divider { border-color: var(--ui-border) !important; }
   color: var(--ui-text-secondary) !important;
   border-color: var(--ui-border) !important;
 }
-/* Keep inline-colored tag components intact */
-.main-content [class*="tag"]:not(.tag-default, .tag-wrapper, .v-tag, [style*="background"], [style*="color"]) {
-  background-color: var(--ui-surface) !important;
-  color: var(--ui-text-secondary) !important;
-  border-color: var(--ui-border) !important;
-}
