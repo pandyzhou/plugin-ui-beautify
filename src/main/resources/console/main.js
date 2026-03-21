@@ -26,7 +26,10 @@
     color = color.trim();
     if (!color) return fallback;
     if (color.startsWith("rgba(")) {
-      return color.replace(/rgba\(([^)]+),[^,]+\)$/, "rgba($1," + alpha + ")");
+      var rgbaMatch = color.match(/rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/);
+      return rgbaMatch
+        ? ("rgba(" + rgbaMatch[1] + "," + rgbaMatch[2] + "," + rgbaMatch[3] + "," + alpha + ")")
+        : fallback;
     }
     if (color.startsWith("rgb(")) {
       return color.replace("rgb(", "rgba(").replace(")", "," + alpha + ")");
