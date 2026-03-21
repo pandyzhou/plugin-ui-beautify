@@ -322,6 +322,28 @@ body .\!bg-gray-300\/60 { background-color: var(--ui-surface-hover) !important; 
   background-color: var(--ui-surface) !important;
   border-color: var(--ui-border) !important;
 }
+/* Third-party plugin cards/toolbars */
+.main-content .card:not(.card-wrapper) {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.main-content .card:not(.card-wrapper) > [class*="bg-white"],
+.main-content .card:not(.card-wrapper) > [class*="bg-gray-50"],
+.main-content .card:not(.card-wrapper) > [class*="bg-gray-100"],
+.main-content .card-header > [class*="bg-white"],
+.main-content .card-header > [class*="bg-gray-50"],
+.main-content .card-header > [class*="bg-gray-100"] {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+.main-content .card:not(.card-wrapper) > [class*="border-gray-100"],
+.main-content .card:not(.card-wrapper) > [class*="border-b-gray-100"],
+.main-content .card-header > [class*="border-gray-100"],
+.main-content .card-header > [class*="border-b-gray-100"] {
+  border-color: var(--ui-border) !important;
+}
 body .hover\:bg-gray-50:hover { background-color: var(--ui-surface-hover) !important; }
 body .hover\:bg-gray-100:hover { background-color: var(--ui-surface-hover) !important; }
 body .text-gray-900, body .text-gray-800, body .text-gray-700 { color: var(--ui-text) !important; }
