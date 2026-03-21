@@ -138,7 +138,7 @@
       setTimeout(function() { root.style.transition = ""; }, 500);
 
       /* Load base CSS (light or dark) */
-      var isDark = DARK_THEMES.indexOf(theme) !== -1;
+      var isDark = DARK_THEMES.includes(theme);
       var baseName = isDark ? "theme-base-dark" : "theme-base-light";
       var existingBase = document.getElementById(BASE_LINK_ID);
       if (!existingBase || existingBase.dataset.base !== baseName) {

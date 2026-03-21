@@ -77,7 +77,7 @@ var DARK_THEMES = ["dark", "deepblue", "aurora", "neon"];
 加载逻辑位于 `App.loadThemeCSS()` 方法中：
 
 ```javascript
-var isDark = DARK_THEMES.indexOf(theme) !== -1;
+var isDark = DARK_THEMES.includes(theme);
 var baseName = isDark ? "theme-base-dark" : "theme-base-light";
 ```
 
