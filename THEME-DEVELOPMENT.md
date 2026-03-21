@@ -13,7 +13,7 @@ style.css（全局结构，主题无关）
   |
   +-- theme-base-light.css（浅色公共样式 + CSS 变量）
   |     +-- theme-default.css（薄荷）
-  |     +-- theme-ocean.css（天空蓝）
+  |     +-- theme-ocean.css（海洋）
   |     +-- theme-sakura.css（樱花）
   |     +-- theme-minimal.css（极简）
   |
@@ -466,7 +466,7 @@ App.register({
 src/main/resources/static/
   +-- gateway-beautify.css    # 公共样式（所有网关主题共享）
   +-- gateway-default.css     # 薄荷主题
-  +-- gateway-ocean.css       # 天空蓝主题
+  +-- gateway-ocean.css       # 海洋主题
   +-- gateway-sakura.css      # 樱花主题
   +-- gateway-dark.css        # 暗夜主题
   +-- gateway-deepblue.css    # 深邃蓝主题
