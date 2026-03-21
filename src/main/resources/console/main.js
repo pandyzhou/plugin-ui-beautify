@@ -1005,18 +1005,17 @@
       }
       var self = this;
       var candidates = document.querySelectorAll(
-        ".main-content .card-header > div, " +
-        ".main-content .card-header [class*='bg-white'], .main-content .card-header [class*='bg-gray-50'], .main-content .card-header [class*='bg-gray-100'], " +
-        ".main-content .card:not(.card-wrapper) [class*='bg-white'], .main-content .card:not(.card-wrapper) [class*='bg-gray-50'], .main-content .card:not(.card-wrapper) [class*='bg-gray-100'], " +
-        ".main-content .card:not(.card-wrapper) [class*='border-b-gray-100'], .main-content .card:not(.card-wrapper) [class*='border-gray-100'], " +
-        ".main-content .group[class*='bg-white'], .main-content .flex[class*='bg-white']"
+        ".main-content div, .main-content section, .main-content header, .main-content aside"
       );
       candidates.forEach(function(el) {
         if (!el || !el.dataset || el.dataset.uiDarkCompatPatched === "1") return;
         var tag = el.tagName;
         if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG" || tag === "IMG") return;
+        var rect = el.getBoundingClientRect();
+        if (rect.width < 220 || rect.height < 24 || rect.height > 140) return;
+        if (rect.top < 0 || rect.top > Math.max(320, window.innerHeight * 0.35)) return;
         var style = window.getComputedStyle(el);
-        if (style.display === "inline") return;
+        if (style.display === "inline" || style.visibility === "hidden") return;
         if (!ColorUtils.isLightBackground(style.backgroundColor)) return;
         el.dataset.uiDarkCompatPatched = "1";
         el.dataset.uiDarkCompatBg = el.style.backgroundColor || "";
@@ -1024,9 +1023,7 @@
         el.dataset.uiDarkCompatColor = el.style.color || "";
         el.style.backgroundColor = "var(--ui-surface)";
         el.style.borderColor = "var(--ui-border)";
-        if (tag === "DIV" || tag === "SECTION" || tag === "HEADER" || tag === "ASIDE") {
-          el.style.color = "var(--ui-text)";
-        }
+        el.style.color = "var(--ui-text)";
         self._patched.push(el);
       });
     },
@@ -1041,6 +1038,7 @@
       });
       this._timers.push(setTimeout(function() { self._scan(); }, 200));
       this._timers.push(setTimeout(function() { self._scan(); }, 800));
+      this._timers.push(setTimeout(function() { self._scan(); }, 1800));
     },
     _clear: function() {
       this._patched.forEach(function(el) {
