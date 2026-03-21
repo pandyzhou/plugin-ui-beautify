@@ -22,48 +22,50 @@
     return sb ? sb.getBoundingClientRect().width : 260;
   }
 
-  function cssColorToRgba(color, alpha, fallback) {
-    if (!color || !color.trim()) return fallback;
-    color = color.trim();
-    if (color.startsWith("rgb")) {
-      var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-      return match
-        ? ("rgba(" + match[1] + "," + match[2] + "," + match[3] + "," + alpha + ")")
-        : fallback;
-    }
-    if (color.startsWith("#")) {
-      var hex = color.slice(1);
-      if (hex.length === 3) {
-        hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+  var ColorUtils = {
+    toRgba: function(color, alpha, fallback) {
+      if (!color || !color.trim()) return fallback;
+      color = color.trim();
+      if (color.startsWith("rgb")) {
+        var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        return match
+          ? ("rgba(" + match[1] + "," + match[2] + "," + match[3] + "," + alpha + ")")
+          : fallback;
       }
-      if (hex.length === 6) {
-        var r = parseInt(hex.slice(0, 2), 16);
-        var g = parseInt(hex.slice(2, 4), 16);
-        var b = parseInt(hex.slice(4, 6), 16);
-        return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+      if (color.startsWith("#")) {
+        var hex = color.slice(1);
+        if (hex.length === 3) {
+          hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+        }
+        if (hex.length === 6) {
+          var r = parseInt(hex.slice(0, 2), 16);
+          var g = parseInt(hex.slice(2, 4), 16);
+          var b = parseInt(hex.slice(4, 6), 16);
+          return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+        }
       }
-    }
-    return fallback;
-  }
+      return fallback;
+    },
 
-  function cssColorToRgbTriplet(color, fallback) {
-    if (!color || !color.trim()) return fallback;
-    color = color.trim();
-    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
-      var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-      return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
-    }
-    if (color.startsWith("#")) {
-      var hex = color.slice(1);
-      if (hex.length === 3) {
-        hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+    toRgbTriplet: function(color, fallback) {
+      if (!color || !color.trim()) return fallback;
+      color = color.trim();
+      if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
+        var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
       }
-      if (hex.length === 6) {
-        return parseInt(hex.slice(0, 2), 16) + "," + parseInt(hex.slice(2, 4), 16) + "," + parseInt(hex.slice(4, 6), 16);
+      if (color.startsWith("#")) {
+        var hex = color.slice(1);
+        if (hex.length === 3) {
+          hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
+        }
+        if (hex.length === 6) {
+          return parseInt(hex.slice(0, 2), 16) + "," + parseInt(hex.slice(2, 4), 16) + "," + parseInt(hex.slice(4, 6), 16);
+        }
       }
+      return fallback;
     }
-    return fallback;
-  }
+  };
 
   /* ========== APP CORE — Config, Router, Module Registry ========== */
 
@@ -643,7 +645,7 @@
       if (!c) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        c = cssColorToRgba(primary, 0.12, this._COLORS["minimal"] || this._COLORS["default"]);
+        c = ColorUtils.toRgba(primary, 0.12, this._COLORS["minimal"] || this._COLORS["default"]);
       }
       this._el.style.background = "radial-gradient(circle," + c + " 0%,transparent 70%)";
     },
@@ -758,7 +760,7 @@
       if (!grad) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        var rgb = cssColorToRgbTriplet(primary, "99,102,241");
+        var rgb = ColorUtils.toRgbTriplet(primary, "99,102,241");
         grad = "radial-gradient(ellipse at 40% 40%,rgba(" + rgb + ",0.06) 0%,transparent 60%)";
       }
       this._inner.style.background = grad;
@@ -1082,7 +1084,7 @@
       if (!this._color) {
         var style = getComputedStyle(document.documentElement);
         var primary = style.getPropertyValue("--ui-primary").trim();
-        this._color = cssColorToRgbTriplet(primary, this._COLORS["minimal"] || this._COLORS["default"]);
+        this._color = ColorUtils.toRgbTriplet(primary, this._COLORS["minimal"] || this._COLORS["default"]);
       }
     },
     _startDraw: function() {
