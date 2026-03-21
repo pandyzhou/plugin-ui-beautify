@@ -25,13 +25,13 @@
     if (!color) return fallback;
     color = color.trim();
     if (!color) return fallback;
-    if (color.indexOf("rgba(") === 0) {
+    if (color.startsWith("rgba(")) {
       return color.replace(/rgba\(([^)]+),[^,]+\)$/, "rgba($1," + alpha + ")");
     }
-    if (color.indexOf("rgb(") === 0) {
+    if (color.startsWith("rgb(")) {
       return color.replace("rgb(", "rgba(").replace(")", "," + alpha + ")");
     }
-    if (color.charAt(0) === "#") {
+    if (color.startsWith("#")) {
       var hex = color.slice(1);
       if (hex.length === 3) {
         hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
@@ -50,11 +50,11 @@
     if (!color) return fallback;
     color = color.trim();
     if (!color) return fallback;
-    if (color.indexOf("rgb(") === 0 || color.indexOf("rgba(") === 0) {
+    if (color.startsWith("rgb(") || color.startsWith("rgba(")) {
       var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
       return match ? (match[1] + "," + match[2] + "," + match[3]) : fallback;
     }
-    if (color.charAt(0) === "#") {
+    if (color.startsWith("#")) {
       var hex = color.slice(1);
       if (hex.length === 3) {
         hex = hex.split("").map(function(ch) { return ch + ch; }).join("");
