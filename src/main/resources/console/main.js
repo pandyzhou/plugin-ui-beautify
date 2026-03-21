@@ -192,25 +192,61 @@
         return existing;
       }
 
+      var loadingId = id + "-loading";
+      var inFlight = document.getElementById(loadingId);
+      if (inFlight) {
+        if (inFlight.dataset[dataKey] === dataValue) {
+          return inFlight;
+        }
+        if (typeof inFlight._uiBeautifyCleanup === "function") {
+          inFlight._uiBeautifyCleanup();
+        } else if (inFlight.parentNode) {
+          inFlight.remove();
+        }
+      }
+
       var link = document.createElement("link");
       var oldLink = existing;
       var settled = false;
-      link.id = id + "-loading";
+      var timeoutId = null;
+      link.id = loadingId;
       link.rel = "stylesheet";
       link.dataset[dataKey] = dataValue;
       link.href = href;
 
+      function cleanup() {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        link.onload = null;
+        link.onerror = null;
+        link._uiBeautifyCleanup = null;
+      }
+
       function finalize() {
         if (settled) return;
         settled = true;
+        cleanup();
         link.id = id;
         if (oldLink && oldLink.parentNode) {
           oldLink.remove();
         }
       }
 
+      function discard() {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        if (link.parentNode) {
+          link.remove();
+        }
+      }
+
+      link._uiBeautifyCleanup = discard;
       link.onload = finalize;
-      setTimeout(finalize, 2000);
+      link.onerror = discard;
+      timeoutId = setTimeout(discard, 2000);
 
       if (anchorEl && anchorEl.parentNode) {
         if (anchorEl.nextSibling) {
