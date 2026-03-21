@@ -1500,19 +1500,19 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
     },
     _cleanup: function() {
       [
-        ".ui-plugin-page-toolbar",
-        ".ui-app-store-toolbar",
-        ".ui-app-store-filter-panel",
-        ".ui-app-store-chip",
-        ".ui-app-store-chip-active",
-        ".ui-app-store-toolbar-icon",
-        ".ui-app-store-preview",
-        ".ui-dashboard-quick-action",
-        ".ui-dashboard-quick-action-icon",
-        ".ui-dashboard-quick-action-arrow"
-      ].forEach(function(selector) {
-        document.querySelectorAll(selector).forEach(function(el) {
-          el.classList.remove(selector.slice(1));
+        "ui-plugin-page-toolbar",
+        "ui-app-store-toolbar",
+        "ui-app-store-filter-panel",
+        "ui-app-store-chip",
+        "ui-app-store-chip-active",
+        "ui-app-store-toolbar-icon",
+        "ui-app-store-preview",
+        "ui-dashboard-quick-action",
+        "ui-dashboard-quick-action-icon",
+        "ui-dashboard-quick-action-arrow"
+      ].forEach(function(className) {
+        document.querySelectorAll("." + className).forEach(function(el) {
+          el.classList.remove(className);
         });
       });
     },
