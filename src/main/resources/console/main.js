@@ -25,14 +25,11 @@
   function cssColorToRgba(color, alpha, fallback) {
     if (!color || !color.trim()) return fallback;
     color = color.trim();
-    if (color.startsWith("rgba(")) {
-      var rgbaMatch = color.match(/rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,/);
-      return rgbaMatch
-        ? ("rgba(" + rgbaMatch[1] + "," + rgbaMatch[2] + "," + rgbaMatch[3] + "," + alpha + ")")
+    if (color.startsWith("rgb")) {
+      var match = color.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      return match
+        ? ("rgba(" + match[1] + "," + match[2] + "," + match[3] + "," + alpha + ")")
         : fallback;
-    }
-    if (color.startsWith("rgb(")) {
-      return color.replace("rgb(", "rgba(").replace(")", "," + alpha + ")");
     }
     if (color.startsWith("#")) {
       var hex = color.slice(1);
