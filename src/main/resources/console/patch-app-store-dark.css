@@ -53,6 +53,20 @@ body.ui-route-app-store .card-body aside input[type="radio"] {
   border-color: var(--ui-border) !important;
 }
 
+body.ui-route-app-store .card-body aside fieldset input:checked + label {
+  color: var(--ui-text) !important;
+  font-weight: 600 !important;
+}
+
+body.ui-route-app-store .card-body aside fieldset input:checked + label::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.8));
+}
+
 body.ui-route-app-store .ui-app-store-toolbar-icon {
   background: rgba(51,65,85,0.7) !important;
   border: 1px solid var(--ui-border) !important;
