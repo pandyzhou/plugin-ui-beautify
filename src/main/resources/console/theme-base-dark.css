@@ -376,7 +376,14 @@ body .shadow, body .shadow-md { box-shadow: 0 4px 12px var(--ui-shadow) !importa
 /* Empty state */
 .empty-wrapper { color: var(--ui-text-secondary) !important; }
 .empty-title { color: var(--ui-text) !important; }
-.empty-message { color: var(--ui-text-muted) !important; }
+.empty-message {
+  color: var(--ui-text-secondary) !important;
+  opacity: 0.92 !important;
+}
+.alert-description,
+.alert-default .alert-description {
+  color: var(--ui-text-secondary) !important;
+}
 /* Widget cards */
 .widget-card { background-color: var(--ui-surface) !important; }
 /* Avatar */
