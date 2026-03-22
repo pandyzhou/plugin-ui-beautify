@@ -1589,6 +1589,7 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
       this._patchPluginPageToolbars();
       this._patchAppStorePage();
       this._patchDashboardQuickActions();
+      this._patchEmptyStatePagination();
     },
     _looksLikeHeaderActionArea: function(el) {
       // 优先依赖交互结构判断工具栏，而不是依赖编译后的工具类名。
@@ -1699,26 +1700,23 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
         }
       });
     },
-    _patchDashboardQuickActions: function() {
-      if (!document.body.classList.contains("ui-route-dashboard")) return;
+    _patchEmptyStatePagination: function() {
+      [
+        "ui-route-equipments",
+        "ui-route-timeline",
+        "ui-route-friends"
+      ].forEach(function(routeClass) {
+        if (!document.body.classList.contains(routeClass)) {
+          return;
+        }
 
-      // 快捷访问卡片没有专门的数据属性，这里使用“标题 + 主图标 + 右上角 aria-hidden 箭头”组合来识别。
-      document.querySelectorAll(".dashboard [aria-hidden='true']").forEach(function(arrow) {
-        var card = arrow.parentElement;
-        if (!(card instanceof HTMLElement)) return;
-
-        var title = card.querySelector("h3");
-        var icon = Array.from(card.querySelectorAll("span")).find(function(span) {
-          return span !== arrow && !!span.querySelector("svg");
+        document.querySelectorAll('.pagination__select option').forEach(function(option) {
+          if (option.textContent && option.textContent.trim() === '1 / 0') {
+            option.remove();
+          }
         });
-
-        if (!title || !icon || card.querySelectorAll("svg").length < 2) return;
-
-        card.classList.add("ui-dashboard-quick-action");
-        icon.classList.add("ui-dashboard-quick-action-icon");
-        arrow.classList.add("ui-dashboard-quick-action-arrow");
       });
-    }
+    },
   });
 
   /* --- Module: Shadow Theme Bridge --- */
