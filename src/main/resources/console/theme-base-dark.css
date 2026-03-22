@@ -20,6 +20,7 @@
   --ui-scrollbar: rgba(255,255,255,0.15);
   --ui-scrollbar-hover: rgba(255,255,255,0.25);
   --ui-overlay: rgba(0,0,0,0.6);
+  --ui-opacity-subtle: 0.92;
 }
 
 /* === 1. Body === */
@@ -378,7 +379,7 @@ body .shadow, body .shadow-md { box-shadow: 0 4px 12px var(--ui-shadow) !importa
 .empty-title { color: var(--ui-text) !important; }
 .empty-message {
   color: var(--ui-text-secondary) !important;
-  opacity: 0.92 !important;
+  opacity: var(--ui-opacity-subtle) !important;
 }
 .alert-description,
 .alert-default .alert-description {
