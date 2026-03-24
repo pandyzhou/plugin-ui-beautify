@@ -1322,7 +1322,6 @@
   App.register({
     id: "buttonRipple", skipIfReducedMotion: true,
     _styleEl: null, _handler: null,
-    _styleCache: new WeakMap(),
     init: function() {
       var self = this;
       this._styleEl = document.createElement("style");
@@ -1340,24 +1339,14 @@
         if (r.width === 0 || r.height === 0) return;
         var size = Math.max(r.width, r.height);
         
-        var cachedStyle = self._styleCache.get(btn);
-        if (!cachedStyle) {
-            var computedStyle = window.getComputedStyle(btn);
-            var zIndex = computedStyle.zIndex;
-            if (zIndex === "auto" || isNaN(parseInt(zIndex, 10))) {
-                zIndex = "1000"; // Fallback if no specific z-index is set
-            } else {
-                // Ensure ripple is above the button by incrementing its z-index slightly
-                // while keeping it as a string
-                zIndex = (parseInt(zIndex, 10) + 1).toString();
-            }
-
-            cachedStyle = {
-                borderRadius: computedStyle.borderRadius,
-                color: computedStyle.color || "currentColor",
-                zIndex: zIndex
-            };
-            self._styleCache.set(btn, cachedStyle);
+        var computedStyle = window.getComputedStyle(btn);
+        var zIndex = computedStyle.zIndex;
+        if (zIndex === "auto" || isNaN(parseInt(zIndex, 10))) {
+            zIndex = "1000"; // Fallback if no specific z-index is set
+        } else {
+            // Ensure ripple is above the button by incrementing its z-index slightly
+            // while keeping it as a string
+            zIndex = (parseInt(zIndex, 10) + 1).toString();
         }
 
         var container = document.createElement("div");
@@ -1365,12 +1354,12 @@
           position: "fixed",
           pointerEvents: "none",
           overflow: "hidden",
-          zIndex: cachedStyle.zIndex,
+          zIndex: zIndex,
           left: r.left + "px",
           top: r.top + "px",
           width: r.width + "px",
           height: r.height + "px",
-          borderRadius: cachedStyle.borderRadius
+          borderRadius: computedStyle.borderRadius
         });
 
         var clientX = e.detail === 0 ? r.left + r.width / 2 : e.clientX;
@@ -1383,7 +1372,7 @@
           height: size + "px",
           left: (clientX - r.left - size / 2) + "px",
           top: (clientY - r.top - size / 2) + "px",
-          background: cachedStyle.color
+          background: computedStyle.color || "currentColor"
         });
         
         container.appendChild(rip);
@@ -1400,7 +1389,6 @@
       if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
       this._handler = null;
       this._styleEl = null;
-      this._styleCache = new WeakMap();
     }
   });
 
