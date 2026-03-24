@@ -1341,7 +1341,9 @@
         
         var computedStyle = window.getComputedStyle(btn);
         
-        // Find effective z-index by walking up the tree
+        // To prevent Vue/Virtual DOM from stripping positioning classes, the ripple uses a detached fixed container.
+        // We traverse up from btn (currentEl) to find the nearest explicit stacking context (elStyle.zIndex !== "auto").
+        // Once found, we add 1 to that z-index for effectiveZIndex to ensure the ripple renders above the target control/context.
         var effectiveZIndex = "1000"; // Ultimate fallback
         var currentEl = btn;
         while (currentEl && currentEl !== document.body) {
