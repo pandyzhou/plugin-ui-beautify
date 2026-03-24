@@ -1322,7 +1322,6 @@
   App.register({
     id: "buttonRipple", skipIfReducedMotion: true,
     _styleEl: null, _handler: null,
-    _rippleContainer: null,
     _styleCache: new WeakMap(),
     init: function() {
       var self = this;
@@ -1331,16 +1330,6 @@
         "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
         "._ui_ripple{position:absolute;border-radius:50%;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
       document.head.appendChild(this._styleEl);
-      
-      this._rippleContainer = document.createElement("div");
-      Object.assign(this._rippleContainer.style, {
-        position: "fixed",
-        pointerEvents: "none",
-        overflow: "hidden",
-        zIndex: window.__UI_BEAUTIFY_ZINDEX_RIPPLE || "1000",
-        display: "none"
-      });
-      document.body.appendChild(this._rippleContainer);
 
       this._handler = function(e) {
         if (!App.isEnabled("enableEffects")) return;
@@ -1361,8 +1350,12 @@
             self._styleCache.set(btn, cachedStyle);
         }
 
-        Object.assign(self._rippleContainer.style, {
-          display: "block",
+        var container = document.createElement("div");
+        Object.assign(container.style, {
+          position: "fixed",
+          pointerEvents: "none",
+          overflow: "hidden",
+          zIndex: window.__UI_BEAUTIFY_ZINDEX_RIPPLE || "1000",
           left: r.left + "px",
           top: r.top + "px",
           width: r.width + "px",
@@ -1383,13 +1376,11 @@
           background: cachedStyle.color
         });
         
-        self._rippleContainer.appendChild(rip);
+        container.appendChild(rip);
+        document.body.appendChild(container);
         
         setTimeout(function() {
-            if (rip.parentNode) rip.remove();
-            if (self._rippleContainer && self._rippleContainer.childNodes.length === 0) {
-                self._rippleContainer.style.display = "none";
-            }
+            if (container.parentNode) container.remove();
         }, 550);
       };
       document.addEventListener("click", this._handler);
@@ -1397,10 +1388,8 @@
     destroy: function() {
       if (this._handler) document.removeEventListener("click", this._handler);
       if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
-      if (this._rippleContainer && this._rippleContainer.parentNode) this._rippleContainer.remove();
       this._handler = null;
       this._styleEl = null;
-      this._rippleContainer = null;
       this._styleCache = new WeakMap();
     }
   });
