@@ -1326,19 +1326,31 @@
       this._styleEl = document.createElement("style");
       this._styleEl.textContent =
         "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
-        "._ui_ripple-host{position:relative!important;overflow:hidden!important}" +
-        "._ui_ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
+        "._ui_ripple{position:absolute;border-radius:50%;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
       document.head.appendChild(this._styleEl);
       this._handler = function(e) {
         if (!App.isEnabled("enableEffects")) return;
         var btn = e.target.closest("button, .btn, [role='button'], a.action-btn");
         if (!btn) return;
-        btn.classList.add("_ui_ripple-host");
-        var r = btn.getBoundingClientRect(), size = Math.max(r.width, r.height);
-        var rip = document.createElement("span"); rip.className = "_ui_ripple";
-        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;";
-        btn.appendChild(rip);
-        setTimeout(function() { rip.remove(); }, 550);
+        
+        var r = btn.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return;
+        var size = Math.max(r.width, r.height);
+        
+        var container = document.createElement("div");
+        var style = window.getComputedStyle(btn);
+        container.style.cssText = "position:fixed; pointer-events:none; overflow:hidden; z-index:99999;" +
+          "left:" + r.left + "px; top:" + r.top + "px; width:" + r.width + "px; height:" + r.height + "px;" +
+          "border-radius:" + style.borderRadius + ";";
+
+        var rip = document.createElement("span");
+        rip.className = "_ui_ripple";
+        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;background:" + (style.color || "currentColor") + ";";
+        
+        container.appendChild(rip);
+        document.body.appendChild(container);
+        
+        setTimeout(function() { if (container.parentNode) container.remove(); }, 550);
       };
       document.addEventListener("click", this._handler);
     },
