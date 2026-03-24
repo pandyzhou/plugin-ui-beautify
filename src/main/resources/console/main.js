@@ -1323,22 +1323,71 @@
     id: "buttonRipple", skipIfReducedMotion: true,
     _styleEl: null, _handler: null,
     init: function() {
+      var self = this;
       this._styleEl = document.createElement("style");
       this._styleEl.textContent =
         "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
-        "._ui_ripple-host{position:relative!important;overflow:hidden!important}" +
-        "._ui_ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
+        "._ui_ripple{position:absolute;border-radius:50%;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
       document.head.appendChild(this._styleEl);
+
       this._handler = function(e) {
         if (!App.isEnabled("enableEffects")) return;
         var btn = e.target.closest("button, .btn, [role='button'], a.action-btn");
         if (!btn) return;
-        btn.classList.add("_ui_ripple-host");
-        var r = btn.getBoundingClientRect(), size = Math.max(r.width, r.height);
-        var rip = document.createElement("span"); rip.className = "_ui_ripple";
-        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;";
-        btn.appendChild(rip);
-        setTimeout(function() { rip.remove(); }, 550);
+        
+        var r = btn.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return;
+        var size = Math.max(r.width, r.height);
+        
+        var computedStyle = window.getComputedStyle(btn);
+        
+        // To prevent Vue/Virtual DOM from stripping positioning classes, the ripple uses a detached fixed container.
+        // We traverse up from btn (currentEl) to find the nearest explicit stacking context (elStyle.zIndex !== "auto").
+        // Once found, we add 1 to that z-index for effectiveZIndex to ensure the ripple renders above the target control/context.
+        var effectiveZIndex = "1000"; // Ultimate fallback
+        var currentEl = btn;
+        while (currentEl && currentEl !== document.body) {
+            var elStyle = window.getComputedStyle(currentEl);
+            if (elStyle.zIndex !== "auto" && !isNaN(parseInt(elStyle.zIndex, 10))) {
+                // We found a stacking context, use its z-index + 1
+                effectiveZIndex = (parseInt(elStyle.zIndex, 10) + 1).toString();
+                break;
+            }
+            currentEl = currentEl.parentElement;
+        }
+
+        var container = document.createElement("div");
+        Object.assign(container.style, {
+          position: "fixed",
+          pointerEvents: "none",
+          overflow: "hidden",
+          zIndex: effectiveZIndex,
+          left: r.left + "px",
+          top: r.top + "px",
+          width: r.width + "px",
+          height: r.height + "px",
+          borderRadius: computedStyle.borderRadius
+        });
+
+        var clientX = e.detail === 0 ? r.left + r.width / 2 : e.clientX;
+        var clientY = e.detail === 0 ? r.top + r.height / 2 : e.clientY;
+
+        var rip = document.createElement("span");
+        rip.className = "_ui_ripple";
+        Object.assign(rip.style, {
+          width: size + "px",
+          height: size + "px",
+          left: (clientX - r.left - size / 2) + "px",
+          top: (clientY - r.top - size / 2) + "px",
+          background: computedStyle.color || "currentColor"
+        });
+        
+        container.appendChild(rip);
+        document.body.appendChild(container);
+        
+        setTimeout(function() {
+            if (container.parentNode) container.remove();
+        }, 550);
       };
       document.addEventListener("click", this._handler);
     },
