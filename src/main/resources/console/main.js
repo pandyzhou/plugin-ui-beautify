@@ -1322,12 +1322,20 @@
   App.register({
     id: "buttonRipple", skipIfReducedMotion: true,
     _styleEl: null, _handler: null,
+    _rippleContainer: null,
+    _styleCache: new WeakMap(),
     init: function() {
+      var self = this;
       this._styleEl = document.createElement("style");
       this._styleEl.textContent =
         "@keyframes _ui_ripple{0%{transform:scale(0);opacity:0.35}100%{transform:scale(4);opacity:0}}" +
         "._ui_ripple{position:absolute;border-radius:50%;pointer-events:none;animation:_ui_ripple .5s ease-out forwards}";
       document.head.appendChild(this._styleEl);
+      
+      this._rippleContainer = document.createElement("div");
+      this._rippleContainer.style.cssText = "position:fixed; pointer-events:none; overflow:hidden; z-index:" + (window.__UI_BEAUTIFY_ZINDEX_RIPPLE || 1000) + "; display:none;";
+      document.body.appendChild(this._rippleContainer);
+
       this._handler = function(e) {
         if (!App.isEnabled("enableEffects")) return;
         var btn = e.target.closest("button, .btn, [role='button'], a.action-btn");
@@ -1337,28 +1345,46 @@
         if (r.width === 0 || r.height === 0) return;
         var size = Math.max(r.width, r.height);
         
-        var container = document.createElement("div");
-        var style = window.getComputedStyle(btn);
-        container.style.cssText = "position:fixed; pointer-events:none; overflow:hidden; z-index:99999;" +
-          "left:" + r.left + "px; top:" + r.top + "px; width:" + r.width + "px; height:" + r.height + "px;" +
-          "border-radius:" + style.borderRadius + ";";
+        var cachedStyle = self._styleCache.get(btn);
+        if (!cachedStyle) {
+            var computedStyle = window.getComputedStyle(btn);
+            cachedStyle = {
+                borderRadius: computedStyle.borderRadius,
+                color: computedStyle.color || "currentColor"
+            };
+            self._styleCache.set(btn, cachedStyle);
+        }
+
+        self._rippleContainer.style.display = "block";
+        self._rippleContainer.style.left = r.left + "px";
+        self._rippleContainer.style.top = r.top + "px";
+        self._rippleContainer.style.width = r.width + "px";
+        self._rippleContainer.style.height = r.height + "px";
+        self._rippleContainer.style.borderRadius = cachedStyle.borderRadius;
 
         var rip = document.createElement("span");
         rip.className = "_ui_ripple";
-        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;background:" + (style.color || "currentColor") + ";";
+        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;background:" + cachedStyle.color + ";";
         
-        container.appendChild(rip);
-        document.body.appendChild(container);
+        self._rippleContainer.appendChild(rip);
         
-        setTimeout(function() { if (container.parentNode) container.remove(); }, 550);
+        setTimeout(function() {
+            if (rip.parentNode) rip.remove();
+            if (self._rippleContainer && self._rippleContainer.childNodes.length === 0) {
+                self._rippleContainer.style.display = "none";
+            }
+        }, 550);
       };
       document.addEventListener("click", this._handler);
     },
     destroy: function() {
       if (this._handler) document.removeEventListener("click", this._handler);
       if (this._styleEl && this._styleEl.parentNode) this._styleEl.remove();
+      if (this._rippleContainer && this._rippleContainer.parentNode) this._rippleContainer.remove();
       this._handler = null;
       this._styleEl = null;
+      this._rippleContainer = null;
+      this._styleCache = new WeakMap();
     }
   });
 
