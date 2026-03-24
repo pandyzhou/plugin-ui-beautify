@@ -1343,9 +1343,19 @@
         var cachedStyle = self._styleCache.get(btn);
         if (!cachedStyle) {
             var computedStyle = window.getComputedStyle(btn);
+            var zIndex = computedStyle.zIndex;
+            if (zIndex === "auto" || isNaN(parseInt(zIndex, 10))) {
+                zIndex = "1000"; // Fallback if no specific z-index is set
+            } else {
+                // Ensure ripple is above the button by incrementing its z-index slightly
+                // while keeping it as a string
+                zIndex = (parseInt(zIndex, 10) + 1).toString();
+            }
+
             cachedStyle = {
                 borderRadius: computedStyle.borderRadius,
-                color: computedStyle.color || "currentColor"
+                color: computedStyle.color || "currentColor",
+                zIndex: zIndex
             };
             self._styleCache.set(btn, cachedStyle);
         }
@@ -1355,7 +1365,7 @@
           position: "fixed",
           pointerEvents: "none",
           overflow: "hidden",
-          zIndex: window.__UI_BEAUTIFY_ZINDEX_RIPPLE || "1000",
+          zIndex: cachedStyle.zIndex,
           left: r.left + "px",
           top: r.top + "px",
           width: r.width + "px",
