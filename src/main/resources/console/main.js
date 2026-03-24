@@ -1333,7 +1333,13 @@
       document.head.appendChild(this._styleEl);
       
       this._rippleContainer = document.createElement("div");
-      this._rippleContainer.style.cssText = "position:fixed; pointer-events:none; overflow:hidden; z-index:" + (window.__UI_BEAUTIFY_ZINDEX_RIPPLE || 1000) + "; display:none;";
+      Object.assign(this._rippleContainer.style, {
+        position: "fixed",
+        pointerEvents: "none",
+        overflow: "hidden",
+        zIndex: window.__UI_BEAUTIFY_ZINDEX_RIPPLE || "1000",
+        display: "none"
+      });
       document.body.appendChild(this._rippleContainer);
 
       this._handler = function(e) {
@@ -1355,16 +1361,24 @@
             self._styleCache.set(btn, cachedStyle);
         }
 
-        self._rippleContainer.style.display = "block";
-        self._rippleContainer.style.left = r.left + "px";
-        self._rippleContainer.style.top = r.top + "px";
-        self._rippleContainer.style.width = r.width + "px";
-        self._rippleContainer.style.height = r.height + "px";
-        self._rippleContainer.style.borderRadius = cachedStyle.borderRadius;
+        Object.assign(self._rippleContainer.style, {
+          display: "block",
+          left: r.left + "px",
+          top: r.top + "px",
+          width: r.width + "px",
+          height: r.height + "px",
+          borderRadius: cachedStyle.borderRadius
+        });
 
         var rip = document.createElement("span");
         rip.className = "_ui_ripple";
-        rip.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(e.clientX-r.left-size/2)+"px;top:"+(e.clientY-r.top-size/2)+"px;background:" + cachedStyle.color + ";";
+        Object.assign(rip.style, {
+          width: size + "px",
+          height: size + "px",
+          left: (e.clientX - r.left - size / 2) + "px",
+          top: (e.clientY - r.top - size / 2) + "px",
+          background: cachedStyle.color
+        });
         
         self._rippleContainer.appendChild(rip);
         
