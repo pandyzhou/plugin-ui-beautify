@@ -1370,13 +1370,16 @@
           borderRadius: cachedStyle.borderRadius
         });
 
+        var clientX = e.detail === 0 ? r.left + r.width / 2 : e.clientX;
+        var clientY = e.detail === 0 ? r.top + r.height / 2 : e.clientY;
+
         var rip = document.createElement("span");
         rip.className = "_ui_ripple";
         Object.assign(rip.style, {
           width: size + "px",
           height: size + "px",
-          left: (e.clientX - r.left - size / 2) + "px",
-          top: (e.clientY - r.top - size / 2) + "px",
+          left: (clientX - r.left - size / 2) + "px",
+          top: (clientY - r.top - size / 2) + "px",
           background: cachedStyle.color
         });
         
