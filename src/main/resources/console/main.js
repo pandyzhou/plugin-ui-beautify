@@ -1340,13 +1340,18 @@
         var size = Math.max(r.width, r.height);
         
         var computedStyle = window.getComputedStyle(btn);
-        var zIndex = computedStyle.zIndex;
-        if (zIndex === "auto" || isNaN(parseInt(zIndex, 10))) {
-            zIndex = "1000"; // Fallback if no specific z-index is set
-        } else {
-            // Ensure ripple is above the button by incrementing its z-index slightly
-            // while keeping it as a string
-            zIndex = (parseInt(zIndex, 10) + 1).toString();
+        
+        // Find effective z-index by walking up the tree
+        var effectiveZIndex = "1000"; // Ultimate fallback
+        var currentEl = btn;
+        while (currentEl && currentEl !== document.body) {
+            var elStyle = window.getComputedStyle(currentEl);
+            if (elStyle.zIndex !== "auto" && !isNaN(parseInt(elStyle.zIndex, 10))) {
+                // We found a stacking context, use its z-index + 1
+                effectiveZIndex = (parseInt(elStyle.zIndex, 10) + 1).toString();
+                break;
+            }
+            currentEl = currentEl.parentElement;
         }
 
         var container = document.createElement("div");
@@ -1354,7 +1359,7 @@
           position: "fixed",
           pointerEvents: "none",
           overflow: "hidden",
-          zIndex: zIndex,
+          zIndex: effectiveZIndex,
           left: r.left + "px",
           top: r.top + "px",
           width: r.width + "px",
