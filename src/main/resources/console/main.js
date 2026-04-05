@@ -1749,6 +1749,26 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
         }
       });
     },
+    _patchDashboardQuickActions: function() {
+      if (!document.body.classList.contains("ui-route-dashboard")) return;
+
+      // 快捷访问卡片没有专门的数据属性，这里使用“标题 + 主图标 + 右上角 aria-hidden 箭头”组合来识别。
+      document.querySelectorAll(".dashboard [aria-hidden='true']").forEach(function(arrow) {
+        var card = arrow.parentElement;
+        if (!(card instanceof HTMLElement)) return;
+
+        var title = card.querySelector("h3");
+        var icon = Array.from(card.querySelectorAll("span")).find(function(span) {
+          return span !== arrow && !!span.querySelector("svg");
+        });
+
+        if (!title || !icon || card.querySelectorAll("svg").length < 2) return;
+
+        card.classList.add("ui-dashboard-quick-action");
+        icon.classList.add("ui-dashboard-quick-action-icon");
+        arrow.classList.add("ui-dashboard-quick-action-arrow");
+      });
+    },
     _patchEmptyStatePagination: function() {
       [
         "ui-route-equipments",

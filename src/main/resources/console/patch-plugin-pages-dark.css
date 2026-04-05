@@ -53,3 +53,10 @@ body.ui-route-photos .card-wrapper .card-body p.v-popper--has-tooltip {
   padding: 0.5rem 0.75rem 0.75rem !important;
   text-shadow: 0 1px 2px rgba(2, 6, 23, 0.35) !important;
 }
+
+body.ui-route-theme .rounded-b-base.bg-white,
+body.ui-route-theme .bg-white.px-4.py-4,
+body.ui-route-theme .border-t.border-gray-200 {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
