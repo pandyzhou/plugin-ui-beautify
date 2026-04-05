@@ -44,6 +44,18 @@ body.ui-route-plugins-app-store-integration .description-item__content {
   font-variant-numeric: tabular-nums;
 }
 
+body.ui-route-theme .rounded-b-base.bg-white,
+body.ui-route-theme .bg-white.px-4.py-4,
+body.ui-route-theme .border-t.border-gray-200,
+body.ui-route-plugins .rounded-b-base.bg-white,
+body.ui-route-plugins .bg-white.px-4.py-4,
+body.ui-route-plugins .border-t.border-gray-200,
+body.ui-route-overview .bg-white.px-4.py-4,
+body.ui-route-overview .border-t.border-gray-200 {
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+
 body.ui-route-photos .card-wrapper .card-body p.v-popper--has-tooltip {
   color: var(--ui-text) !important;
   font-size: 13px !important;

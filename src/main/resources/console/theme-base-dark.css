@@ -21,6 +21,13 @@
   --ui-scrollbar-hover: rgba(255,255,255,0.25);
   --ui-overlay: rgba(0,0,0,0.6);
   --ui-opacity-subtle: 0.92;
+  --ui-input-bg: rgba(15,23,42,0.72);
+  --ui-input-bg-hover: rgba(30,41,59,0.96);
+  --ui-input-border: rgba(148,163,184,0.18);
+  --ui-input-border-hover: rgba(148,163,184,0.28);
+  --ui-input-text: var(--ui-text);
+  --ui-input-placeholder: #94a3b8;
+  --ui-input-focus-ring: rgba(139,92,246,0.18);
 }
 
 /* === 1. Body === */
@@ -29,8 +36,15 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 /* === 2. Sidebar === */
 .sidebar { background: var(--ui-bg) !important; border-right: 1px solid var(--ui-border) !important; }
 .sidebar__logo-container img, .sidebar__logo-container svg { filter: brightness(1.8) !important; }
-.sidebar__search { background-color: var(--ui-surface) !important; border: 1px solid var(--ui-border) !important; color: var(--ui-text) !important; }
-.sidebar__search:hover { border-color: var(--ui-border-hover) !important; }
+.sidebar__search {
+  background-color: var(--ui-input-bg) !important;
+  border: 1px solid var(--ui-input-border) !important;
+  color: var(--ui-input-text) !important;
+}
+.sidebar__search:hover {
+  background-color: var(--ui-input-bg-hover) !important;
+  border-color: var(--ui-input-border-hover) !important;
+}
 .sidebar__search-text, .sidebar__search-shortcut { color: var(--ui-text-muted) !important; }
 .sidebar__profile { border-top: 1px solid var(--ui-border) !important; }
 
@@ -82,15 +96,29 @@ body { background-color: var(--ui-bg) !important; color: var(--ui-text) !importa
 /* === 9. Forms === */
 input[type="text"], input[type="email"], input[type="password"],
 input[type="url"], input[type="search"], input[type="number"],
-textarea, .formkit-outer select {
-  background: var(--ui-surface) !important; border-color: var(--ui-border) !important; color: var(--ui-text) !important;
+textarea, .formkit-outer select, .formkit-inner,
+.pagination__select, .mx-input {
+  background: var(--ui-input-bg) !important;
+  border-color: var(--ui-input-border) !important;
+  color: var(--ui-input-text) !important;
+}
+input[type="text"]:hover, input[type="email"]:hover, input[type="password"]:hover,
+input[type="url"]:hover, input[type="search"]:hover, input[type="number"]:hover,
+textarea:hover, .formkit-outer select:hover, .formkit-inner:hover,
+.pagination__select:hover, .mx-input:hover {
+  background: var(--ui-input-bg-hover) !important;
+  border-color: var(--ui-input-border-hover) !important;
 }
 .formkit-outer input[type="text"]:focus, .formkit-outer input[type="email"]:focus, .formkit-outer input[type="password"]:focus,
 .formkit-outer input[type="url"]:focus, .formkit-outer input[type="search"]:focus, .formkit-outer input[type="number"]:focus,
-.formkit-outer textarea:focus, .formkit-outer select:focus {
-  border-color: var(--ui-primary) !important; box-shadow: 0 0 0 3px var(--ui-primary-soft) !important;
+.formkit-outer textarea:focus, .formkit-outer select:focus, .formkit-inner:focus-within,
+.pagination__select:focus, .mx-input:focus {
+  border-color: var(--ui-primary) !important;
+  box-shadow: 0 0 0 3px var(--ui-input-focus-ring) !important;
 }
-input::placeholder, textarea::placeholder { color: var(--ui-text-muted) !important; }
+input::placeholder, textarea::placeholder, .mx-input::placeholder {
+  color: var(--ui-input-placeholder) !important;
+}
 .formkit-label { color: var(--ui-text) !important; }
 .formkit-help { color: var(--ui-text-muted) !important; }
 
@@ -112,9 +140,13 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 }
 .formkit-listbox, .formkit-dropdown-wrapper,
 [data-type="select"] .formkit-inner {
-  background-color: var(--ui-surface) !important; border-color: var(--ui-border) !important;
+  background-color: var(--ui-input-bg) !important;
+  border-color: var(--ui-input-border) !important;
 }
-.formkit-outer select option { background-color: var(--ui-bg) !important; color: var(--ui-text) !important; }
+.formkit-outer select option {
+  background-color: var(--ui-input-bg-hover) !important;
+  color: var(--ui-input-text) !important;
+}
 
 /* === 11. Modal (deep coverage) === */
 .modal-wrapper .modal-layer { backdrop-filter: blur(12px) !important; background: var(--ui-overlay) !important; }

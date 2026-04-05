@@ -20,6 +20,13 @@
   --ui-scrollbar: rgba(148,163,184,0.3);
   --ui-scrollbar-hover: rgba(148,163,184,0.5);
   --ui-overlay: rgba(255,255,255,0.8);
+  --ui-input-bg: rgba(255,255,255,0.96);
+  --ui-input-bg-hover: #ffffff;
+  --ui-input-border: rgba(148,163,184,0.28);
+  --ui-input-border-hover: rgba(99,102,241,0.2);
+  --ui-input-text: #0f172a;
+  --ui-input-placeholder: #64748b;
+  --ui-input-focus-ring: rgba(99,102,241,0.14);
 }
 
 /* === 1. Sidebar === */
@@ -32,13 +39,14 @@
 }
 .sidebar__search {
   border-radius: 0.75rem !important;
-  background-color: var(--ui-surface-hover) !important;
-  border: 1px solid var(--ui-border) !important;
-  color: var(--ui-text) !important;
+  background-color: var(--ui-input-bg) !important;
+  border: 1px solid var(--ui-input-border) !important;
+  color: var(--ui-input-text) !important;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .sidebar__search:hover {
-  border-color: var(--ui-border-hover) !important;
+  background-color: var(--ui-input-bg-hover) !important;
+  border-color: var(--ui-input-border-hover) !important;
 }
 .sidebar__profile {
   /* position: relative needed for ::before decorative pseudo-element */
@@ -149,23 +157,30 @@
 /* === 8. Forms === */
 input[type="text"], input[type="email"], input[type="password"],
 input[type="url"], input[type="search"], input[type="number"],
-textarea {
+textarea, .formkit-outer select, .formkit-inner,
+.pagination__select, .mx-input {
   border-radius: 0.625rem !important;
-  background: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  background: var(--ui-input-bg) !important;
+  border-color: var(--ui-input-border) !important;
+  color: var(--ui-input-text) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
 }
-.formkit-outer select {
-  background: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
-  color: var(--ui-text) !important;
+input[type="text"]:hover, input[type="email"]:hover, input[type="password"]:hover,
+input[type="url"]:hover, input[type="search"]:hover, input[type="number"]:hover,
+textarea:hover, .formkit-outer select:hover, .formkit-inner:hover,
+.pagination__select:hover, .mx-input:hover {
+  background: var(--ui-input-bg-hover) !important;
+  border-color: var(--ui-input-border-hover) !important;
 }
 .formkit-outer input[type="text"]:focus, .formkit-outer input[type="email"]:focus, .formkit-outer input[type="password"]:focus,
 .formkit-outer input[type="url"]:focus, .formkit-outer input[type="search"]:focus, .formkit-outer input[type="number"]:focus,
-.formkit-outer textarea:focus, .formkit-outer select:focus {
+.formkit-outer textarea:focus, .formkit-outer select:focus, .formkit-inner:focus-within,
+.pagination__select:focus, .mx-input:focus {
   border-color: var(--ui-primary) !important;
-  box-shadow: 0 0 0 3px var(--ui-primary-soft) !important;
+  box-shadow: 0 0 0 3px var(--ui-input-focus-ring) !important;
+}
+input::placeholder, textarea::placeholder, .mx-input::placeholder {
+  color: var(--ui-input-placeholder) !important;
 }
 .formkit-label { color: var(--ui-text) !important; }
 .formkit-help { color: var(--ui-text-muted) !important; }
@@ -190,8 +205,12 @@ li[role="option"]:hover, li[role="option"][aria-selected="true"],
 }
 .formkit-listbox, .formkit-dropdown-wrapper,
 [data-type="select"] .formkit-inner {
-  background-color: var(--ui-surface) !important;
-  border-color: var(--ui-border) !important;
+  background-color: var(--ui-input-bg) !important;
+  border-color: var(--ui-input-border) !important;
+}
+.formkit-outer select option {
+  background-color: var(--ui-input-bg-hover) !important;
+  color: var(--ui-input-text) !important;
 }
 
 /* === 10. Modal === */
