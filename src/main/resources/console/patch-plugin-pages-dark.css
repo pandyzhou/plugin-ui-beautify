@@ -35,6 +35,19 @@
   color: var(--ui-text-secondary) !important;
 }
 
+body .formkit-outer[data-type="select"] .select-container input[type="text"][readonly]:focus,
+body .formkit-outer[data-type="select"] .select-container input[type="text"][readonly]:focus-visible,
+body .formkit-outer[data-type="select"] input.formkit-input[type="text"][readonly]:focus,
+body .formkit-outer[data-type="select"] input.formkit-input[type="text"][readonly]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+}
+
 body.ui-route-plugins-app-store-integration .description-item__label {
   color: var(--ui-text-secondary) !important;
 }

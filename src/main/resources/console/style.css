@@ -236,14 +236,26 @@ select:disabled {
   background-position: right 0.75rem center !important;
   background-size: 12px !important;
 }
-.formkit-outer select:focus,
-.formkit-outer select:focus-visible,
-.form-select:focus,
-.form-select:focus-visible {
+body .formkit-outer[data-type="select"] select:focus,
+body .formkit-outer[data-type="select"] select:focus-visible,
+body [data-type="select"] select:focus,
+body [data-type="select"] select:focus-visible,
+body .form-select:focus,
+body .form-select:focus-visible,
+body .formkit-outer[data-type="select"] .formkit-inner:focus,
+body .formkit-outer[data-type="select"] .formkit-inner:focus-within,
+body [data-type="select"] .formkit-inner:focus,
+body [data-type="select"] .formkit-inner:focus-within,
+body .formkit-outer[data-type="select"][data-focused="true"] .formkit-inner,
+body .formkit-outer[data-type="select"][data-focus="true"] .formkit-inner,
+body [data-type="select"][data-focused="true"] .formkit-inner,
+body [data-type="select"][data-focus="true"] .formkit-inner {
   outline: none !important;
   box-shadow: none !important;
+  border-color: var(--ui-border, #e5e7eb) !important;
   --tw-ring-color: transparent !important;
   --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
 }
 
 /* --- Menu Item Hover Micro-shift --- */
