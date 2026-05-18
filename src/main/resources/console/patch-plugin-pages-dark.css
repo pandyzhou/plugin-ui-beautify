@@ -35,6 +35,25 @@
   color: var(--ui-text-secondary) !important;
 }
 
+body .formkit-outer input.formkit-input[type="text"]:focus,
+body .formkit-outer input.formkit-input[type="text"]:focus-visible,
+body .formkit-outer input.formkit-input:focus,
+body .formkit-outer input.formkit-input:focus-visible,
+body .formkit-outer textarea.formkit-input:focus,
+body .formkit-outer textarea.formkit-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+}
+
+body .formkit-outer .formkit-inner:focus-within {
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-shadow: 0 0 #0000 !important;
+}
+
 body .formkit-outer[data-type="select"] .select-container input[type="text"][readonly]:focus,
 body .formkit-outer[data-type="select"] .select-container input[type="text"][readonly]:focus-visible,
 body .formkit-outer[data-type="select"] input.formkit-input[type="text"][readonly]:focus,
