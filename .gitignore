@@ -25,3 +25,5 @@ Thumbs.db
 
 # Backup
 _backup/
+.narrafork/
+.worktrees/
