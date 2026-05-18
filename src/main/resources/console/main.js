@@ -1674,6 +1674,26 @@ function scan() { document.querySelectorAll("[role='tablist'], .tab-bar, .tabs")
           el.classList.add("ui-plugin-page-toolbar");
         }
       });
+
+      document.querySelectorAll(".main-content > div > div, .main-content > div > section, .main-content > div > header").forEach(function(el) {
+        if (
+          el.classList.contains("card-wrapper") ||
+          el.classList.contains("card-header") ||
+          el.classList.contains("page-header") ||
+          el.classList.contains("ui-plugin-page-toolbar")
+        ) return;
+
+        var rect = el.getBoundingClientRect();
+        if (rect.width < 160 || rect.height < 36 || rect.height > 120) return;
+
+        var style = window.getComputedStyle(el);
+        if (
+          ColorUtils.isLightBackground(style.backgroundColor) &&
+          self._looksLikeHeaderActionArea(el)
+        ) {
+          el.classList.add("ui-plugin-page-toolbar");
+        }
+      });
     },
     _patchAppStorePage: function() {
       if (!document.body.classList.contains("ui-route-app-store")) return;
