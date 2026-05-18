@@ -35,7 +35,7 @@ spec:
           label: "启用网关页面美化"
           name: enableGateway
           value: true
-          help: "关闭后登录、注册等网关页面不会注入美化样式，避免与前台主题冲突"
+          help: "若主题修改了登录和注册页面，请关闭该选项"
         - $formkit: select
           label: "网关页面风格"
           name: gatewayTheme

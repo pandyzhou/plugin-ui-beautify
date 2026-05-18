@@ -237,9 +237,13 @@ select:disabled {
   background-size: 12px !important;
 }
 .formkit-outer select:focus,
-.form-select:focus {
+.formkit-outer select:focus-visible,
+.form-select:focus,
+.form-select:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 2px var(--ui-primary-soft, rgba(99, 102, 241, 0.2)) !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
 }
 
 /* --- Menu Item Hover Micro-shift --- */
