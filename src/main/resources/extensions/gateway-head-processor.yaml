@@ -1,0 +1,9 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: ui-beautify-gateway-head-processor
+spec:
+  extensionPointName: template-head-processor
+  className: run.halo.ui.beautify.GatewayHeadProcessor
+  displayName: "UI Beautify Gateway Head Processor"
+  description: "Injects the gateway beautify loader into theme head for login, signup, and password reset pages"

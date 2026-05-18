@@ -27,9 +27,6 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
 
     private static final int MAX_RESPONSE_BODY_SIZE = 512 * 1024;
 
-    private static final String CSS_BASE =
-        "/plugins/" + PLUGIN_NAME + "/assets/static/";
-
     private static final String JS_BASE =
         "/plugins/" + PLUGIN_NAME + "/assets/static/";
 
@@ -114,15 +111,11 @@ public class GatewayStyleInjector implements AdditionalWebFilter {
             }
             return getGatewayTheme().flatMap(theme -> {
                 String injection =
-                    "<link rel=\"stylesheet\" href=\""
-                        + CSS_BASE + "gateway-beautify.css\" />\n"
-                        + "<link rel=\"stylesheet\" href=\""
-                        + CSS_BASE + "gateway-" + theme
-                        + ".css\" />\n"
-                        + "<script src=\"" + JS_BASE
-                        + "gateway-effects.js\" defer></script>\n"
-                        + "<script>window.__UI_BEAUTIFY_THEME__=\""
-                        + theme + "\";</script>\n";
+                    "<script>window.__UI_BEAUTIFY_GATEWAY__={theme:\""
+                        + theme + "\"};window.__UI_BEAUTIFY_THEME__=\""
+                        + theme + "\";</script>\n"
+                        + "<script id=\"ui-beautify-gateway-loader-js\" src=\""
+                        + JS_BASE + "gateway-loader.js\" defer></script>\n";
 
                 ServerHttpResponse originalResponse =
                     exchange.getResponse();
